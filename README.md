@@ -1,343 +1,109 @@
-# Cloudora – Modern Cloud Storage & Media Management Platform
+# Cloudora
 
-Cloudora is a high-performance cloud storage and digital media management platform inspired by Dropbox, Google Drive, and Cloudflare's developer-first aesthetic.
+Cloudora is a modern cloud storage and digital asset management platform engineered for speed, privacy, and minimalist aesthetics. Built with a React 18, Vite, and TypeScript frontend alongside an Express.js backend, Cloudora delivers a streamlined workspace for managing, streaming, and sharing media and files.
 
-This initial foundation delivers a **complete, responsive frontend application** and a **dedicated Node.js/Express authentication backend** powered by JSON Web Tokens (JWT) and Bcrypt password hashing.
-
----
-
-## ⚡ Architectural Scope & Boundaries
-
-In accordance with strict project scope boundaries:
-- **Completed**:
-  1. Complete frontend application (React 19, TypeScript, Tailwind CSS, Lucide icons, Dark/Light mode).
-  2. Separate Node.js backend (Express.js, TypeScript).
-  3. User registration with input validation and duplicate detection.
-  4. User login with password verification.
-  5. Stateless JWT authentication (`Authorization: Bearer <token>`).
-  6. 10-round salt Bcrypt password hashing.
-  7. Authentication middleware (`authenticate`).
-  8. Basic authorization middleware (`authorizeRoles`, `authorizeUserAccess`).
-  9. Client-side protected route boundaries (`ProtectedRoute`, `PublicRoute`).
-  10. User profile endpoint (`GET /api/auth/me`).
-  11. End-to-end Axios client integration with token persistence.
-- **Strictly Deferred to Future Engineering Phases (by User)**:
-  - Database schema engineering (PostgreSQL, Prisma ORM, migrations, indexing, connection pooling).
-  - Object storage engines (MinIO, AWS S3).
-  - Message brokers and background queues (Kafka, Redpanda, BullMQ).
-  - Media processing pipelines (FFmpeg, Sharp).
-  - In-memory caching and distributed rate-limiting (Redis).
-  - Infrastructure and containerization (Docker, Kubernetes, Nginx, CI/CD, Prometheus, Grafana).
+<p align="center">
+  <img src="docs/screenshots/hero-preview.png" alt="Cloudora Platform Hero Overview" width="100%" />
+</p>
 
 ---
 
-## 📁 Project Structure
+## Core Capabilities
 
-```text
-Cloudora/
-│
-├── client/
-│   ├── public/
-│   │   └── cloudora-icon.svg
-│   ├── src/
-│   │   ├── assets/
-│   │   ├── components/
-│   │   │   ├── common/
-│   │   │   │   ├── CloudoraLogo.tsx
-│   │   │   │   ├── FileTypeIcon.tsx
-│   │   │   │   └── ThemeToggle.tsx
-│   │   │   ├── layout/
-│   │   │   │   ├── AppLayout.tsx
-│   │   │   │   ├── Footer.tsx
-│   │   │   │   ├── Navbar.tsx
-│   │   │   │   ├── Sidebar.tsx
-│   │   │   │   └── TopNavbar.tsx
-│   │   │   └── ui/
-│   │   │       ├── Badge.tsx
-│   │   │       ├── Button.tsx
-│   │   │       ├── Input.tsx
-│   │   │       └── Modal.tsx
-│   │   ├── pages/
-│   │   │   ├── Landing/
-│   │   │   │   └── LandingPage.tsx
-│   │   │   ├── Auth/
-│   │   │   │   ├── LoginPage.tsx
-│   │   │   │   └── RegisterPage.tsx
-│   │   │   ├── Dashboard/
-│   │   │   │   └── DashboardPage.tsx
-│   │   │   ├── Files/
-│   │   │   │   └── FilesPage.tsx
-│   │   │   ├── Shared/
-│   │   │   │   └── SharedPage.tsx
-│   │   │   ├── Media/
-│   │   │   │   └── MediaPage.tsx
-│   │   │   ├── Recent/
-│   │   │   │   └── RecentPage.tsx
-│   │   │   ├── Starred/
-│   │   │   │   └── StarredPage.tsx
-│   │   │   ├── Trash/
-│   │   │   │   └── TrashPage.tsx
-│   │   │   └── Settings/
-│   │   │       └── SettingsPage.tsx
-│   │   ├── context/
-│   │   │   ├── AuthContext.tsx
-│   │   │   └── ThemeContext.tsx
-│   │   ├── hooks/
-│   │   │   ├── useAuth.ts
-│   │   │   └── useTheme.ts
-│   │   ├── services/
-│   │   │   ├── api.ts
-│   │   │   └── auth.service.ts
-│   │   ├── routes/
-│   │   │   ├── AppRoutes.tsx
-│   │   │   ├── ProtectedRoute.tsx
-│   │   │   └── PublicRoute.tsx
-│   │   ├── types/
-│   │   │   ├── auth.types.ts
-│   │   │   └── storage.types.ts
-│   │   ├── utils/
-│   │   │   ├── formatters.ts
-│   │   │   └── mockData.ts
-│   │   ├── App.tsx
-│   │   ├── index.css
-│   │   └── main.tsx
-│   ├── .env.example
-│   ├── index.html
-│   ├── package.json
-│   ├── postcss.config.js
-│   ├── tailwind.config.js
-│   └── tsconfig.json
-│
-├── server/
-│   ├── src/
-│   │   ├── config/
-│   │   │   └── env.ts
-│   │   ├── controllers/
-│   │   │   └── auth.controller.ts
-│   │   ├── middleware/
-│   │   │   ├── auth.middleware.ts
-│   │   │   └── error.middleware.ts
-│   │   ├── routes/
-│   │   │   └── auth.routes.ts
-│   │   ├── services/
-│   │   │   └── auth.service.ts
-│   │   ├── types/
-│   │   │   └── user.types.ts
-│   │   ├── utils/
-│   │   │   ├── errors.ts
-│   │   │   └── fileDb.ts
-│   │   ├── app.ts
-│   │   └── server.ts
-│   ├── data/
-│   │   └── users.json
-│   ├── .env.example
-│   ├── package.json
-│   └── tsconfig.json
-│
-├── .gitignore
-└── README.md
-```
+Cloudora provides a cohesive set of services designed to handle everyday file operations and rich media storage:
+
+* **Store**: High-throughput cloud storage, file hierarchy management, and categorized folder organization.
+* **Manage**: Dedicated media library for lossless audio, video, and image assets, accompanied by version tracking, metadata filtering, and bulk operations.
+* **Share**: Instant shareable links, granular access permissions, and cross-device synchronization.
+* **Monitor**: Real-time storage telemetry, upload tracking, transfer queues, and system notifications.
+* **Protect**: Cryptographic privacy tolerance, 30-day trash recovery lifecycle, and access-controlled endpoints.
+
+<p align="center">
+  <img src="docs/screenshots/features-preview.jpg" alt="Cloudora Core Capabilities" width="100%" />
+</p>
 
 ---
 
-## 🛠️ Technology Stack
+## Design System
 
-### Frontend (`client/`)
-- **React 19** with **TypeScript**
-- **Vite** (Next-generation lightning-fast bundler)
-- **Tailwind CSS v3.4** (Custom Cloudflare orange palette, hairline borders, dotted grid canvas)
-- **React Router DOM v7** (Client routing & navigation guards)
-- **Lucide React** (Clean, consistent iconography)
-- **Axios** (Configured with request and response interceptors)
-- **Urbanist** Google Font typography
-
-### Backend (`server/`)
-- **Node.js** & **Express.js** with **TypeScript**
-- **bcrypt** (Cost factor 10 password hashing)
-- **jsonwebtoken** (RFC 7519 signed JWT generation & verification)
-- **cors** (Strict origin validation)
-- **dotenv** (Configuration loading)
-- **Atomic File JSON Storage** (`server/data/users.json`)
+Cloudora is styled using a modern architectural aesthetic:
+* **Palette**: Pure black (`#07070A`), subtle charcoal surfaces (`#0A0A0E` / `#111116`), and high-contrast crisp white typography.
+* **Borderless Layout**: Flat document streams and tables separated exclusively by hairline bottom divider lines (`border-b border-white/[0.06]`), eliminating boxy cards and cluttered borders.
+* **Typography & Motion**: Bold condensed display headers paired with smooth marquee tickers and responsive micro-interactions.
 
 ---
 
-## 🔑 Authentication API Reference
+## Technology Stack
 
-Base URL: `http://localhost:5000/api`
+### Frontend
+* **Core**: React 18, TypeScript, Vite
+* **Styling**: Tailwind CSS, PostCSS, Autoprefixer
+* **Icons & UI**: Lucide React
+* **State & Routing**: React Router v6, Context API, Axios
 
-### 1. Register User
-`POST /auth/register`
-
-- **Request Body**:
-  ```json
-  {
-    "name": "Jane Doe",
-    "email": "jane@example.com",
-    "password": "Password@123"
-  }
-  ```
-- **Validation**:
-  - `name`: Min 2 characters.
-  - `email`: Valid RFC email syntax; duplicates rejected with `409 Conflict`.
-  - `password`: Min 8 characters; hashed with bcrypt before storing.
-- **Success Response (201 Created)**:
-  ```json
-  {
-    "success": true,
-    "message": "Account registered successfully.",
-    "data": {
-      "user": {
-        "id": "76495111-2df8-43bb-a309-fa9869612cbb",
-        "name": "Jane Doe",
-        "email": "jane@example.com",
-        "role": "USER",
-        "createdAt": "2026-11-06T06:55:31.019Z"
-      },
-      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-    }
-  }
-  ```
-
-### 2. Login User
-`POST /auth/login`
-
-- **Request Body**:
-  ```json
-  {
-    "email": "jane@example.com",
-    "password": "Password@123"
-  }
-  ```
-- **Security**: Compares password against bcrypt hash. Returns generic `401 Unauthorized` on mismatch or missing user to prevent account enumeration.
-- **Success Response (200 OK)**:
-  ```json
-  {
-    "success": true,
-    "message": "Login successful.",
-    "data": {
-      "user": {
-        "id": "76495111-2df8-43bb-a309-fa9869612cbb",
-        "name": "Jane Doe",
-        "email": "jane@example.com",
-        "role": "USER",
-        "createdAt": "2026-11-06T06:55:31.019Z"
-      },
-      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-    }
-  }
-  ```
-
-### 3. Get Current User Profile
-`GET /auth/me`
-
-- **Headers**:
-  ```text
-  Authorization: Bearer <token>
-  ```
-- **Security**: Protected by `authenticate` middleware. Rejects expired or missing tokens with `401`. Never returns `passwordHash`.
-- **Success Response (200 OK)**:
-  ```json
-  {
-    "success": true,
-    "data": {
-      "user": {
-        "id": "76495111-2df8-43bb-a309-fa9869612cbb",
-        "name": "Jane Doe",
-        "email": "jane@example.com",
-        "role": "USER",
-        "createdAt": "2026-11-06T06:55:31.019Z"
-      }
-    }
-  }
-  ```
-
-### 4. Logout User
-`POST /auth/logout`
-
-- **Response (200 OK)**:
-  ```json
-  {
-    "success": true,
-    "message": "User logged out successfully.",
-    "meta": {
-      "notice": "Stateless JWT cleared on client. Server-side token blacklisting will be integrated in future phases."
-    }
-  }
-  ```
+### Backend
+* **Runtime**: Node.js, Express.js, TypeScript (ts-node-dev)
+* **Authentication**: Stateless JSON Web Tokens (JWT), Bcrypt password hashing
+* **Validation**: Express middleware for schema validation and role-based guards
+* **CORS & Security**: Standard security headers and configured CORS policies
 
 ---
 
-## ⚠️ Current Limitations & Architectural Notes
-
-1. **Temporary JSON Persistence (`server/data/users.json`)**:
-   - The file-based JSON database is strictly a temporary storage mechanism for development and testing.
-   - It is **not production-grade** and lacks ACID transactions, row-level locks, and horizontal replication.
-   - It will be superseded by PostgreSQL and Prisma in the subsequent database engineering phase.
-2. **Stateless JWTs**:
-   - In this initial phase, JWT revocation relies on client-side token deletion from `localStorage`.
-   - Redis-backed token denylisting, refresh tokens, and sliding sessions will be integrated in future distributed architecture stages.
-3. **Dashboard Mock Data**:
-   - Files, folders, and storage metrics in the dashboard are realistic UI demonstrations and are not yet backed by object storage (MinIO/S3).
-
----
-
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
-- Node.js `v18+` or `v20+` or `v22+`
-- npm `v9+` or `v10+` or `v11+`
+* Node.js (v18.0.0 or higher recommended)
+* npm or yarn
 
----
+### Installation
 
-### Backend Setup & Execution
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/UBX-CODE/Cloudora.git
+   cd Cloudora
+   ```
 
-1. Navigate to the server folder:
+2. Install backend dependencies:
    ```bash
    cd server
-   ```
-2. Copy environment file:
-   ```bash
-   cp .env.example .env
-   ```
-3. Install dependencies:
-   ```bash
    npm install
    ```
-4. Start the backend development server:
+
+3. Install frontend dependencies:
    ```bash
+   cd ../client
+   npm install
+   ```
+
+### Running Locally
+
+1. Start the authentication backend:
+   ```bash
+   cd server
    npm run dev
    ```
-   Server will run on `http://localhost:5000`.
+   The backend API will run on `http://localhost:5000`.
 
----
-
-### Frontend Setup & Execution
-
-1. Open a new terminal and navigate to the client folder:
+2. Start the Vite client application in a separate terminal:
    ```bash
    cd client
-   ```
-2. Copy environment file:
-   ```bash
-   cp .env.example .env
-   ```
-3. Install dependencies:
-   ```bash
-   npm install
-   ```
-4. Start the frontend development server:
-   ```bash
    npm run dev
    ```
-   Frontend will run on `http://localhost:5173`.
+   The web application will be accessible at `http://localhost:5173`.
 
 ---
 
-## 🧪 Default Test Account
+## Authentication Endpoints
 
-A pre-seeded user is available in `server/data/users.json`:
-- **Email**: `elena@cloudora.io`
-- **Password**: `Password@123`
+| Method | Endpoint | Description | Auth Required |
+|---|---|---|---|
+| POST | `/api/auth/register` | Register a new user account | No |
+| POST | `/api/auth/login` | Authenticate user and receive JWT token | No |
+| GET | `/api/auth/me` | Fetch authenticated user profile | Bearer Token |
+| GET | `/api/health` | Service health status check | No |
 
-You can also register any new account on the `/register` page.
+---
 
+## License
+
+This project is licensed under the MIT License.
