@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+  <defs>
+    <linearGradient id="cloudoraGrad" x1="4" y1="4" x2="44" y2="44" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FF6B00"/>
+      <stop offset="100%" stop-color="#F38020"/>
+    </linearGradient>
+  </defs>
+  <rect width="48" height="48" rx="12" fill="#111317"/>
+  <path d="M16 32h16c4.418 0 8-3.582 8-8 0-4.079-3.05-7.445-7.001-7.938C32.185 11.238 27.534 8 22 8c-6.075 0-11.085 4.508-11.905 10.366C6.541 19.344 4 22.368 4 26c0 3.314 2.686 6 6 6h6z" fill="url(#cloudoraGrad)"/>
+  <path d="M19 28l5-5 5 5" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M24 23v10" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
+</svg>
+

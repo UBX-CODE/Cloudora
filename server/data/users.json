@@ -1,0 +1,10 @@
+[
+  {
+    "id": "b26b354e-eaf1-47af-863b-5d9c260ca033",
+    "name": "Elena Rostova",
+    "email": "elena@cloudora.io",
+    "passwordHash": "$2b$10$BxFhAQUpTn2L4Xjl6A4qIus6tOrzJBYEaryjr1ZyvUhBgVKs3bpOG",
+    "role": "USER",
+    "createdAt": "2026-11-06T06:55:31.019Z"
+  }
+]

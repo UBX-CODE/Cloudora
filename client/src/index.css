@@ -1,0 +1,198 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-main: #0B0A0F;
+    --hero-purple: #4E2EE3;
+    --text-primary: #FFFFFF;
+    --accent-pink: #FF5E97;
+    --accent-cyan: #00D2FF;
+    --accent-yellow: #FFD13B;
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    background-color: #0B0A0F;
+    color: #FFFFFF;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+/* Condensed Display Headline Typography */
+.font-display {
+  font-family: 'Bebas Neue', Impact, sans-serif;
+  letter-spacing: 0.02em;
+  line-height: 0.95;
+}
+
+/* Signature Pixetivity Yellow Brutalist Pill Button */
+.btn-pix-yellow {
+  background-color: #FFD13B;
+  color: #000000;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 800;
+  text-transform: uppercase;
+  border-radius: 9999px;
+  border: 2px solid #000000;
+  box-shadow: 3px 3px 0px #000000;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.btn-pix-yellow:hover {
+  transform: translate(1px, 1px);
+  box-shadow: 2px 2px 0px #000000;
+  background-color: #F5C628;
+}
+
+.btn-pix-yellow:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0px 0px 0px #000000;
+}
+
+/* White Arrow Disc Inside Button */
+.arrow-disc {
+  width: 1.85rem;
+  height: 1.85rem;
+  border-radius: 9999px;
+  background-color: #FFFFFF;
+  border: 1.5px solid #000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #000000;
+  font-weight: 900;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+/* Outline Pill Button from Pixetivity Navbar */
+.btn-pix-outline {
+  background-color: transparent;
+  color: #FFFFFF;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: 9999px;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  padding: 0.5rem 1.25rem;
+  transition: all 0.2s ease;
+}
+
+.btn-pix-outline:hover {
+  border-color: #00D2FF;
+  color: #00D2FF;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Clean Cloudflare & Google Docs style table & card utility */
+.clean-card {
+  background-color: #12131A;
+  border: 1px solid #1E202C;
+  border-radius: 0.75rem;
+}
+
+.clean-table th {
+  padding: 0.75rem 1.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #8E92A4;
+  border-bottom: 1px solid #1E202C;
+}
+
+.clean-table td {
+  padding: 0.875rem 1.25rem;
+  border-bottom: 1px solid #1A1B24;
+  font-size: 0.8125rem;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0B0A0F;
+}
+::-webkit-scrollbar-thumb {
+  background: #232135;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #5033E1;
+}
+
+/* Prevent Chrome / Edge / Safari white or yellow autofill border & background */
+input,
+input:focus,
+input:focus-visible,
+select:focus,
+textarea:focus {
+  outline: none !important;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-text-fill-color: #FFFFFF !important;
+  -webkit-box-shadow: 0 0 0 1000px #0E0D17 inset !important;
+  box-shadow: 0 0 0 1000px #0E0D17 inset !important;
+  border-color: #262438 !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Architectural Grid Background with Crosshairs */
+.auth-grid-bg {
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* Seamless Continuous Hardware-Accelerated Marquee Animations */
+@keyframes marquee-forward {
+  0% {
+    transform: translate3d(0%, 0, 0);
+  }
+  100% {
+    transform: translate3d(-100%, 0, 0);
+  }
+}
+
+@keyframes marquee-backward {
+  0% {
+    transform: translate3d(-100%, 0, 0);
+  }
+  100% {
+    transform: translate3d(0%, 0, 0);
+  }
+}
+
+.animate-marquee-forward {
+  display: flex;
+  flex-shrink: 0;
+  will-change: transform;
+  animation: marquee-forward 32s linear infinite;
+}
+
+.animate-marquee-backward {
+  display: flex;
+  flex-shrink: 0;
+  will-change: transform;
+  animation: marquee-backward 36s linear infinite;
+}
+
+.marquee-container:hover .animate-marquee-forward,
+.marquee-container:hover .animate-marquee-backward {
+  animation-play-state: paused;
+}
+
