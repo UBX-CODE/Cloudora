@@ -10,5 +10,6 @@ export const config = {
   JWT_SECRET: process.env.JWT_SECRET || 'cloudora_dev_default_secret_key_change_in_production',
   JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || '7d',
   CORS_ORIGIN: process.env.CORS_ORIGIN || 'http://localhost:5173',
+  DATABASE_URL: process.env.DATABASE_URL || '',
 };
 
