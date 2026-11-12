@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
@@ -22,8 +21,9 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  files        File[]
-  folders      Folder[]
+  files         File[]
+  folders       Folder[]
+  uploadSession UploadSession[]
 }
 
 enum FileStatus {
@@ -33,24 +33,24 @@ enum FileStatus {
 }
 
 model Folder {
-  id        String   @id @default(uuid())
-  name      String
+  id   String @id @default(uuid())
+  name String
 
-  ownerId   String
-  owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId String
+  owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 
-  parentId  String?
-  parent    Folder?  @relation("FolderHierarchy", fields: [parentId], references: [id], onDelete: Restrict)
-  children  Folder[] @relation("FolderHierarchy")
+  parentId String?
+  parent   Folder?  @relation("FolderHierarchy", fields: [parentId], references: [id], onDelete: Restrict)
+  children Folder[] @relation("FolderHierarchy")
 
-  isStarred Boolean  @default(false)
-  isTrashed Boolean  @default(false)
+  isStarred Boolean   @default(false)
+  isTrashed Boolean   @default(false)
   trashedAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  files     File[]
+  files File[]
 
   @@index([ownerId, parentId])
   @@index([ownerId, createdAt])
@@ -65,21 +65,54 @@ model File {
   checksum   String?
   status     FileStatus @default(PENDING)
 
-  ownerId    String
-  owner      User       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId String
+  owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 
-  folderId   String?
-  folder     Folder?    @relation(fields: [folderId], references: [id], onDelete: SetNull)
+  folderId String?
+  folder   Folder? @relation(fields: [folderId], references: [id], onDelete: SetNull)
 
-  isStarred  Boolean    @default(false)
-  isTrashed  Boolean    @default(false)
-  trashedAt  DateTime?
+  isStarred Boolean   @default(false)
+  isTrashed Boolean   @default(false)
+  trashedAt DateTime?
 
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  uploadSession UploadSession?
 
   @@index([ownerId, folderId])
   @@index([ownerId, createdAt])
   @@index([ownerId, isStarred])
   @@index([ownerId, isTrashed])
+}
+
+enum UploadSessionStatus {
+  INITIATED
+  IN_PROGRESS
+  COMPLETED
+  ABORTED
+  FAILED
+}
+
+model UploadSession {
+  id String @id @default(uuid())
+
+  ownerId String
+  owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  fileId String @unique
+  file   File   @relation(fields: [fileId], references: [id], onDelete: Cascade)
+
+  multipartUploadId String @unique
+  partSize          Int
+  totalParts        Int
+
+  status UploadSessionStatus @default(INITIATED)
+
+  expiresAt DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([ownerId, status])
+  @@index([expiresAt])
 }

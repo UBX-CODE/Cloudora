@@ -290,6 +290,7 @@ export type FileWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"File"> | Date | string
   owner?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   folder?: Prisma.XOR<Prisma.FolderNullableScalarRelationFilter, Prisma.FolderWhereInput> | null
+  uploadSession?: Prisma.XOR<Prisma.UploadSessionNullableScalarRelationFilter, Prisma.UploadSessionWhereInput> | null
 }
 
 export type FileOrderByWithRelationInput = {
@@ -309,6 +310,7 @@ export type FileOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   owner?: Prisma.UserOrderByWithRelationInput
   folder?: Prisma.FolderOrderByWithRelationInput
+  uploadSession?: Prisma.UploadSessionOrderByWithRelationInput
 }
 
 export type FileWhereUniqueInput = Prisma.AtLeast<{
@@ -331,6 +333,7 @@ export type FileWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"File"> | Date | string
   owner?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   folder?: Prisma.XOR<Prisma.FolderNullableScalarRelationFilter, Prisma.FolderWhereInput> | null
+  uploadSession?: Prisma.XOR<Prisma.UploadSessionNullableScalarRelationFilter, Prisma.UploadSessionWhereInput> | null
 }, "id" | "storageKey">
 
 export type FileOrderByWithAggregationInput = {
@@ -390,6 +393,7 @@ export type FileCreateInput = {
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutFilesInput
   folder?: Prisma.FolderCreateNestedOneWithoutFilesInput
+  uploadSession?: Prisma.UploadSessionCreateNestedOneWithoutFileInput
 }
 
 export type FileUncheckedCreateInput = {
@@ -407,6 +411,7 @@ export type FileUncheckedCreateInput = {
   trashedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  uploadSession?: Prisma.UploadSessionUncheckedCreateNestedOneWithoutFileInput
 }
 
 export type FileUpdateInput = {
@@ -424,6 +429,7 @@ export type FileUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutFilesNestedInput
   folder?: Prisma.FolderUpdateOneWithoutFilesNestedInput
+  uploadSession?: Prisma.UploadSessionUpdateOneWithoutFileNestedInput
 }
 
 export type FileUncheckedUpdateInput = {
@@ -441,6 +447,7 @@ export type FileUncheckedUpdateInput = {
   trashedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  uploadSession?: Prisma.UploadSessionUncheckedUpdateOneWithoutFileNestedInput
 }
 
 export type FileCreateManyInput = {
@@ -561,6 +568,11 @@ export type FileSumOrderByAggregateInput = {
   size?: Prisma.SortOrder
 }
 
+export type FileScalarRelationFilter = {
+  is?: Prisma.FileWhereInput
+  isNot?: Prisma.FileWhereInput
+}
+
 export type FileCreateNestedManyWithoutOwnerInput = {
   create?: Prisma.XOR<Prisma.FileCreateWithoutOwnerInput, Prisma.FileUncheckedCreateWithoutOwnerInput> | Prisma.FileCreateWithoutOwnerInput[] | Prisma.FileUncheckedCreateWithoutOwnerInput[]
   connectOrCreate?: Prisma.FileCreateOrConnectWithoutOwnerInput | Prisma.FileCreateOrConnectWithoutOwnerInput[]
@@ -657,6 +669,20 @@ export type EnumFileStatusFieldUpdateOperationsInput = {
   set?: $Enums.FileStatus
 }
 
+export type FileCreateNestedOneWithoutUploadSessionInput = {
+  create?: Prisma.XOR<Prisma.FileCreateWithoutUploadSessionInput, Prisma.FileUncheckedCreateWithoutUploadSessionInput>
+  connectOrCreate?: Prisma.FileCreateOrConnectWithoutUploadSessionInput
+  connect?: Prisma.FileWhereUniqueInput
+}
+
+export type FileUpdateOneRequiredWithoutUploadSessionNestedInput = {
+  create?: Prisma.XOR<Prisma.FileCreateWithoutUploadSessionInput, Prisma.FileUncheckedCreateWithoutUploadSessionInput>
+  connectOrCreate?: Prisma.FileCreateOrConnectWithoutUploadSessionInput
+  upsert?: Prisma.FileUpsertWithoutUploadSessionInput
+  connect?: Prisma.FileWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.FileUpdateToOneWithWhereWithoutUploadSessionInput, Prisma.FileUpdateWithoutUploadSessionInput>, Prisma.FileUncheckedUpdateWithoutUploadSessionInput>
+}
+
 export type FileCreateWithoutOwnerInput = {
   id?: string
   name: string
@@ -671,6 +697,7 @@ export type FileCreateWithoutOwnerInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   folder?: Prisma.FolderCreateNestedOneWithoutFilesInput
+  uploadSession?: Prisma.UploadSessionCreateNestedOneWithoutFileInput
 }
 
 export type FileUncheckedCreateWithoutOwnerInput = {
@@ -687,6 +714,7 @@ export type FileUncheckedCreateWithoutOwnerInput = {
   trashedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  uploadSession?: Prisma.UploadSessionUncheckedCreateNestedOneWithoutFileInput
 }
 
 export type FileCreateOrConnectWithoutOwnerInput = {
@@ -749,6 +777,7 @@ export type FileCreateWithoutFolderInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutFilesInput
+  uploadSession?: Prisma.UploadSessionCreateNestedOneWithoutFileInput
 }
 
 export type FileUncheckedCreateWithoutFolderInput = {
@@ -765,6 +794,7 @@ export type FileUncheckedCreateWithoutFolderInput = {
   trashedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  uploadSession?: Prisma.UploadSessionUncheckedCreateNestedOneWithoutFileInput
 }
 
 export type FileCreateOrConnectWithoutFolderInput = {
@@ -791,6 +821,90 @@ export type FileUpdateWithWhereUniqueWithoutFolderInput = {
 export type FileUpdateManyWithWhereWithoutFolderInput = {
   where: Prisma.FileScalarWhereInput
   data: Prisma.XOR<Prisma.FileUpdateManyMutationInput, Prisma.FileUncheckedUpdateManyWithoutFolderInput>
+}
+
+export type FileCreateWithoutUploadSessionInput = {
+  id?: string
+  name: string
+  mimeType: string
+  size: bigint | number
+  storageKey?: string | null
+  checksum?: string | null
+  status?: $Enums.FileStatus
+  isStarred?: boolean
+  isTrashed?: boolean
+  trashedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  owner: Prisma.UserCreateNestedOneWithoutFilesInput
+  folder?: Prisma.FolderCreateNestedOneWithoutFilesInput
+}
+
+export type FileUncheckedCreateWithoutUploadSessionInput = {
+  id?: string
+  name: string
+  mimeType: string
+  size: bigint | number
+  storageKey?: string | null
+  checksum?: string | null
+  status?: $Enums.FileStatus
+  ownerId: string
+  folderId?: string | null
+  isStarred?: boolean
+  isTrashed?: boolean
+  trashedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type FileCreateOrConnectWithoutUploadSessionInput = {
+  where: Prisma.FileWhereUniqueInput
+  create: Prisma.XOR<Prisma.FileCreateWithoutUploadSessionInput, Prisma.FileUncheckedCreateWithoutUploadSessionInput>
+}
+
+export type FileUpsertWithoutUploadSessionInput = {
+  update: Prisma.XOR<Prisma.FileUpdateWithoutUploadSessionInput, Prisma.FileUncheckedUpdateWithoutUploadSessionInput>
+  create: Prisma.XOR<Prisma.FileCreateWithoutUploadSessionInput, Prisma.FileUncheckedCreateWithoutUploadSessionInput>
+  where?: Prisma.FileWhereInput
+}
+
+export type FileUpdateToOneWithWhereWithoutUploadSessionInput = {
+  where?: Prisma.FileWhereInput
+  data: Prisma.XOR<Prisma.FileUpdateWithoutUploadSessionInput, Prisma.FileUncheckedUpdateWithoutUploadSessionInput>
+}
+
+export type FileUpdateWithoutUploadSessionInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  mimeType?: Prisma.StringFieldUpdateOperationsInput | string
+  size?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  storageKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksum?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumFileStatusFieldUpdateOperationsInput | $Enums.FileStatus
+  isStarred?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isTrashed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  trashedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  owner?: Prisma.UserUpdateOneRequiredWithoutFilesNestedInput
+  folder?: Prisma.FolderUpdateOneWithoutFilesNestedInput
+}
+
+export type FileUncheckedUpdateWithoutUploadSessionInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  mimeType?: Prisma.StringFieldUpdateOperationsInput | string
+  size?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  storageKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksum?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumFileStatusFieldUpdateOperationsInput | $Enums.FileStatus
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  folderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isStarred?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isTrashed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  trashedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type FileCreateManyOwnerInput = {
@@ -823,6 +937,7 @@ export type FileUpdateWithoutOwnerInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   folder?: Prisma.FolderUpdateOneWithoutFilesNestedInput
+  uploadSession?: Prisma.UploadSessionUpdateOneWithoutFileNestedInput
 }
 
 export type FileUncheckedUpdateWithoutOwnerInput = {
@@ -839,6 +954,7 @@ export type FileUncheckedUpdateWithoutOwnerInput = {
   trashedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  uploadSession?: Prisma.UploadSessionUncheckedUpdateOneWithoutFileNestedInput
 }
 
 export type FileUncheckedUpdateManyWithoutOwnerInput = {
@@ -887,6 +1003,7 @@ export type FileUpdateWithoutFolderInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutFilesNestedInput
+  uploadSession?: Prisma.UploadSessionUpdateOneWithoutFileNestedInput
 }
 
 export type FileUncheckedUpdateWithoutFolderInput = {
@@ -903,6 +1020,7 @@ export type FileUncheckedUpdateWithoutFolderInput = {
   trashedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  uploadSession?: Prisma.UploadSessionUncheckedUpdateOneWithoutFileNestedInput
 }
 
 export type FileUncheckedUpdateManyWithoutFolderInput = {
@@ -940,6 +1058,7 @@ export type FileSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   updatedAt?: boolean
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   folder?: boolean | Prisma.File$folderArgs<ExtArgs>
+  uploadSession?: boolean | Prisma.File$uploadSessionArgs<ExtArgs>
 }, ExtArgs["result"]["file"]>
 
 export type FileSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1001,6 +1120,7 @@ export type FileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = run
 export type FileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   folder?: boolean | Prisma.File$folderArgs<ExtArgs>
+  uploadSession?: boolean | Prisma.File$uploadSessionArgs<ExtArgs>
 }
 export type FileIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -1016,6 +1136,7 @@ export type $FilePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   objects: {
     owner: Prisma.$UserPayload<ExtArgs>
     folder: Prisma.$FolderPayload<ExtArgs> | null
+    uploadSession: Prisma.$UploadSessionPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1428,6 +1549,7 @@ export interface Prisma__FileClient<T, Null = never, ExtArgs extends runtime.Typ
   readonly [Symbol.toStringTag]: "PrismaPromise"
   owner<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   folder<T extends Prisma.File$folderArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.File$folderArgs<ExtArgs>>): Prisma.Prisma__FolderClient<runtime.Types.Result.GetResult<Prisma.$FolderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  uploadSession<T extends Prisma.File$uploadSessionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.File$uploadSessionArgs<ExtArgs>>): Prisma.Prisma__UploadSessionClient<runtime.Types.Result.GetResult<Prisma.$UploadSessionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1888,6 +2010,25 @@ export type File$folderArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
    */
   include?: Prisma.FolderInclude<ExtArgs> | null
   where?: Prisma.FolderWhereInput
+}
+
+/**
+ * File.uploadSession
+ */
+export type File$uploadSessionArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UploadSession
+   */
+  select?: Prisma.UploadSessionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the UploadSession
+   */
+  omit?: Prisma.UploadSessionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UploadSessionInclude<ExtArgs> | null
+  where?: Prisma.UploadSessionWhereInput
 }
 
 /**

@@ -24,3 +24,14 @@ export const FileStatus = {
 } as const
 
 export type FileStatus = (typeof FileStatus)[keyof typeof FileStatus]
+
+
+export const UploadSessionStatus = {
+  INITIATED: 'INITIATED',
+  IN_PROGRESS: 'IN_PROGRESS',
+  COMPLETED: 'COMPLETED',
+  ABORTED: 'ABORTED',
+  FAILED: 'FAILED'
+} as const
+
+export type UploadSessionStatus = (typeof UploadSessionStatus)[keyof typeof UploadSessionStatus]

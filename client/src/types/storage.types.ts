@@ -57,5 +57,65 @@ export interface UploadQueueItem {
   speed?: string;
   eta?: string;
   errorMessage?: string;
+  file?: File;
+  fileId?: string;
+  folderId?: string;
+  loadedBytes?: number;
+  totalParts?: number;
+  uploadedPartsCount?: number;
 }
 
+export interface SingleUploadInitResponse {
+  fileId: string;
+  uploadUrl: string;
+  storageKey: string;
+  expiresIn: number;
+}
+
+export interface MultipartInitResponse {
+  fileId: string;
+  sessionId: string;
+  storageKey: string;
+  partSize: number;
+  totalParts: number;
+  expiresAt: string;
+}
+
+export interface MultipartPartUrl {
+  partNumber: number;
+  uploadUrl: string;
+}
+
+export interface MultipartPartUrlsResponse {
+  fileId: string;
+  sessionId: string;
+  partSize: number;
+  totalParts: number;
+  expiresIn: number;
+  urls: MultipartPartUrl[];
+}
+
+export interface UploadedPart {
+  PartNumber: number;
+  ETag: string;
+}
+
+export interface UploadSessionStatusResponse {
+  fileId: string;
+  sessionId: string;
+  status: 'INITIATED' | 'IN_PROGRESS' | 'COMPLETED' | 'ABORTED' | 'FAILED';
+  partSize: number;
+  totalParts: number;
+  expiresAt: string;
+  isExpired: boolean;
+  uploadedParts: UploadedPart[];
+  missingPartNumbers: number[];
+}
+
+export interface CompleteUploadResponse {
+  fileId: string;
+  status: 'UPLOADED';
+  name: string;
+  size: number;
+  message?: string;
+}

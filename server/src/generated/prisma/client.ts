@@ -54,3 +54,8 @@ export type Folder = Prisma.FolderModel
  * 
  */
 export type File = Prisma.FileModel
+/**
+ * Model UploadSession
+ * 
+ */
+export type UploadSession = Prisma.UploadSessionModel

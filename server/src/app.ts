@@ -4,6 +4,9 @@ import authRoutes from './routes/auth.routes';
 import { errorHandler } from './middleware/error.middleware';
 import { AppError } from './utils/errors';
 import { config } from './config/env';
+import folderRoutes from './routes/folder.routes';
+import { checkStorageConnection } from './services/storage.service';
+import fileRoutes from './routes/file.routes';
 
 const app: Application = express();
 
@@ -28,11 +31,25 @@ app.get('/api/health', (_req: Request, res: Response) => {
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/folders', folderRoutes);
+app.use('/api/files', fileRoutes);
+
+app.get('/api/storage/health', async (req, res) => {
+  const isConnected = await checkStorageConnection();
+
+  res.status(isConnected ? 200 : 500).json({
+    success: isConnected,
+    message: isConnected
+      ? 'Storage is connected'
+      : 'Storage connection failed',
+  });
+});
 
 // Catch-all 404 handler
 app.use((_req: Request, _res: Response, next: NextFunction) => {
   next(new AppError('Resource not found on this server.', 404));
 });
+
 
 // Centralized Error Handling
 app.use(errorHandler);

@@ -1,0 +1,28 @@
+services:
+  minio:
+    image: cgr.dev/chainguard/minio:latest
+    container_name: cloudora-minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: cloudora_admin
+      MINIO_ROOT_PASSWORD: cloudora_local_secret_123
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: cloudora-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+
+volumes:
+  minio_data:
+  redis_data:
