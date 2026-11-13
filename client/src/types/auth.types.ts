@@ -5,6 +5,8 @@ export interface User {
   name: string;
   email: string;
   role: UserRole;
+  storageUsed?: number;
+  storageLimit?: number;
   createdAt: string;
 }
 

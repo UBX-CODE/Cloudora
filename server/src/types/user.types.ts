@@ -6,6 +6,8 @@ export interface IUser {
   email: string;
   passwordHash: string;
   role: UserRole;
+  storageUsed?: number;
+  storageLimit?: number;
   createdAt: string;
 }
 

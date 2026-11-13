@@ -17,11 +17,13 @@ const SALT_ROUNDS = 10;
 
 // Convert Prisma User into our existing SafeUser format
 function sanitizeUser(user: any): SafeUser {
-  const { passwordHash, ...safeUser } = user;
+  const { passwordHash, storageUsed, storageLimit, createdAt, updatedAt, ...safeUser } = user;
 
   return {
     ...safeUser,
-    createdAt: user.createdAt.toISOString(),
+    storageUsed: storageUsed !== undefined && storageUsed !== null ? Number(storageUsed) : 0,
+    storageLimit: storageLimit !== undefined && storageLimit !== null ? Number(storageLimit) : 5368709120,
+    createdAt: createdAt ? new Date(createdAt).toISOString() : new Date().toISOString(),
   };
 }
 
