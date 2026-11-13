@@ -7,6 +7,14 @@ import {
   FolderAncestor,
   FolderStats,
 } from '../types/folder.types';
+import { getOrSetCache, invalidateCacheByPattern } from '../utils/cache';
+
+const FOLDER_CACHE_TTL = 300; // 5 minutes TTL
+
+// Helper to flush all cached folder views for this user
+async function invalidateUserFolderCache(ownerId: string): Promise<void> {
+  await invalidateCacheByPattern(`cache:folder:*:${ownerId}*`);
+}
 
 /**
  * Validates folder name for length, empty characters, and forbidden path characters.
@@ -141,36 +149,45 @@ export async function createFolder(ownerId: string, dto: CreateFolderDTO) {
     throw new AppError('A folder with this name already exists in this location.', 409);
   }
 
-  return prisma.folder.create({
+  const folder = await prisma.folder.create({
     data: {
       name,
       ownerId,
       parentId,
     },
   });
+
+  // Invalidate cached views for this user
+  await invalidateUserFolderCache(ownerId);
+
+  return folder;
 }
 
 /**
  * 2. Get Root Folders (folders with parentId = null).
  */
 export async function getRootFolders(ownerId: string) {
-  return prisma.folder.findMany({
-    where: {
-      ownerId,
-      parentId: null,
-      isTrashed: false,
-    },
-    include: {
-      _count: {
-        select: {
-          children: { where: { isTrashed: false } },
-          files: { where: { isTrashed: false } },
+  const cacheKey = `cache:folder:root:${ownerId}`;
+
+  return getOrSetCache(cacheKey, FOLDER_CACHE_TTL, async () => {
+    return prisma.folder.findMany({
+      where: {
+        ownerId,
+        parentId: null,
+        isTrashed: false,
+      },
+      include: {
+        _count: {
+          select: {
+            children: { where: { isTrashed: false } },
+            files: { where: { isTrashed: false } },
+          },
         },
       },
-    },
-    orderBy: {
-      name: 'asc',
-    },
+      orderBy: {
+        name: 'asc',
+      },
+    });
   });
 }
 
@@ -178,7 +195,7 @@ export async function getRootFolders(ownerId: string) {
  * 3. Get Subfolders by Parent ID.
  */
 export async function getSubfoldersByParentId(ownerId: string, parentId: string) {
-  // Validate parent existence and ownership
+  // Validate parent existence and ownership first
   const parent = await prisma.folder.findFirst({
     where: {
       id: parentId,
@@ -191,23 +208,27 @@ export async function getSubfoldersByParentId(ownerId: string, parentId: string)
     throw new AppError('Parent folder not found.', 404);
   }
 
-  return prisma.folder.findMany({
-    where: {
-      ownerId,
-      parentId,
-      isTrashed: false,
-    },
-    include: {
-      _count: {
-        select: {
-          children: { where: { isTrashed: false } },
-          files: { where: { isTrashed: false } },
+  const cacheKey = `cache:folder:subfolders:${ownerId}:${parentId}`;
+
+  return getOrSetCache(cacheKey, FOLDER_CACHE_TTL, async () => {
+    return prisma.folder.findMany({
+      where: {
+        ownerId,
+        parentId,
+        isTrashed: false,
+      },
+      include: {
+        _count: {
+          select: {
+            children: { where: { isTrashed: false } },
+            files: { where: { isTrashed: false } },
+          },
         },
       },
-    },
-    orderBy: {
-      name: 'asc',
-    },
+      orderBy: {
+        name: 'asc',
+      },
+    });
   });
 }
 
@@ -215,46 +236,50 @@ export async function getSubfoldersByParentId(ownerId: string, parentId: string)
  * 4. Get Folder Details with Breadcrumb Ancestors.
  */
 export async function getFolderDetails(ownerId: string, folderId: string) {
-  const folder = await prisma.folder.findFirst({
-    where: {
-      id: folderId,
-      ownerId,
-    },
-    include: {
-      _count: {
-        select: {
-          children: { where: { isTrashed: false } },
-          files: { where: { isTrashed: false } },
+  const cacheKey = `cache:folder:details:${ownerId}:${folderId}`;
+
+  return getOrSetCache(cacheKey, FOLDER_CACHE_TTL, async () => {
+    const folder = await prisma.folder.findFirst({
+      where: {
+        id: folderId,
+        ownerId,
+      },
+      include: {
+        _count: {
+          select: {
+            children: { where: { isTrashed: false } },
+            files: { where: { isTrashed: false } },
+          },
         },
       },
-    },
-  });
-
-  if (!folder) {
-    throw new AppError('Folder not found.', 404);
-  }
-
-  // Construct breadcrumbs from root to current folder
-  const ancestors: FolderAncestor[] = [];
-  let currentParentId = folder.parentId;
-  const visited = new Set<string>();
-
-  while (currentParentId && !visited.has(currentParentId)) {
-    visited.add(currentParentId);
-    const parent = await prisma.folder.findFirst({
-      where: { id: currentParentId, ownerId },
-      select: { id: true, name: true, parentId: true },
     });
 
-    if (!parent) break;
-    ancestors.unshift(parent);
-    currentParentId = parent.parentId;
-  }
+    if (!folder) {
+      throw new AppError('Folder not found.', 404);
+    }
 
-  return {
-    folder,
-    ancestors,
-  };
+    // Construct breadcrumbs from root to current folder
+    const ancestors: FolderAncestor[] = [];
+    let currentParentId = folder.parentId;
+    const visited = new Set<string>();
+
+    while (currentParentId && !visited.has(currentParentId)) {
+      visited.add(currentParentId);
+      const parentRecord: { id: string; name: string; parentId: string | null } | null = await prisma.folder.findFirst({
+        where: { id: currentParentId, ownerId },
+        select: { id: true, name: true, parentId: true },
+      });
+
+      if (!parentRecord) break;
+      ancestors.unshift(parentRecord);
+      currentParentId = parentRecord.parentId;
+    }
+
+    return {
+      folder,
+      ancestors,
+    };
+  });
 }
 
 /**
@@ -294,10 +319,15 @@ export async function renameFolder(ownerId: string, folderId: string, dto: Renam
     throw new AppError('A folder with this name already exists in this location.', 409);
   }
 
-  return prisma.folder.update({
+  const updatedFolder = await prisma.folder.update({
     where: { id: folderId },
     data: { name: newName },
   });
+
+  // Invalidate cache
+  await invalidateUserFolderCache(ownerId);
+
+  return updatedFolder;
 }
 
 /**
@@ -363,10 +393,15 @@ export async function moveFolder(ownerId: string, folderId: string, dto: MoveFol
     );
   }
 
-  return prisma.folder.update({
+  const updatedFolder = await prisma.folder.update({
     where: { id: folderId },
     data: { parentId: targetParentId },
   });
+
+  // Invalidate cache
+  await invalidateUserFolderCache(ownerId);
+
+  return updatedFolder;
 }
 
 /**
@@ -396,7 +431,7 @@ export async function trashFolder(ownerId: string, folderId: string) {
   const allFolderIds = [folderId, ...allDescendantIds];
   const trashedAt = new Date();
 
-  return prisma.$transaction(async (tx) => {
+  const result = await prisma.$transaction(async (tx) => {
     // Soft-delete folder and all nested subfolders
     await tx.folder.updateMany({
       where: {
@@ -430,6 +465,11 @@ export async function trashFolder(ownerId: string, folderId: string) {
       trashedFilesCount: filesUpdateResult.count,
     };
   });
+
+  // Invalidate cache
+  await invalidateUserFolderCache(ownerId);
+
+  return result;
 }
 
 /**
@@ -481,7 +521,7 @@ export async function restoreFolder(ownerId: string, folderId: string) {
   const { allDescendantIds } = await getDescendantFolderHierarchy(ownerId, folderId);
   const allFolderIds = [folderId, ...allDescendantIds];
 
-  return prisma.$transaction(async (tx) => {
+  const result = await prisma.$transaction(async (tx) => {
     // Restore the target folder, updating parentId if reparented to root
     const restoredFolder = await tx.folder.update({
       where: { id: folderId },
@@ -524,6 +564,11 @@ export async function restoreFolder(ownerId: string, folderId: string) {
       restoredFilesCount: restoredFiles.count,
     };
   });
+
+  // Invalidate cache
+  await invalidateUserFolderCache(ownerId);
+
+  return result;
 }
 
 /**
@@ -542,7 +587,7 @@ export async function permanentlyDeleteFolder(ownerId: string, folderId: string)
   const { allDescendantIds, levels } = await getDescendantFolderHierarchy(ownerId, folderId);
   const allFolderIds = [folderId, ...allDescendantIds];
 
-  return prisma.$transaction(async (tx) => {
+  const result = await prisma.$transaction(async (tx) => {
     // 1. Delete all files inside this folder hierarchy
     const filesDeleted = await tx.file.deleteMany({
       where: {
@@ -575,6 +620,11 @@ export async function permanentlyDeleteFolder(ownerId: string, folderId: string)
       deletedFilesCount: filesDeleted.count,
     };
   });
+
+  // Invalidate cache
+  await invalidateUserFolderCache(ownerId);
+
+  return result;
 }
 
 /**
@@ -610,8 +660,13 @@ export async function toggleStarFolder(
 
   const newStarred = typeof explicitStar === 'boolean' ? explicitStar : !folder.isStarred;
 
-  return prisma.folder.update({
+  const updatedFolder = await prisma.folder.update({
     where: { id: folderId },
     data: { isStarred: newStarred },
   });
+
+  // Invalidate cache
+  await invalidateUserFolderCache(ownerId);
+
+  return updatedFolder;
 }
