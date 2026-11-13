@@ -120,3 +120,4 @@ export async function toggleStarFolder(id: string, isStarred?: boolean): Promise
   const response = await api.patch(`/folders/${id}/star`, { isStarred });
   return mapFolder(response.data.data.folder);
 }
+

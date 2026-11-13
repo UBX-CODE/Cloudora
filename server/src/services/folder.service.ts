@@ -1,4 +1,7 @@
+import { DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { prisma } from '../lib/prisma';
+import { storageClient } from '../lib/storage';
+import { config } from '../config/env';
 import { AppError } from '../utils/errors';
 import {
   CreateFolderDTO,
@@ -8,6 +11,7 @@ import {
   FolderStats,
 } from '../types/folder.types';
 import { getOrSetCache, invalidateCacheByPattern } from '../utils/cache';
+import { recordFilesDeleted } from './quota.service';
 
 const FOLDER_CACHE_TTL = 300; // 5 minutes TTL
 
@@ -587,8 +591,38 @@ export async function permanentlyDeleteFolder(ownerId: string, folderId: string)
   const { allDescendantIds, levels } = await getDescendantFolderHierarchy(ownerId, folderId);
   const allFolderIds = [folderId, ...allDescendantIds];
 
+  // 1. Find all files in folder hierarchy to track deleted bytes and MinIO storage keys
+  const filesToDelete = await prisma.file.findMany({
+    where: {
+      folderId: { in: allFolderIds },
+      ownerId,
+    },
+    select: { size: true, storageKey: true },
+  });
+
+  const totalBytesDeleted = filesToDelete.reduce(
+    (sum, f) => sum + BigInt(f.size),
+    BigInt(0)
+  );
+
+  // 2. Clean up MinIO S3 objects
+  for (const f of filesToDelete) {
+    if (f.storageKey) {
+      try {
+        await storageClient.send(
+          new DeleteObjectCommand({
+            Bucket: config.MINIO_BUCKET,
+            Key: f.storageKey,
+          })
+        );
+      } catch (err: any) {
+        console.warn(`[MinIO Folder Delete Warning] Key "${f.storageKey}":`, err.message);
+      }
+    }
+  }
+
   const result = await prisma.$transaction(async (tx) => {
-    // 1. Delete all files inside this folder hierarchy
+    // 3. Delete all files inside this folder hierarchy
     const filesDeleted = await tx.file.deleteMany({
       where: {
         folderId: { in: allFolderIds },
@@ -596,7 +630,7 @@ export async function permanentlyDeleteFolder(ownerId: string, folderId: string)
       },
     });
 
-    // 2. Delete folders in bottom-up reverse depth order (deepest children first)
+    // 4. Delete folders in bottom-up reverse depth order (deepest children first)
     let foldersDeletedCount = 0;
     for (let i = levels.length - 1; i >= 0; i--) {
       const res = await tx.folder.deleteMany({
@@ -608,7 +642,7 @@ export async function permanentlyDeleteFolder(ownerId: string, folderId: string)
       foldersDeletedCount += res.count;
     }
 
-    // 3. Delete the root target folder
+    // 5. Delete the root target folder
     await tx.folder.delete({
       where: { id: folderId },
     });
@@ -620,6 +654,11 @@ export async function permanentlyDeleteFolder(ownerId: string, folderId: string)
       deletedFilesCount: filesDeleted.count,
     };
   });
+
+  // 6. Atomically decrement user storage quota
+  if (totalBytesDeleted > BigInt(0)) {
+    await recordFilesDeleted(ownerId, totalBytesDeleted);
+  }
 
   // Invalidate cache
   await invalidateUserFolderCache(ownerId);

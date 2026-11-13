@@ -18,6 +18,7 @@ export function errorHandler(
   res.status(statusCode).json({
     success: false,
     message,
+    ...(err.code ? { code: err.code } : {}),
     ...(config.NODE_ENV === 'development' && statusCode === 500 ? { stack: err.stack } : {}),
   });
 }

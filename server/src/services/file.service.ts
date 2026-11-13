@@ -11,6 +11,7 @@ import {
   StorageSummaryDTO,
 } from '../types/file.types';
 import { getOrSetCache, invalidateCacheByPattern } from '../utils/cache';
+import { recordFilesDeleted } from './quota.service';
 
 const DEFAULT_STORAGE_LIMIT_BYTES = 5 * 1024 * 1024 * 1024; // 5 GB Free Tier
 
@@ -454,6 +455,9 @@ export async function permanentlyDeleteFile(ownerId: string, fileId: string): Pr
     where: { id: fileId },
   });
 
+  // 3. Atomically decrement user storage quota
+  await recordFilesDeleted(ownerId, file.size);
+
   await invalidateUserCache(ownerId);
   return { deleted: true, fileId };
 }
@@ -535,17 +539,26 @@ export async function getStorageUsageSummary(ownerId: string): Promise<StorageSu
       }
     }
 
+    const user = await prisma.user.findUnique({
+      where: { id: ownerId },
+      select: { storageUsed: true, storageLimit: true },
+    });
+
+    const userLimit = user ? Number(user.storageLimit) : DEFAULT_STORAGE_LIMIT_BYTES;
+    const userUsed = user ? Number(user.storageUsed) : totalUsedBytes;
+
     const percentageUsed = Math.min(
       100,
-      Number(((totalUsedBytes / DEFAULT_STORAGE_LIMIT_BYTES) * 100).toFixed(2))
+      Number(((userUsed / userLimit) * 100).toFixed(2))
     );
 
     return {
-      totalUsedBytes,
-      storageLimitBytes: DEFAULT_STORAGE_LIMIT_BYTES,
+      totalUsedBytes: userUsed,
+      storageLimitBytes: userLimit,
       percentageUsed,
       breakdown,
       fileCount: files.length,
     };
   });
 }
+

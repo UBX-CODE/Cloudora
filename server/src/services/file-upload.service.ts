@@ -13,6 +13,7 @@ import { prisma } from '../lib/prisma';
 import { storageClient } from '../lib/storage';
 import { config } from '../config/env';
 import { AppError } from '../utils/errors';
+import { verifyStorageQuota, recordUploadCompleted } from './quota.service';
 
 export interface CreateUploadDTO {
   name: string;
@@ -121,6 +122,7 @@ async function validateFolderOwnership(ownerId: string, folderId?: string): Prom
 export async function createUploadUrl(ownerId: string, data: CreateUploadDTO) {
   const { cleanName, cleanMime } = validateUploadMetadata(data.name, data.mimeType, data.size);
   await validateFolderOwnership(ownerId, data.folderId);
+  await verifyStorageQuota(ownerId, data.size);
 
   const fileId = randomUUID();
   const storageKey = `${ownerId}/${fileId}`;
@@ -219,6 +221,9 @@ export async function confirmSingleUpload(ownerId: string, fileId: string) {
     },
   });
 
+  // Atomically increment user's storage quota usage
+  await recordUploadCompleted(ownerId, file.size);
+
   return {
     fileId: updatedFile.id,
     status: updatedFile.status,
@@ -241,6 +246,7 @@ export async function initializeMultipartUpload(ownerId: string, data: CreateMul
   }
 
   await validateFolderOwnership(ownerId, data.folderId);
+  await verifyStorageQuota(ownerId, data.size);
 
   const fileId = randomUUID();
   const storageKey = `${ownerId}/${fileId}`;
@@ -532,6 +538,9 @@ export async function completeMultipartUpload(
         },
       }),
     ]);
+
+    // Atomically increment user's storage quota usage
+    await recordUploadCompleted(ownerId, actualSize);
 
     return {
       fileId,

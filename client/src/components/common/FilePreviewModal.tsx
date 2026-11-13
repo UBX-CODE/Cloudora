@@ -178,3 +178,4 @@ export const FilePreviewModal: React.FC<FilePreviewModalProps> = ({ file, isOpen
     </Modal>
   );
 };
+

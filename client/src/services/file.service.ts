@@ -158,3 +158,4 @@ export async function toggleStarFile(fileId: string, isStarred?: boolean): Promi
   const response = await api.patch(`/files/${fileId}/star`, { isStarred });
   return mapFile(response.data.data);
 }
+

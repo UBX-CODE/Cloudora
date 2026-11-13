@@ -657,14 +657,6 @@ export type FileUncheckedUpdateManyWithoutFolderNestedInput = {
   deleteMany?: Prisma.FileScalarWhereInput | Prisma.FileScalarWhereInput[]
 }
 
-export type BigIntFieldUpdateOperationsInput = {
-  set?: bigint | number
-  increment?: bigint | number
-  decrement?: bigint | number
-  multiply?: bigint | number
-  divide?: bigint | number
-}
-
 export type EnumFileStatusFieldUpdateOperationsInput = {
   set?: $Enums.FileStatus
 }

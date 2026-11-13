@@ -17,3 +17,4 @@ export async function downloadFile(fileId: string, fallbackName?: string): Promi
     alert(err.response?.data?.message || 'Failed to download file. Please check permissions.');
   }
 }
+
