@@ -1,4 +1,4 @@
-export type FileCategory = 'document' | 'image' | 'video' | 'audio' | 'archive' | 'code';
+export type FileCategory = 'document' | 'image' | 'video' | 'audio' | 'archive' | 'code' | 'other';
 
 export interface FileItem {
   id: string;

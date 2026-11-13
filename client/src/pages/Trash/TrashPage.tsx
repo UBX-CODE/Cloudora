@@ -1,31 +1,105 @@
-import React, { useState } from 'react';
-import { Trash2, RotateCcw, AlertCircle } from 'lucide-react';
-import { mockTrashFiles } from '../../utils/mockData';
+import React, { useState, useEffect } from 'react';
+import { Trash2, RotateCcw, AlertCircle, Loader2, Folder, FileText } from 'lucide-react';
 import { formatFileSize, formatRelativeTime } from '../../utils/formatters';
 import { FileTypeIcon } from '../../components/common/FileTypeIcon';
 import { Modal } from '../../components/ui/Modal';
-import { FileItem } from '../../types/storage.types';
+import { FileItem, FolderItem } from '../../types/storage.types';
+import {
+  fetchTrashFiles,
+  restoreFile,
+  permanentlyDeleteFile,
+} from '../../services/file.service';
+import {
+  fetchTrashedFolders,
+  restoreFolder,
+  permanentlyDeleteFolder,
+} from '../../services/folder.service';
 
 export const TrashPage: React.FC = () => {
-  const [trashItems, setTrashItems] = useState<FileItem[]>(mockTrashFiles);
-  const [itemToDelete, setItemToDelete] = useState<FileItem | null>(null);
+  const [trashFiles, setTrashFiles] = useState<FileItem[]>([]);
+  const [trashFolders, setTrashFolders] = useState<FolderItem[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const [itemToDelete, setItemToDelete] = useState<{ id: string; name: string; type: 'file' | 'folder' } | null>(null);
   const [emptyTrashConfirmOpen, setEmptyTrashConfirmOpen] = useState(false);
+  const [actionInProgress, setActionInProgress] = useState(false);
 
-  const handleRestore = (id: string, name: string) => {
-    setTrashItems((prev) => prev.filter((item) => item.id !== id));
-    alert(`Restored "${name}" back to vault.`);
+  const loadTrash = async () => {
+    setLoading(true);
+    try {
+      const [files, folders] = await Promise.all([
+        fetchTrashFiles(),
+        fetchTrashedFolders().catch(() => []),
+      ]);
+      setTrashFiles(files);
+      setTrashFolders(folders);
+    } catch (err) {
+      console.error('[Trash Load Error]:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handlePermanentDelete = () => {
+  useEffect(() => {
+    loadTrash();
+  }, []);
+
+  const handleRestoreFile = async (id: string, name: string) => {
+    try {
+      await restoreFile(id);
+      setTrashFiles((prev) => prev.filter((item) => item.id !== id));
+    } catch (err: any) {
+      alert(err.response?.data?.message || `Failed to restore "${name}".`);
+    }
+  };
+
+  const handleRestoreFolder = async (id: string, name: string) => {
+    try {
+      await restoreFolder(id);
+      setTrashFolders((prev) => prev.filter((item) => item.id !== id));
+    } catch (err: any) {
+      alert(err.response?.data?.message || `Failed to restore folder "${name}".`);
+    }
+  };
+
+  const handlePermanentDelete = async () => {
     if (!itemToDelete) return;
-    setTrashItems((prev) => prev.filter((item) => item.id !== itemToDelete.id));
-    setItemToDelete(null);
+    setActionInProgress(true);
+    try {
+      if (itemToDelete.type === 'file') {
+        await permanentlyDeleteFile(itemToDelete.id);
+        setTrashFiles((prev) => prev.filter((item) => item.id !== itemToDelete.id));
+      } else {
+        await permanentlyDeleteFolder(itemToDelete.id);
+        setTrashFolders((prev) => prev.filter((item) => item.id !== itemToDelete.id));
+      }
+      setItemToDelete(null);
+    } catch (err: any) {
+      alert(err.response?.data?.message || `Failed to permanently delete.`);
+    } finally {
+      setActionInProgress(false);
+    }
   };
 
-  const handleEmptyTrash = () => {
-    setTrashItems([]);
-    setEmptyTrashConfirmOpen(false);
+  const handleEmptyTrash = async () => {
+    setActionInProgress(true);
+    try {
+      await Promise.all([
+        ...trashFiles.map((f) => permanentlyDeleteFile(f.id)),
+        ...trashFolders.map((f) => permanentlyDeleteFolder(f.id)),
+      ]);
+      setTrashFiles([]);
+      setTrashFolders([]);
+      setEmptyTrashConfirmOpen(false);
+    } catch (err) {
+      alert('Failed to completely empty trash.');
+      loadTrash();
+    } finally {
+      setActionInProgress(false);
+    }
   };
+
+  const totalCount = trashFiles.length + trashFolders.length;
 
   return (
     <div className="space-y-6 animate-in fade-in duration-150">
@@ -36,150 +110,204 @@ export const TrashPage: React.FC = () => {
             Trash & Disaster Recovery
           </h1>
           <p className="text-xs text-gray-400 mt-1 font-sans">
-            Deleted items are shielded for 30 days before permanent purging. You can restore or destroy them immediately.
+            Deleted items can be restored back to your drive or permanently purged from storage.
           </p>
         </div>
 
-        {trashItems.length > 0 && (
+        {totalCount > 0 && (
           <button
             onClick={() => setEmptyTrashConfirmOpen(true)}
             className="px-4 py-2 rounded-xl text-xs font-bold text-black bg-white hover:bg-gray-200 transition-colors flex items-center gap-2"
           >
             <Trash2 className="w-3.5 h-3.5" />
-            <span>Empty Trash ({trashItems.length})</span>
+            <span>Empty Trash ({totalCount})</span>
           </button>
         )}
       </div>
 
-      {trashItems.length === 0 ? (
-        <div className="py-16 text-center">
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-20 text-gray-400 gap-3">
+          <Loader2 className="w-7 h-7 animate-spin text-white" />
+          <span className="text-xs font-mono">Loading trash contents...</span>
+        </div>
+      ) : totalCount === 0 ? (
+        <div className="py-20 text-center">
           <Trash2 className="w-10 h-10 mx-auto text-gray-700 mb-3" />
-          <h3 className="text-sm font-semibold text-white">
-            Trash is Empty
-          </h3>
+          <h3 className="text-sm font-semibold text-white">Trash is Empty</h3>
           <p className="text-xs text-gray-500 mt-1 max-w-sm mx-auto font-sans">
-            No deleted files found. Any assets you remove from your workspace will appear here before permanent purging.
+            Items moved to trash will appear here for recovery before being permanently erased.
           </p>
         </div>
       ) : (
-        <div className="space-y-0">
-          {/* Header Row */}
-          <div className="grid grid-cols-12 text-[11px] font-mono uppercase tracking-wider text-gray-500 pb-3 border-b border-white/[0.08] px-2">
-            <div className="col-span-5 sm:col-span-4">Item Name</div>
-            <div className="hidden sm:block sm:col-span-2">Category</div>
-            <div className="col-span-3 sm:col-span-2">Size</div>
-            <div className="hidden sm:block sm:col-span-2">Deleted Date</div>
-            <div className="col-span-4 sm:col-span-2 text-right">Actions</div>
-          </div>
-
-          {/* Rows */}
-          {trashItems.map((item) => (
-            <div
-              key={item.id}
-              className="grid grid-cols-12 items-center py-3.5 border-b border-white/[0.06] hover:bg-white/[0.03] px-2 transition-colors group"
-            >
-              <div className="col-span-5 sm:col-span-4 font-medium flex items-center gap-3 min-w-0 pr-2">
-                <FileTypeIcon category={item.category} />
-                <span className="text-xs font-medium text-white truncate">
-                  {item.name}
-                </span>
-              </div>
-
-              <div className="hidden sm:block sm:col-span-2">
-                <span className="capitalize text-gray-400 font-mono text-[11px] px-2 py-0.5 rounded bg-white/[0.04]">
-                  {item.category}
-                </span>
-              </div>
-
-              <div className="col-span-3 sm:col-span-2 font-mono text-gray-400 text-xs">
-                {formatFileSize(item.size)}
-              </div>
-
-              <div className="hidden sm:block sm:col-span-2 font-mono text-gray-500 text-xs">
-                {item.deletedAt ? formatRelativeTime(item.deletedAt) : 'Recently'}
-              </div>
-
-              <div className="col-span-4 sm:col-span-2 text-right">
-                <div className="inline-flex items-center gap-2">
-                  <button
-                    onClick={() => handleRestore(item.id, item.name)}
-                    className="px-2.5 py-1 rounded-lg text-xs font-medium text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 flex items-center gap-1"
+        <div className="space-y-6">
+          {/* Trashed Folders */}
+          {trashFolders.length > 0 && (
+            <div className="space-y-2">
+              <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-gray-400 px-1">
+                Trashed Folders ({trashFolders.length})
+              </h2>
+              <div className="space-y-1">
+                {trashFolders.map((folder) => (
+                  <div
+                    key={folder.id}
+                    className="flex items-center justify-between p-3 rounded-xl bg-[#111116] border border-white/5"
                   >
-                    <RotateCcw className="w-3 h-3 text-white" />
-                    <span>Restore</span>
-                  </button>
-                  <button
-                    onClick={() => setItemToDelete(item)}
-                    className="px-2.5 py-1 rounded-lg text-xs font-medium text-gray-400 hover:text-white hover:bg-white/10 flex items-center gap-1"
-                  >
-                    <Trash2 className="w-3 h-3" />
-                    <span>Purge</span>
-                  </button>
-                </div>
+                    <div className="flex items-center gap-3 min-w-0">
+                      <Folder className="w-5 h-5 text-amber-400/80 shrink-0" />
+                      <div className="min-w-0">
+                        <span className="text-xs font-medium text-white truncate block">
+                          {folder.name}
+                        </span>
+                        <span className="text-[10px] text-gray-500 font-mono">
+                          {folder.itemsCount} items
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleRestoreFolder(folder.id, folder.name)}
+                        className="px-3 py-1.5 rounded-lg text-xs font-medium text-white bg-white/10 hover:bg-white/20 flex items-center gap-1.5 transition-colors"
+                      >
+                        <RotateCcw className="w-3 h-3" />
+                        <span>Restore</span>
+                      </button>
+                      <button
+                        onClick={() => setItemToDelete({ id: folder.id, name: folder.name, type: 'folder' })}
+                        className="p-1.5 rounded-lg text-gray-400 hover:text-red-400 hover:bg-white/5 transition-colors"
+                        title="Delete Permanently"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-          ))}
+          )}
+
+          {/* Trashed Files */}
+          {trashFiles.length > 0 && (
+            <div className="space-y-2">
+              <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-gray-400 px-1">
+                Trashed Files ({trashFiles.length})
+              </h2>
+
+              <div className="space-y-0">
+                <div className="grid grid-cols-12 text-[11px] font-mono uppercase tracking-wider text-gray-500 pb-3 border-b border-white/[0.08] px-2">
+                  <div className="col-span-6 sm:col-span-5">Name</div>
+                  <div className="hidden sm:block sm:col-span-2">Type</div>
+                  <div className="col-span-3 sm:col-span-2">Size</div>
+                  <div className="col-span-3 text-right">Actions</div>
+                </div>
+
+                {trashFiles.map((file) => (
+                  <div
+                    key={file.id}
+                    className="grid grid-cols-12 items-center py-3.5 border-b border-white/[0.06] hover:bg-white/[0.03] px-2 transition-colors"
+                  >
+                    <div className="col-span-6 sm:col-span-5 flex items-center gap-3 min-w-0 pr-2">
+                      <FileTypeIcon category={file.category} />
+                      <span className="text-xs font-medium text-white truncate">
+                        {file.name}
+                      </span>
+                    </div>
+
+                    <div className="hidden sm:block sm:col-span-2">
+                      <span className="capitalize text-gray-400 font-mono text-[11px] px-2 py-0.5 rounded bg-white/[0.04]">
+                        {file.category}
+                      </span>
+                    </div>
+
+                    <div className="col-span-3 sm:col-span-2 font-mono text-gray-400 text-xs">
+                      {formatFileSize(file.size)}
+                    </div>
+
+                    <div className="col-span-3 text-right">
+                      <div className="inline-flex items-center gap-2">
+                        <button
+                          onClick={() => handleRestoreFile(file.id, file.name)}
+                          className="px-3 py-1.5 rounded-lg text-xs font-medium text-white bg-white/10 hover:bg-white/20 flex items-center gap-1.5 transition-colors"
+                        >
+                          <RotateCcw className="w-3 h-3" />
+                          <span>Restore</span>
+                        </button>
+                        <button
+                          onClick={() => setItemToDelete({ id: file.id, name: file.name, type: 'file' })}
+                          className="p-1.5 rounded-lg text-gray-400 hover:text-red-400 hover:bg-white/5 transition-colors"
+                          title="Delete Permanently"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
-      {/* Empty Trash Confirmation Modal */}
+      {/* Delete Confirmation Modal */}
       <Modal
-        isOpen={emptyTrashConfirmOpen}
-        onClose={() => setEmptyTrashConfirmOpen(false)}
-        title="Permanently Empty Trash?"
-        description="This will destroy all items currently staged in trash. This action cannot be undone."
+        isOpen={!!itemToDelete}
+        onClose={() => setItemToDelete(null)}
+        title="Permanently Delete Item"
+        description="This action is irreversible. The object will be purged from MinIO object storage and the database permanently."
         maxWidth="sm"
       >
         <div className="space-y-4 pt-2">
-          <div className="p-4 rounded-xl bg-white/[0.04] border border-white/10 text-xs text-gray-300 flex items-start gap-2.5">
-            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-white" />
-            <span className="font-mono">
-              All cryptographic references to these files will be wiped permanently from your vault.
-            </span>
-          </div>
-
-          <div className="flex justify-end gap-2 pt-1">
+          <p className="text-xs text-white">
+            Are you sure you want to permanently destroy <span className="font-bold underline">{itemToDelete?.name}</span>?
+          </p>
+          <div className="flex justify-end gap-2 pt-2">
             <button
               type="button"
-              onClick={() => setEmptyTrashConfirmOpen(false)}
-              className="px-4 py-2 rounded-xl text-xs font-semibold text-gray-400 hover:text-white hover:bg-white/5 border border-white/10"
+              onClick={() => setItemToDelete(null)}
+              className="px-4 py-2 rounded-xl text-xs font-semibold text-gray-400 hover:text-white"
             >
               Cancel
             </button>
             <button
               type="button"
-              onClick={handleEmptyTrash}
-              className="px-4 py-2 rounded-xl text-xs font-bold text-black bg-white hover:bg-gray-200 transition-colors"
+              disabled={actionInProgress}
+              onClick={handlePermanentDelete}
+              className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-red-600 hover:bg-red-500 transition-colors disabled:opacity-50"
             >
-              Confirm Empty Trash
+              {actionInProgress ? 'Deleting...' : 'Delete Permanently'}
             </button>
           </div>
         </div>
       </Modal>
 
-      {/* Single Item Purge Confirmation Modal */}
+      {/* Empty Trash Confirmation Modal */}
       <Modal
-        isOpen={!!itemToDelete}
-        onClose={() => setItemToDelete(null)}
-        title="Permanently Delete Item?"
-        description={`"${itemToDelete?.name}" will be wiped from disk storage immediately.`}
+        isOpen={emptyTrashConfirmOpen}
+        onClose={() => setEmptyTrashConfirmOpen(false)}
+        title="Empty Entire Trash"
+        description="All items currently in the trash will be erased forever."
         maxWidth="sm"
       >
         <div className="space-y-4 pt-2">
-          <div className="flex justify-end gap-2 pt-1">
+          <p className="text-xs text-white">
+            Are you sure you want to permanently purge all {totalCount} items from trash?
+          </p>
+          <div className="flex justify-end gap-2 pt-2">
             <button
               type="button"
-              onClick={() => setItemToDelete(null)}
-              className="px-4 py-2 rounded-xl text-xs font-semibold text-gray-400 hover:text-white hover:bg-white/5 border border-white/10"
+              onClick={() => setEmptyTrashConfirmOpen(false)}
+              className="px-4 py-2 rounded-xl text-xs font-semibold text-gray-400 hover:text-white"
             >
               Cancel
             </button>
             <button
               type="button"
-              onClick={handlePermanentDelete}
-              className="px-4 py-2 rounded-xl text-xs font-bold text-black bg-white hover:bg-gray-200 transition-colors"
+              disabled={actionInProgress}
+              onClick={handleEmptyTrash}
+              className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-red-600 hover:bg-red-500 transition-colors disabled:opacity-50"
             >
-              Purge File
+              {actionInProgress ? 'Purging...' : 'Empty Trash'}
             </button>
           </div>
         </div>
