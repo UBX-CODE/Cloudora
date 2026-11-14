@@ -46,6 +46,7 @@ router.get('/:id/session', getSessionStatus);
 // Presigned Streaming & Download URLs
 router.get('/:id/download-url', fileController.getDownloadUrl);
 router.get('/:id/preview-url', fileController.getPreviewUrl);
+router.get('/:id/thumbnail-url', fileController.getThumbnailUrl);
 
 // File Metadata & Mutations
 router.get('/:id', fileController.getFileDetails);

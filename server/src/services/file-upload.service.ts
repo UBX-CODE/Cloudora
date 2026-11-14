@@ -14,6 +14,7 @@ import { storageClient } from '../lib/storage';
 import { config } from '../config/env';
 import { AppError } from '../utils/errors';
 import { verifyStorageQuota, recordUploadCompleted } from './quota.service';
+import { dispatchFileProcessingJob } from '../queues/file-processing.queue';
 
 export interface CreateUploadDTO {
   name: string;
@@ -223,6 +224,16 @@ export async function confirmSingleUpload(ownerId: string, fileId: string) {
 
   // Atomically increment user's storage quota usage
   await recordUploadCompleted(ownerId, file.size);
+
+  // Dispatch asynchronous thumbnail generation for images
+  if (file.mimeType.startsWith('image/')) {
+  await dispatchFileProcessingJob({
+    fileId: file.id,
+    storageKey: file.storageKey!,
+    mimeType: file.mimeType,
+    ownerId,
+  });
+  }
 
   return {
     fileId: updatedFile.id,
@@ -542,6 +553,15 @@ export async function completeMultipartUpload(
     // Atomically increment user's storage quota usage
     await recordUploadCompleted(ownerId, actualSize);
 
+    // Dispatch asynchronous thumbnail generation for images
+    if (file.mimeType.startsWith('image/')) {
+        await dispatchFileProcessingJob({
+        fileId: file.id,
+        storageKey: file.storageKey!,
+        mimeType: file.mimeType,
+        ownerId,
+      });
+    }
     return {
       fileId,
       status: 'UPLOADED',

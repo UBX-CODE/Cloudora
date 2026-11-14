@@ -77,6 +77,8 @@ export function formatFileResponse(file: any): FileResponseDTO {
     size: Number(file.size),
     status: file.status,
     folderId: file.folderId,
+    hasThumbnail: Boolean(file.thumbnailKey),
+    thumbnailKey: file.thumbnailKey || null,
     isStarred: Boolean(file.isStarred),
     isTrashed: Boolean(file.isTrashed),
     trashedAt: file.trashedAt ? new Date(file.trashedAt).toISOString() : null,
@@ -267,6 +269,37 @@ export async function getPreviewUrl(
 }
 
 /**
+ * 4b. Generate presigned thumbnail URL.
+ * Valid for 1 hour (3600s).
+ */
+export async function getThumbnailUrl(
+  ownerId: string,
+  fileId: string
+): Promise<{ thumbnailUrl: string }> {
+  const file = await prisma.file.findFirst({
+    where: { id: fileId, ownerId },
+  });
+
+  if (!file) {
+    throw new AppError('File not found.', 404);
+  }
+
+  if (!file.thumbnailKey) {
+    throw new AppError('No thumbnail available for this file.', 404);
+  }
+
+  const command = new GetObjectCommand({
+    Bucket: config.MINIO_BUCKET,
+    Key: file.thumbnailKey,
+    ResponseContentType: 'image/webp',
+    ResponseContentDisposition: 'inline',
+  });
+
+  const thumbnailUrl = await getSignedUrl(storageClient, command, { expiresIn: 3600 });
+  return { thumbnailUrl };
+}
+
+/**
  * 5. Rename file with sibling collision prevention in the same folder.
  */
 export async function renameFile(ownerId: string, fileId: string, rawNewName: string): Promise<FileResponseDTO> {
@@ -436,7 +469,7 @@ export async function permanentlyDeleteFile(ownerId: string, fileId: string): Pr
     throw new AppError('File not found.', 404);
   }
 
-  // 1. Delete object from MinIO S3 bucket
+  // 1. Delete object and thumbnail from MinIO S3 bucket
   if (file.storageKey) {
     try {
       await storageClient.send(
@@ -447,6 +480,19 @@ export async function permanentlyDeleteFile(ownerId: string, fileId: string): Pr
       );
     } catch (err: any) {
       console.warn(`[MinIO Delete Warning] Key "${file.storageKey}":`, err.message);
+    }
+  }
+
+  if (file.thumbnailKey) {
+    try {
+      await storageClient.send(
+        new DeleteObjectCommand({
+          Bucket: config.MINIO_BUCKET,
+          Key: file.thumbnailKey,
+        })
+      );
+    } catch (err: any) {
+      console.warn(`[MinIO Thumbnail Delete Warning] Key "${file.thumbnailKey}":`, err.message);
     }
   }
 

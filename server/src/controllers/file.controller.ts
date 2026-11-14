@@ -107,6 +107,26 @@ export async function getPreviewUrl(req: Request, res: Response, next: NextFunct
 }
 
 /**
+ * Get presigned thumbnail URL.
+ */
+export async function getThumbnailUrl(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    if (!req.user?.id) throw new AppError('Authentication required.', 401);
+
+    const { id } = req.params;
+    const result = await fileService.getThumbnailUrl(req.user.id, id);
+
+    res.status(200).json({
+      success: true,
+      message: 'Thumbnail URL generated successfully',
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
  * Rename file.
  */
 export async function renameFile(req: Request, res: Response, next: NextFunction): Promise<void> {

@@ -64,6 +64,7 @@ model File {
   mimeType   String
   size       BigInt
   storageKey String?    @unique
+  thumbnailKey String?
   checksum   String?
   status     FileStatus @default(PENDING)
 

@@ -77,36 +77,7 @@ export const DashboardPage: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-150">
-      {/* 1. Storage Quota Metric Card */}
-      {storageSummary && (
-        <div className="p-5 rounded-2xl bg-[#111116] border border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white">
-              <HardDrive className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="text-sm font-bold text-white">Storage Overview</h3>
-              <p className="text-xs text-gray-400 font-mono mt-0.5">
-                {formatFileSize(storageSummary.totalUsedBytes)} of{' '}
-                {formatFileSize(storageSummary.storageLimitBytes)} Used ({storageSummary.percentageUsed}%)
-              </p>
-            </div>
-          </div>
-
-          <div className="w-full sm:w-64 space-y-1.5">
-            <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden">
-              <div
-                className="h-full bg-white transition-all duration-300"
-                style={{ width: `${Math.min(100, storageSummary.percentageUsed)}%` }}
-              />
-            </div>
-            <div className="flex justify-between text-[10px] text-gray-500 font-mono">
-              <span>{storageSummary.fileCount} Active Files</span>
-              <span>Free Tier (5 GB)</span>
-            </div>
-          </div>
-        </div>
-      )}
+      
 
       {/* 2. Filter Tabs & Search Bar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pb-3 border-b border-white/[0.08]">

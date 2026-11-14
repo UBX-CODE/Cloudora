@@ -1,6 +1,7 @@
 import app from './app';
 import { config } from './config/env';
 import { cleanupExpiredUploadSessions } from './services/file-upload.service';
+import './workers/file-processing.worker';
 
 const server = app.listen(config.PORT, () => {
   console.log(`=========================================`);

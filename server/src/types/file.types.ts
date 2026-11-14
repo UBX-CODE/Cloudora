@@ -40,6 +40,8 @@ export interface FileResponseDTO {
   size: number;
   status: string;
   folderId: string | null;
+  hasThumbnail: boolean;
+  thumbnailKey?: string | null;
   isStarred: boolean;
   isTrashed: boolean;
   trashedAt: string | null;

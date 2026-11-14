@@ -597,7 +597,7 @@ export async function permanentlyDeleteFolder(ownerId: string, folderId: string)
       folderId: { in: allFolderIds },
       ownerId,
     },
-    select: { size: true, storageKey: true },
+    select: { size: true, storageKey: true, thumbnailKey: true },
   });
 
   const totalBytesDeleted = filesToDelete.reduce(
@@ -605,7 +605,7 @@ export async function permanentlyDeleteFolder(ownerId: string, folderId: string)
     BigInt(0)
   );
 
-  // 2. Clean up MinIO S3 objects
+  // 2. Clean up MinIO S3 objects & thumbnails
   for (const f of filesToDelete) {
     if (f.storageKey) {
       try {
@@ -617,6 +617,18 @@ export async function permanentlyDeleteFolder(ownerId: string, folderId: string)
         );
       } catch (err: any) {
         console.warn(`[MinIO Folder Delete Warning] Key "${f.storageKey}":`, err.message);
+      }
+    }
+    if (f.thumbnailKey) {
+      try {
+        await storageClient.send(
+          new DeleteObjectCommand({
+            Bucket: config.MINIO_BUCKET,
+            Key: f.thumbnailKey,
+          })
+        );
+      } catch (err: any) {
+        console.warn(`[MinIO Thumbnail Delete Warning] Key "${f.thumbnailKey}":`, err.message);
       }
     }
   }
