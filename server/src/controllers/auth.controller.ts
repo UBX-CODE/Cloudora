@@ -49,6 +49,43 @@ export async function getCurrentUser(req: Request, res: Response, next: NextFunc
   }
 }
 
+export async function updateProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    if (!req.user?.id) {
+      throw new AppError('Unauthorized: Missing user context.', 401);
+    }
+
+    const { name } = req.body;
+    const updatedUser = await authService.updateProfile(req.user.id, { name });
+
+    res.status(200).json({
+      success: true,
+      message: 'Profile updated successfully.',
+      data: { user: updatedUser },
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function changePassword(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    if (!req.user?.id) {
+      throw new AppError('Unauthorized: Missing user context.', 401);
+    }
+
+    const { currentPassword, newPassword } = req.body;
+    const result = await authService.changePassword(req.user.id, { currentPassword, newPassword });
+
+    res.status(200).json({
+      success: true,
+      message: result.message,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 export async function logout(_req: Request, res: Response): Promise<void> {
   // Clear architectural note:
   // In this initial version, JWTs are stateless without a Redis/database token-revocation denylist.

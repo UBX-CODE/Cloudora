@@ -146,3 +146,59 @@ export async function getUserById(userId: string): Promise<SafeUser> {
 
   return sanitizeUser(user);
 }
+
+// Update user profile (name)
+export async function updateProfile(userId: string, data: { name: string }): Promise<SafeUser> {
+  const { name } = data;
+  if (!name || name.trim().length < 2) {
+    throw new AppError('Name must be at least 2 characters long.', 400);
+  }
+
+  const updatedUser = await prisma.user.update({
+    where: { id: userId },
+    data: { name: name.trim() },
+  });
+
+  return sanitizeUser(updatedUser);
+}
+
+// Change account password
+export async function changePassword(
+  userId: string,
+  data: { currentPassword: string; newPassword: string }
+): Promise<{ success: boolean; message: string }> {
+  const { currentPassword, newPassword } = data;
+
+  if (!currentPassword || !newPassword) {
+    throw new AppError('Current password and new password are required.', 400);
+  }
+
+  if (newPassword.length < 8) {
+    throw new AppError('New password must be at least 8 characters long.', 400);
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+
+  if (!user) {
+    throw new AppError('User not found.', 404);
+  }
+
+  const isCurrentValid = await bcrypt.compare(currentPassword, user.passwordHash);
+  if (!isCurrentValid) {
+    throw new AppError('Current password is incorrect.', 400);
+  }
+
+  const passwordHash = await bcrypt.hash(newPassword, SALT_ROUNDS);
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: { passwordHash },
+  });
+
+  return {
+    success: true,
+    message: 'Password changed successfully.',
+  };
+}

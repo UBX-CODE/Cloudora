@@ -11,6 +11,8 @@ router.post('/logout', authController.logout);
 
 // Protected routes (require valid JWT)
 router.get('/me', authenticate, authController.getCurrentUser);
+router.patch('/profile', authenticate, authController.updateProfile);
+router.patch('/password', authenticate, authController.changePassword);
 
 export default router;
 

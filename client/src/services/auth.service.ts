@@ -31,5 +31,18 @@ export const authService = {
       // Ignore network errors on logout since token is discarded client-side
     }
   },
+
+  async updateProfile(name: string): Promise<User> {
+    const response = await api.patch<ApiResponse<{ user: User }>>('/auth/profile', { name });
+    return response.data.data.user;
+  },
+
+  async changePassword(currentPassword: string, newPassword: string): Promise<string> {
+    const response = await api.patch<ApiResponse<void>>('/auth/password', {
+      currentPassword,
+      newPassword,
+    });
+    return response.data.message || 'Password changed successfully.';
+  },
 };
 
