@@ -7,6 +7,7 @@ import { config } from './config/env';
 import folderRoutes from './routes/folder.routes';
 import { checkStorageConnection } from './services/storage.service';
 import fileRoutes from './routes/file.routes';
+import shareRoutes from './routes/share.routes';
 
 const app: Application = express();
 
@@ -33,6 +34,7 @@ app.get('/api/health', (_req: Request, res: Response) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/folders', folderRoutes);
 app.use('/api/files', fileRoutes);
+app.use('/api/shares', shareRoutes);
 
 app.get('/api/storage/health', async (req, res) => {
   const isConnected = await checkStorageConnection();

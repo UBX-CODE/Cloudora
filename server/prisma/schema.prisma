@@ -12,6 +12,35 @@ enum UserRole {
   ADMIN
 }
 
+enum ShareRole {
+  VIEW
+  EDIT
+}
+
+
+model Share {
+  id           String    @id @default(uuid())
+  token        String    @unique // Public URL token: /s/:token
+  fileId       String?
+  file         File?     @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  folderId     String?
+  folder       Folder?   @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  
+  ownerId      String
+  owner        User      @relation("SharedByUser", fields: [ownerId], references: [id], onDelete: Cascade)
+  sharedWithId String?   // Null for public links, or User.id for direct user sharing
+  sharedWith   User?     @relation("SharedWithUser", fields: [sharedWithId], references: [id], onDelete: Cascade)
+  role         ShareRole @default(VIEW)
+  passwordHash String?   // Optional password protection
+  expiresAt    DateTime? // Optional expiry (e.g. 24 hours, 7 days)
+  viewsCount   Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  @@index([token])
+  @@index([ownerId])
+  @@index([sharedWithId])
+}
+
 model User {
   id           String   @id @default(uuid())
   name         String
@@ -26,6 +55,8 @@ model User {
   files         File[]
   folders       Folder[]
   uploadSession UploadSession[]
+  sharesCreated  Share[] @relation("SharedByUser")
+  sharesReceived Share[] @relation("SharedWithUser")
 }
 
 enum FileStatus {
@@ -53,6 +84,7 @@ model Folder {
   updatedAt DateTime @updatedAt
 
   files File[]
+  shares Share[]
 
   @@index([ownerId, parentId])
   @@index([ownerId, createdAt])
@@ -81,6 +113,7 @@ model File {
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   uploadSession UploadSession?
+  shares        Share[]
 
   @@index([ownerId, folderId])
   @@index([ownerId, createdAt])

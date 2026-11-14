@@ -27,11 +27,15 @@ api.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
     if (error.response?.status === 401) {
-      // Clear local storage if token rejected
+      // Clear local storage if token rejected (except on auth pages or public share pages)
       const currentPath = window.location.pathname;
-      const isAuthPage = currentPath === '/login' || currentPath === '/register' || currentPath === '/';
-      
-      if (!isAuthPage) {
+      const isAuthOrPublicPage =
+        currentPath === '/login' ||
+        currentPath === '/register' ||
+        currentPath === '/' ||
+        currentPath.startsWith('/s/');
+
+      if (!isAuthOrPublicPage) {
         localStorage.removeItem('cloudora_token');
         localStorage.removeItem('cloudora_user');
         window.location.href = '/login';

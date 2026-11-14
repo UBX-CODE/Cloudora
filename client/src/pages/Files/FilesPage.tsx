@@ -25,6 +25,7 @@ import { formatFileSize, formatRelativeTime } from '../../utils/formatters';
 import { FileTypeIcon } from '../../components/common/FileTypeIcon';
 import { Modal } from '../../components/ui/Modal';
 import { FilePreviewModal } from '../../components/common/FilePreviewModal';
+import { ShareModal } from '../../components/common/ShareModal';
 import { FileItem, FolderItem } from '../../types/storage.types';
 import {
   fetchFiles,
@@ -69,6 +70,10 @@ export const FilesPage: React.FC = () => {
 
   // Modals & Actions
   const [previewFile, setPreviewFile] = useState<FileItem | null>(null);
+  const [shareTarget, setShareTarget] = useState<{
+    item: FileItem | FolderItem;
+    type: 'file' | 'folder';
+  } | null>(null);
   const [newFolderModalOpen, setNewFolderModalOpen] = useState(false);
   const [newFolderName, setNewFolderName] = useState('');
   const [creatingFolder, setCreatingFolder] = useState(false);
@@ -477,13 +482,25 @@ export const FilesPage: React.FC = () => {
                         </p>
                       </div>
                     </div>
-                    <button
-                      onClick={(e) => handleTrashFolder(folder, e)}
-                      className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-white/10 text-gray-400 hover:text-red-400 transition-all"
-                      title="Delete Folder"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShareTarget({ item: folder, type: 'folder' });
+                        }}
+                        className="p-1 rounded hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+                        title="Share Folder"
+                      >
+                        <Share2 className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={(e) => handleTrashFolder(folder, e)}
+                        className="p-1 rounded hover:bg-white/10 text-gray-400 hover:text-red-400 transition-colors"
+                        title="Delete Folder"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -598,6 +615,13 @@ export const FilesPage: React.FC = () => {
                               <Eye className="w-3.5 h-3.5" />
                             </button>
                             <button
+                              onClick={() => setShareTarget({ item: file, type: 'file' })}
+                              className="p-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+                              title="Share Asset"
+                            >
+                              <Share2 className="w-3.5 h-3.5" />
+                            </button>
+                            <button
                               onClick={() => downloadFile(file.id, file.name)}
                               className="p-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
                               title="Download"
@@ -680,6 +704,13 @@ export const FilesPage: React.FC = () => {
                             title="Preview"
                           >
                             <Eye className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => setShareTarget({ item: file, type: 'file' })}
+                            className="p-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white"
+                            title="Share Asset"
+                          >
+                            <Share2 className="w-3.5 h-3.5" />
                           </button>
                           <button
                             onClick={() => downloadFile(file.id, file.name)}
@@ -816,6 +847,14 @@ export const FilesPage: React.FC = () => {
         file={previewFile}
         isOpen={!!previewFile}
         onClose={() => setPreviewFile(null)}
+      />
+
+      {/* Secure Cryptographic Share Modal */}
+      <ShareModal
+        isOpen={Boolean(shareTarget)}
+        onClose={() => setShareTarget(null)}
+        target={shareTarget ? shareTarget.item : null}
+        targetType={shareTarget ? shareTarget.type : 'file'}
       />
     </div>
   );

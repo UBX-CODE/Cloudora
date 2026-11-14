@@ -51,6 +51,7 @@ export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
+  Share: 'Share',
   User: 'User',
   Folder: 'Folder',
   File: 'File',
@@ -71,6 +72,24 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
 } as const)
 
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
+
+
+export const ShareScalarFieldEnum = {
+  id: 'id',
+  token: 'token',
+  fileId: 'fileId',
+  folderId: 'folderId',
+  ownerId: 'ownerId',
+  sharedWithId: 'sharedWithId',
+  role: 'role',
+  passwordHash: 'passwordHash',
+  expiresAt: 'expiresAt',
+  viewsCount: 'viewsCount',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ShareScalarFieldEnum = (typeof ShareScalarFieldEnum)[keyof typeof ShareScalarFieldEnum]
 
 
 export const UserScalarFieldEnum = {

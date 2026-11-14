@@ -17,6 +17,7 @@ import { MediaPage } from '../pages/Media/MediaPage';
 import { UploadManagerPage } from '../pages/UploadManager/UploadManagerPage';
 import { TrashPage } from '../pages/Trash/TrashPage';
 import { SettingsPage } from '../pages/Settings/SettingsPage';
+import { PublicSharePage } from '../pages/Shared/PublicSharePage';
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -24,7 +25,10 @@ export const AppRoutes: React.FC = () => {
       {/* 1. First Page / Root route MUST be Landing Page */}
       <Route path="/" element={<LandingPage />} />
 
-      {/* 2. Public Auth Routes (Redirects to /dashboard if already logged in) */}
+      {/* 2. Public Time-Expiring Share Link Route */}
+      <Route path="/s/:token" element={<PublicSharePage />} />
+
+      {/* 3. Public Auth Routes (Redirects to /dashboard if already logged in) */}
       <Route element={<PublicRoute />}>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />

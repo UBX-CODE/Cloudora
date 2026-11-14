@@ -299,6 +299,7 @@ export type FileWhereInput = {
   owner?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   folder?: Prisma.XOR<Prisma.FolderNullableScalarRelationFilter, Prisma.FolderWhereInput> | null
   uploadSession?: Prisma.XOR<Prisma.UploadSessionNullableScalarRelationFilter, Prisma.UploadSessionWhereInput> | null
+  shares?: Prisma.ShareListRelationFilter
 }
 
 export type FileOrderByWithRelationInput = {
@@ -320,6 +321,7 @@ export type FileOrderByWithRelationInput = {
   owner?: Prisma.UserOrderByWithRelationInput
   folder?: Prisma.FolderOrderByWithRelationInput
   uploadSession?: Prisma.UploadSessionOrderByWithRelationInput
+  shares?: Prisma.ShareOrderByRelationAggregateInput
 }
 
 export type FileWhereUniqueInput = Prisma.AtLeast<{
@@ -344,6 +346,7 @@ export type FileWhereUniqueInput = Prisma.AtLeast<{
   owner?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   folder?: Prisma.XOR<Prisma.FolderNullableScalarRelationFilter, Prisma.FolderWhereInput> | null
   uploadSession?: Prisma.XOR<Prisma.UploadSessionNullableScalarRelationFilter, Prisma.UploadSessionWhereInput> | null
+  shares?: Prisma.ShareListRelationFilter
 }, "id" | "storageKey">
 
 export type FileOrderByWithAggregationInput = {
@@ -407,6 +410,7 @@ export type FileCreateInput = {
   owner: Prisma.UserCreateNestedOneWithoutFilesInput
   folder?: Prisma.FolderCreateNestedOneWithoutFilesInput
   uploadSession?: Prisma.UploadSessionCreateNestedOneWithoutFileInput
+  shares?: Prisma.ShareCreateNestedManyWithoutFileInput
 }
 
 export type FileUncheckedCreateInput = {
@@ -426,6 +430,7 @@ export type FileUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   uploadSession?: Prisma.UploadSessionUncheckedCreateNestedOneWithoutFileInput
+  shares?: Prisma.ShareUncheckedCreateNestedManyWithoutFileInput
 }
 
 export type FileUpdateInput = {
@@ -445,6 +450,7 @@ export type FileUpdateInput = {
   owner?: Prisma.UserUpdateOneRequiredWithoutFilesNestedInput
   folder?: Prisma.FolderUpdateOneWithoutFilesNestedInput
   uploadSession?: Prisma.UploadSessionUpdateOneWithoutFileNestedInput
+  shares?: Prisma.ShareUpdateManyWithoutFileNestedInput
 }
 
 export type FileUncheckedUpdateInput = {
@@ -464,6 +470,7 @@ export type FileUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   uploadSession?: Prisma.UploadSessionUncheckedUpdateOneWithoutFileNestedInput
+  shares?: Prisma.ShareUncheckedUpdateManyWithoutFileNestedInput
 }
 
 export type FileCreateManyInput = {
@@ -516,6 +523,11 @@ export type FileUncheckedUpdateManyInput = {
   trashedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type FileNullableScalarRelationFilter = {
+  is?: Prisma.FileWhereInput | null
+  isNot?: Prisma.FileWhereInput | null
 }
 
 export type FileListRelationFilter = {
@@ -593,6 +605,22 @@ export type FileSumOrderByAggregateInput = {
 export type FileScalarRelationFilter = {
   is?: Prisma.FileWhereInput
   isNot?: Prisma.FileWhereInput
+}
+
+export type FileCreateNestedOneWithoutSharesInput = {
+  create?: Prisma.XOR<Prisma.FileCreateWithoutSharesInput, Prisma.FileUncheckedCreateWithoutSharesInput>
+  connectOrCreate?: Prisma.FileCreateOrConnectWithoutSharesInput
+  connect?: Prisma.FileWhereUniqueInput
+}
+
+export type FileUpdateOneWithoutSharesNestedInput = {
+  create?: Prisma.XOR<Prisma.FileCreateWithoutSharesInput, Prisma.FileUncheckedCreateWithoutSharesInput>
+  connectOrCreate?: Prisma.FileCreateOrConnectWithoutSharesInput
+  upsert?: Prisma.FileUpsertWithoutSharesInput
+  disconnect?: Prisma.FileWhereInput | boolean
+  delete?: Prisma.FileWhereInput | boolean
+  connect?: Prisma.FileWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.FileUpdateToOneWithWhereWithoutSharesInput, Prisma.FileUpdateWithoutSharesInput>, Prisma.FileUncheckedUpdateWithoutSharesInput>
 }
 
 export type FileCreateNestedManyWithoutOwnerInput = {
@@ -697,6 +725,98 @@ export type FileUpdateOneRequiredWithoutUploadSessionNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.FileUpdateToOneWithWhereWithoutUploadSessionInput, Prisma.FileUpdateWithoutUploadSessionInput>, Prisma.FileUncheckedUpdateWithoutUploadSessionInput>
 }
 
+export type FileCreateWithoutSharesInput = {
+  id?: string
+  name: string
+  mimeType: string
+  size: bigint | number
+  storageKey?: string | null
+  thumbnailKey?: string | null
+  checksum?: string | null
+  status?: $Enums.FileStatus
+  isStarred?: boolean
+  isTrashed?: boolean
+  trashedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  owner: Prisma.UserCreateNestedOneWithoutFilesInput
+  folder?: Prisma.FolderCreateNestedOneWithoutFilesInput
+  uploadSession?: Prisma.UploadSessionCreateNestedOneWithoutFileInput
+}
+
+export type FileUncheckedCreateWithoutSharesInput = {
+  id?: string
+  name: string
+  mimeType: string
+  size: bigint | number
+  storageKey?: string | null
+  thumbnailKey?: string | null
+  checksum?: string | null
+  status?: $Enums.FileStatus
+  ownerId: string
+  folderId?: string | null
+  isStarred?: boolean
+  isTrashed?: boolean
+  trashedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  uploadSession?: Prisma.UploadSessionUncheckedCreateNestedOneWithoutFileInput
+}
+
+export type FileCreateOrConnectWithoutSharesInput = {
+  where: Prisma.FileWhereUniqueInput
+  create: Prisma.XOR<Prisma.FileCreateWithoutSharesInput, Prisma.FileUncheckedCreateWithoutSharesInput>
+}
+
+export type FileUpsertWithoutSharesInput = {
+  update: Prisma.XOR<Prisma.FileUpdateWithoutSharesInput, Prisma.FileUncheckedUpdateWithoutSharesInput>
+  create: Prisma.XOR<Prisma.FileCreateWithoutSharesInput, Prisma.FileUncheckedCreateWithoutSharesInput>
+  where?: Prisma.FileWhereInput
+}
+
+export type FileUpdateToOneWithWhereWithoutSharesInput = {
+  where?: Prisma.FileWhereInput
+  data: Prisma.XOR<Prisma.FileUpdateWithoutSharesInput, Prisma.FileUncheckedUpdateWithoutSharesInput>
+}
+
+export type FileUpdateWithoutSharesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  mimeType?: Prisma.StringFieldUpdateOperationsInput | string
+  size?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  storageKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksum?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumFileStatusFieldUpdateOperationsInput | $Enums.FileStatus
+  isStarred?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isTrashed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  trashedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  owner?: Prisma.UserUpdateOneRequiredWithoutFilesNestedInput
+  folder?: Prisma.FolderUpdateOneWithoutFilesNestedInput
+  uploadSession?: Prisma.UploadSessionUpdateOneWithoutFileNestedInput
+}
+
+export type FileUncheckedUpdateWithoutSharesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  mimeType?: Prisma.StringFieldUpdateOperationsInput | string
+  size?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  storageKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  thumbnailKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checksum?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumFileStatusFieldUpdateOperationsInput | $Enums.FileStatus
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  folderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isStarred?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isTrashed?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  trashedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  uploadSession?: Prisma.UploadSessionUncheckedUpdateOneWithoutFileNestedInput
+}
+
 export type FileCreateWithoutOwnerInput = {
   id?: string
   name: string
@@ -713,6 +833,7 @@ export type FileCreateWithoutOwnerInput = {
   updatedAt?: Date | string
   folder?: Prisma.FolderCreateNestedOneWithoutFilesInput
   uploadSession?: Prisma.UploadSessionCreateNestedOneWithoutFileInput
+  shares?: Prisma.ShareCreateNestedManyWithoutFileInput
 }
 
 export type FileUncheckedCreateWithoutOwnerInput = {
@@ -731,6 +852,7 @@ export type FileUncheckedCreateWithoutOwnerInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   uploadSession?: Prisma.UploadSessionUncheckedCreateNestedOneWithoutFileInput
+  shares?: Prisma.ShareUncheckedCreateNestedManyWithoutFileInput
 }
 
 export type FileCreateOrConnectWithoutOwnerInput = {
@@ -796,6 +918,7 @@ export type FileCreateWithoutFolderInput = {
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutFilesInput
   uploadSession?: Prisma.UploadSessionCreateNestedOneWithoutFileInput
+  shares?: Prisma.ShareCreateNestedManyWithoutFileInput
 }
 
 export type FileUncheckedCreateWithoutFolderInput = {
@@ -814,6 +937,7 @@ export type FileUncheckedCreateWithoutFolderInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   uploadSession?: Prisma.UploadSessionUncheckedCreateNestedOneWithoutFileInput
+  shares?: Prisma.ShareUncheckedCreateNestedManyWithoutFileInput
 }
 
 export type FileCreateOrConnectWithoutFolderInput = {
@@ -858,6 +982,7 @@ export type FileCreateWithoutUploadSessionInput = {
   updatedAt?: Date | string
   owner: Prisma.UserCreateNestedOneWithoutFilesInput
   folder?: Prisma.FolderCreateNestedOneWithoutFilesInput
+  shares?: Prisma.ShareCreateNestedManyWithoutFileInput
 }
 
 export type FileUncheckedCreateWithoutUploadSessionInput = {
@@ -876,6 +1001,7 @@ export type FileUncheckedCreateWithoutUploadSessionInput = {
   trashedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  shares?: Prisma.ShareUncheckedCreateNestedManyWithoutFileInput
 }
 
 export type FileCreateOrConnectWithoutUploadSessionInput = {
@@ -910,6 +1036,7 @@ export type FileUpdateWithoutUploadSessionInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutFilesNestedInput
   folder?: Prisma.FolderUpdateOneWithoutFilesNestedInput
+  shares?: Prisma.ShareUpdateManyWithoutFileNestedInput
 }
 
 export type FileUncheckedUpdateWithoutUploadSessionInput = {
@@ -928,6 +1055,7 @@ export type FileUncheckedUpdateWithoutUploadSessionInput = {
   trashedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  shares?: Prisma.ShareUncheckedUpdateManyWithoutFileNestedInput
 }
 
 export type FileCreateManyOwnerInput = {
@@ -963,6 +1091,7 @@ export type FileUpdateWithoutOwnerInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   folder?: Prisma.FolderUpdateOneWithoutFilesNestedInput
   uploadSession?: Prisma.UploadSessionUpdateOneWithoutFileNestedInput
+  shares?: Prisma.ShareUpdateManyWithoutFileNestedInput
 }
 
 export type FileUncheckedUpdateWithoutOwnerInput = {
@@ -981,6 +1110,7 @@ export type FileUncheckedUpdateWithoutOwnerInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   uploadSession?: Prisma.UploadSessionUncheckedUpdateOneWithoutFileNestedInput
+  shares?: Prisma.ShareUncheckedUpdateManyWithoutFileNestedInput
 }
 
 export type FileUncheckedUpdateManyWithoutOwnerInput = {
@@ -1033,6 +1163,7 @@ export type FileUpdateWithoutFolderInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.UserUpdateOneRequiredWithoutFilesNestedInput
   uploadSession?: Prisma.UploadSessionUpdateOneWithoutFileNestedInput
+  shares?: Prisma.ShareUpdateManyWithoutFileNestedInput
 }
 
 export type FileUncheckedUpdateWithoutFolderInput = {
@@ -1051,6 +1182,7 @@ export type FileUncheckedUpdateWithoutFolderInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   uploadSession?: Prisma.UploadSessionUncheckedUpdateOneWithoutFileNestedInput
+  shares?: Prisma.ShareUncheckedUpdateManyWithoutFileNestedInput
 }
 
 export type FileUncheckedUpdateManyWithoutFolderInput = {
@@ -1070,6 +1202,35 @@ export type FileUncheckedUpdateManyWithoutFolderInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+
+/**
+ * Count Type FileCountOutputType
+ */
+
+export type FileCountOutputType = {
+  shares: number
+}
+
+export type FileCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  shares?: boolean | FileCountOutputTypeCountSharesArgs
+}
+
+/**
+ * FileCountOutputType without action
+ */
+export type FileCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the FileCountOutputType
+   */
+  select?: Prisma.FileCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * FileCountOutputType without action
+ */
+export type FileCountOutputTypeCountSharesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ShareWhereInput
+}
 
 
 export type FileSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1091,6 +1252,8 @@ export type FileSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   folder?: boolean | Prisma.File$folderArgs<ExtArgs>
   uploadSession?: boolean | Prisma.File$uploadSessionArgs<ExtArgs>
+  shares?: boolean | Prisma.File$sharesArgs<ExtArgs>
+  _count?: boolean | Prisma.FileCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["file"]>
 
 export type FileSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1156,6 +1319,8 @@ export type FileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   folder?: boolean | Prisma.File$folderArgs<ExtArgs>
   uploadSession?: boolean | Prisma.File$uploadSessionArgs<ExtArgs>
+  shares?: boolean | Prisma.File$sharesArgs<ExtArgs>
+  _count?: boolean | Prisma.FileCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type FileIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -1172,6 +1337,7 @@ export type $FilePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     owner: Prisma.$UserPayload<ExtArgs>
     folder: Prisma.$FolderPayload<ExtArgs> | null
     uploadSession: Prisma.$UploadSessionPayload<ExtArgs> | null
+    shares: Prisma.$SharePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1586,6 +1752,7 @@ export interface Prisma__FileClient<T, Null = never, ExtArgs extends runtime.Typ
   owner<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   folder<T extends Prisma.File$folderArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.File$folderArgs<ExtArgs>>): Prisma.Prisma__FolderClient<runtime.Types.Result.GetResult<Prisma.$FolderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   uploadSession<T extends Prisma.File$uploadSessionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.File$uploadSessionArgs<ExtArgs>>): Prisma.Prisma__UploadSessionClient<runtime.Types.Result.GetResult<Prisma.$UploadSessionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  shares<T extends Prisma.File$sharesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.File$sharesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SharePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2066,6 +2233,30 @@ export type File$uploadSessionArgs<ExtArgs extends runtime.Types.Extensions.Inte
    */
   include?: Prisma.UploadSessionInclude<ExtArgs> | null
   where?: Prisma.UploadSessionWhereInput
+}
+
+/**
+ * File.shares
+ */
+export type File$sharesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Share
+   */
+  select?: Prisma.ShareSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Share
+   */
+  omit?: Prisma.ShareOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ShareInclude<ExtArgs> | null
+  where?: Prisma.ShareWhereInput
+  orderBy?: Prisma.ShareOrderByWithRelationInput | Prisma.ShareOrderByWithRelationInput[]
+  cursor?: Prisma.ShareWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ShareScalarFieldEnum | Prisma.ShareScalarFieldEnum[]
 }
 
 /**

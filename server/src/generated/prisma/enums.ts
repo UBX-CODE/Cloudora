@@ -17,6 +17,14 @@ export const UserRole = {
 export type UserRole = (typeof UserRole)[keyof typeof UserRole]
 
 
+export const ShareRole = {
+  VIEW: 'VIEW',
+  EDIT: 'EDIT'
+} as const
+
+export type ShareRole = (typeof ShareRole)[keyof typeof ShareRole]
+
+
 export const FileStatus = {
   PENDING: 'PENDING',
   UPLOADED: 'UPLOADED',

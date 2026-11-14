@@ -558,14 +558,6 @@ export type UploadSessionUncheckedUpdateOneWithoutFileNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UploadSessionUpdateToOneWithWhereWithoutFileInput, Prisma.UploadSessionUpdateWithoutFileInput>, Prisma.UploadSessionUncheckedUpdateWithoutFileInput>
 }
 
-export type IntFieldUpdateOperationsInput = {
-  set?: number
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type EnumUploadSessionStatusFieldUpdateOperationsInput = {
   set?: $Enums.UploadSessionStatus
 }

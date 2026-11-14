@@ -1,22 +1,81 @@
-import React, { useState } from 'react';
-import { Share2, Eye, Download } from 'lucide-react';
-import { mockFiles } from '../../utils/mockData';
+import React, { useState, useEffect } from 'react';
+import { Share2, Eye, Download, Loader2, Folder } from 'lucide-react';
 import { formatFileSize, formatRelativeTime } from '../../utils/formatters';
 import { FileTypeIcon } from '../../components/common/FileTypeIcon';
-import { Modal } from '../../components/ui/Modal';
+import { FilePreviewModal } from '../../components/common/FilePreviewModal';
+import { getSharedWithMe, ShareItem } from '../../services/share.service';
+import { downloadFile } from '../../utils/download';
 import { FileItem } from '../../types/storage.types';
 
 export const SharedPage: React.FC = () => {
   const [filter, setFilter] = useState<'all' | 'edit' | 'view'>('all');
+  const [sharedItems, setSharedItems] = useState<ShareItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Preview Modal State
   const [previewFile, setPreviewFile] = useState<FileItem | null>(null);
 
-  const sharedFiles = mockFiles.filter((f) => f.isShared);
+  const loadSharedItems = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const items = await getSharedWithMe();
+      setSharedItems(items);
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to load shared assets.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  const filtered = sharedFiles.filter((f) => {
-    if (filter === 'edit') return f.permission === 'edit';
-    if (filter === 'view') return f.permission === 'view';
+  useEffect(() => {
+    loadSharedItems();
+  }, []);
+
+  const filtered = sharedItems.filter((item) => {
+    if (filter === 'edit') return item.role === 'EDIT';
+    if (filter === 'view') return item.role === 'VIEW';
     return true;
   });
+
+  const handleOpenPreview = (item: ShareItem) => {
+    if (item.targetType === 'folder' || !item.file) {
+      // If folder, navigate to public view
+      window.open(item.shareUrl, '_blank');
+      return;
+    }
+
+    const ext = item.file.name.includes('.')
+      ? item.file.name.split('.').pop()?.toLowerCase() || ''
+      : '';
+
+    const mockFileItem: FileItem = {
+      id: item.file.id,
+      name: item.file.name,
+      extension: ext,
+      size: item.file.size,
+      category: 'document',
+      isStarred: false,
+      isShared: true,
+      permission: item.role === 'EDIT' ? 'edit' : 'view',
+      sharedBy: {
+        name: item.owner.name,
+        email: item.owner.email,
+      },
+      updatedAt: item.updatedAt,
+    };
+
+    setPreviewFile(mockFileItem);
+  };
+
+  const handleDownload = (item: ShareItem) => {
+    if (item.targetType === 'file' && item.file) {
+      downloadFile(item.file.id, item.file.name);
+    } else {
+      window.open(item.shareUrl, '_blank');
+    }
+  };
 
   return (
     <div className="space-y-6 animate-in fade-in duration-150">
@@ -27,7 +86,7 @@ export const SharedPage: React.FC = () => {
             Shared With Me
           </h1>
           <p className="text-xs text-gray-400 mt-1 font-sans">
-            Files and folders shared with your account by team members and collaborators.
+            Files and folders shared directly with your account by team members and collaborators.
           </p>
         </div>
 
@@ -41,7 +100,7 @@ export const SharedPage: React.FC = () => {
                 : 'text-gray-400 hover:text-white'
             }`}
           >
-            All Shared ({sharedFiles.length})
+            All Shared ({sharedItems.length})
           </button>
           <button
             onClick={() => setFilter('edit')}
@@ -66,115 +125,107 @@ export const SharedPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Shared Files Stream (Borderless Minimal List - Only Bottom Lines) */}
-      <div className="space-y-0">
-        {/* Header Row */}
-        <div className="grid grid-cols-12 text-[11px] font-mono uppercase tracking-wider text-gray-500 pb-3 border-b border-white/[0.08] px-2">
-          <div className="col-span-5 sm:col-span-4">Asset Name</div>
-          <div className="col-span-3 sm:col-span-3">Shared By</div>
-          <div className="hidden sm:block sm:col-span-2">Access</div>
-          <div className="col-span-2 sm:col-span-1">Size</div>
-          <div className="hidden sm:block sm:col-span-1">Date</div>
-          <div className="col-span-2 sm:col-span-1 text-right">Actions</div>
+      {isLoading ? (
+        <div className="py-20 flex flex-col items-center justify-center gap-3">
+          <Loader2 className="w-6 h-6 animate-spin text-white" />
+          <p className="text-xs font-mono text-gray-500">Retrieving shared assets...</p>
         </div>
+      ) : error ? (
+        <div className="py-12 text-center text-xs text-red-400">{error}</div>
+      ) : filtered.length === 0 ? (
+        <div className="py-20 text-center space-y-3">
+          <div className="w-14 h-14 rounded-2xl bg-white/[0.03] border border-white/[0.08] flex items-center justify-center mx-auto text-gray-500">
+            <Share2 className="w-6 h-6" />
+          </div>
+          <h3 className="text-sm font-semibold text-white">No Shared Assets Found</h3>
+          <p className="text-xs text-gray-500 max-w-sm mx-auto">
+            When teammates share files or directories with your email address, they will appear here.
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-0">
+          {/* Header Row */}
+          <div className="grid grid-cols-12 text-[11px] font-mono uppercase tracking-wider text-gray-500 pb-3 border-b border-white/[0.08] px-2">
+            <div className="col-span-5 sm:col-span-4">Asset Name</div>
+            <div className="col-span-3 sm:col-span-3">Shared By</div>
+            <div className="hidden sm:block sm:col-span-2">Access</div>
+            <div className="col-span-2 sm:col-span-1">Size</div>
+            <div className="hidden sm:block sm:col-span-1">Date</div>
+            <div className="col-span-2 sm:col-span-1 text-right">Actions</div>
+          </div>
 
-        {/* Rows */}
-        {filtered.map((file) => (
-          <div
-            key={file.id}
-            onClick={() => setPreviewFile(file)}
-            className="grid grid-cols-12 items-center py-3.5 border-b border-white/[0.06] hover:bg-white/[0.03] px-2 transition-colors cursor-pointer group"
-          >
-            <div className="col-span-5 sm:col-span-4 font-medium flex items-center gap-3 min-w-0 pr-2">
-              <FileTypeIcon category={file.category} />
-              <span className="text-xs font-medium text-white truncate group-hover:text-gray-300 transition-colors">
-                {file.name}
-              </span>
-            </div>
-
-            <div className="col-span-3 sm:col-span-3">
-              <div className="flex items-center gap-2">
-                <div className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center text-[9px] font-bold text-gray-300 shrink-0">
-                  {file.sharedBy?.name.charAt(0) || 'U'}
-                </div>
-                <span className="text-xs text-gray-300 truncate">
-                  {file.sharedBy?.name || 'Collaborator'}
+          {/* Rows */}
+          {filtered.map((item) => (
+            <div
+              key={item.id}
+              onClick={() => handleOpenPreview(item)}
+              className="grid grid-cols-12 items-center py-3.5 border-b border-white/[0.06] hover:bg-white/[0.03] px-2 transition-colors cursor-pointer group"
+            >
+              <div className="col-span-5 sm:col-span-4 font-medium flex items-center gap-3 min-w-0 pr-2">
+                {item.targetType === 'folder' ? (
+                  <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 shrink-0">
+                    <Folder className="w-4 h-4" />
+                  </div>
+                ) : (
+                  <FileTypeIcon category="document" />
+                )}
+                <span className="text-xs font-medium text-white truncate group-hover:text-gray-300 transition-colors">
+                  {item.targetName}
                 </span>
               </div>
-            </div>
 
-            <div className="hidden sm:block sm:col-span-2">
-              <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium uppercase bg-white/[0.05] text-gray-400">
-                {file.permission === 'edit' ? 'Can Edit' : 'Read Only'}
-              </span>
-            </div>
+              <div className="col-span-3 sm:col-span-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center text-[9px] font-bold text-gray-300 shrink-0">
+                    {item.owner.name.charAt(0).toUpperCase()}
+                  </div>
+                  <span className="text-xs text-gray-300 truncate">{item.owner.name}</span>
+                </div>
+              </div>
 
-            <div className="col-span-2 sm:col-span-1 font-mono text-gray-400 text-xs">
-              {formatFileSize(file.size)}
-            </div>
+              <div className="hidden sm:block sm:col-span-2">
+                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium uppercase bg-white/[0.05] text-gray-400">
+                  {item.role === 'EDIT' ? 'Can Edit' : 'Read Only'}
+                </span>
+              </div>
 
-            <div className="hidden sm:block sm:col-span-1 font-mono text-gray-500 text-xs">
-              {formatRelativeTime(file.updatedAt)}
-            </div>
+              <div className="col-span-2 sm:col-span-1 font-mono text-gray-400 text-xs">
+                {item.file ? formatFileSize(item.file.size) : 'Folder'}
+              </div>
 
-            <div className="col-span-2 sm:col-span-1 text-right" onClick={(e) => e.stopPropagation()}>
-              <div className="inline-flex items-center gap-1">
-                <button
-                  onClick={() => setPreviewFile(file)}
-                  className="p-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
-                  title="Preview"
-                >
-                  <Eye className="w-3.5 h-3.5" />
-                </button>
-                <button
-                  onClick={() => alert(`Downloading: ${file.name}`)}
-                  className="p-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
-                  title="Download"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                </button>
+              <div className="hidden sm:block sm:col-span-1 font-mono text-gray-500 text-xs">
+                {formatRelativeTime(item.createdAt)}
+              </div>
+
+              <div className="col-span-2 sm:col-span-1 text-right" onClick={(e) => e.stopPropagation()}>
+                <div className="inline-flex items-center gap-1">
+                  <button
+                    onClick={() => handleOpenPreview(item)}
+                    className="p-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+                    title="Preview / Open"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    onClick={() => handleDownload(item)}
+                    className="p-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+                    title="Download / Visit"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Preview Modal */}
-      <Modal
-        isOpen={!!previewFile}
-        onClose={() => setPreviewFile(null)}
-        title={previewFile?.name}
-        description={`Shared by ${previewFile?.sharedBy?.name || 'Collaborator'} • Permission: ${
-          previewFile?.permission || 'Read'
-        }`}
-      >
-        <div className="space-y-4 pt-1">
-          <div className="p-6 rounded-2xl bg-[#0C0C10] border border-white/10 text-center">
-            <FileTypeIcon category={previewFile?.category} className="w-12 h-12 mx-auto mb-2" />
-            <p className="text-sm font-semibold text-white">{previewFile?.name}</p>
-          </div>
-          <div className="flex justify-end gap-2">
-            <button
-              type="button"
-              onClick={() => setPreviewFile(null)}
-              className="px-4 py-2 rounded-xl text-xs font-semibold text-gray-400 hover:text-white hover:bg-white/5 border border-white/10"
-            >
-              Close
-            </button>
-            <button
-              type="button"
-              className="px-4 py-2 rounded-xl text-xs font-bold text-black bg-white hover:bg-gray-200 transition-colors flex items-center gap-1.5"
-              onClick={() => {
-                alert(`Downloaded: ${previewFile?.name}`);
-                setPreviewFile(null);
-              }}
-            >
-              <Download className="w-3.5 h-3.5" />
-              <span>Download</span>
-            </button>
-          </div>
+          ))}
         </div>
-      </Modal>
+      )}
+
+      {/* File Preview Modal */}
+      <FilePreviewModal
+        isOpen={Boolean(previewFile)}
+        onClose={() => setPreviewFile(null)}
+        file={previewFile}
+      />
     </div>
   );
 };
