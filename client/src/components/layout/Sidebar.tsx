@@ -1,5 +1,5 @@
-import React from 'react';
-import { NavLink, Link } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
+import { NavLink, Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
   FolderOpen,
@@ -14,6 +14,9 @@ import {
   Plus,
 } from 'lucide-react';
 import { CloudoraLogo } from '../common/CloudoraLogo';
+import { useAuth } from '../../context/AuthContext';
+import { fetchStorageSummary, StorageSummaryResponse } from '../../services/file.service';
+import { formatFileSize } from '../../utils/formatters';
 
 interface SidebarProps {
   isOpen?: boolean;
@@ -21,6 +24,55 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
+  const { user } = useAuth();
+  const location = useLocation();
+  const [summary, setSummary] = useState<StorageSummaryResponse | null>(null);
+
+  const loadStorage = useCallback(async () => {
+    try {
+      const data = await fetchStorageSummary();
+      setSummary(data);
+    } catch {
+      // Quiet fail if not yet authenticated
+    }
+  }, []);
+
+  useEffect(() => {
+    loadStorage();
+
+    // Listen to live storage update events across the application
+    const handleStorageUpdate = () => {
+      loadStorage();
+    };
+
+    window.addEventListener('cloudora:storage-updated', handleStorageUpdate);
+
+    // Refresh every 30 seconds
+    const interval = setInterval(loadStorage, 30000);
+
+    return () => {
+      window.removeEventListener('cloudora:storage-updated', handleStorageUpdate);
+      clearInterval(interval);
+    };
+  }, [loadStorage]);
+
+  // Refresh whenever the user navigates between views
+  useEffect(() => {
+    loadStorage();
+  }, [location.pathname, loadStorage]);
+
+  const totalUsed = summary?.totalUsedBytes ?? user?.storageUsed ?? 0;
+  const totalLimit = summary?.storageLimitBytes ?? user?.storageLimit ?? 5 * 1024 * 1024 * 1024;
+  const percentage =
+    summary?.percentageUsed ??
+    (totalLimit > 0 ? Math.min(100, Number(((totalUsed / totalLimit) * 100).toFixed(1))) : 0);
+
+  const barColor =
+    percentage >= 90
+      ? 'bg-red-500'
+      : percentage >= 75
+      ? 'bg-amber-400'
+      : 'bg-white';
   const navItems = [
     { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { label: 'My Files', path: '/files', icon: FolderOpen },
@@ -110,30 +162,37 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
           </div>
         </div>
 
-        {/* Storage Quota Bar */}
-        <div className="p-4 border-t border-white/[0.06] space-y-2.5 bg-[#07070A]">
+        {/* Storage Quota Bar (Live Reactive Telemetry) */}
+        <Link
+          to="/settings"
+          onClick={onClose}
+          className="p-4 border-t border-white/[0.06] space-y-2.5 bg-[#07070A] hover:bg-white/[0.02] transition-colors block group cursor-pointer"
+          title="Click to view detailed storage telemetry in Settings"
+        >
           <div className="flex items-center justify-between text-xs">
-            <span className="text-gray-400 font-medium flex items-center gap-1.5">
+            <span className="text-gray-400 font-medium flex items-center gap-1.5 group-hover:text-white transition-colors">
               <HardDrive className="w-3.5 h-3.5 text-gray-300" />
               Storage
             </span>
-            <span className="text-gray-300 font-mono text-[11px]">9.6 GB of 15 GB</span>
+            <span className="text-gray-300 font-mono text-[11px]">
+              {formatFileSize(totalUsed)} of {formatFileSize(totalLimit)}
+            </span>
           </div>
 
           <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
             <div
-              className="bg-white h-full rounded-full transition-all duration-300"
-              style={{ width: '64%' }}
+              className={`h-full rounded-full transition-all duration-500 ${barColor}`}
+              style={{ width: `${Math.max(percentage, totalUsed > 0 ? 1 : 0)}%` }}
             />
           </div>
 
-          <div className="pt-1 flex items-center justify-between text-[11px]">
-            <span className="text-gray-500 font-mono">64% allocated</span>
-            <span className="text-gray-300 font-mono text-[10px] font-bold">
-              15 GB FREE
+          <div className="pt-0.5 flex items-center justify-between text-[11px]">
+            <span className="text-gray-500 font-mono">{percentage}% allocated</span>
+            <span className="text-gray-400 font-mono text-[10px] font-bold">
+              {formatFileSize(totalLimit)} TIER
             </span>
           </div>
-        </div>
+        </Link>
       </aside>
     </>
   );

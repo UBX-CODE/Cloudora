@@ -119,6 +119,9 @@ export async function completeUpload(
     `/files/${fileId}/complete`,
     parts ? { parts } : {}
   );
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('cloudora:storage-updated'));
+  }
   return response.data.data;
 }
 

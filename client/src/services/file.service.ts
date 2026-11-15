@@ -141,6 +141,9 @@ export async function moveFile(fileId: string, targetFolderId: string | null): P
  */
 export async function trashFile(fileId: string): Promise<FileItem> {
   const response = await api.patch(`/files/${fileId}/trash`);
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('cloudora:storage-updated'));
+  }
   return mapFile(response.data.data);
 }
 
@@ -149,6 +152,9 @@ export async function trashFile(fileId: string): Promise<FileItem> {
  */
 export async function restoreFile(fileId: string): Promise<FileItem> {
   const response = await api.patch(`/files/${fileId}/restore`);
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('cloudora:storage-updated'));
+  }
   return mapFile(response.data.data);
 }
 
@@ -157,6 +163,9 @@ export async function restoreFile(fileId: string): Promise<FileItem> {
  */
 export async function permanentlyDeleteFile(fileId: string): Promise<void> {
   await api.delete(`/files/${fileId}/permanent`);
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('cloudora:storage-updated'));
+  }
 }
 
 /**
