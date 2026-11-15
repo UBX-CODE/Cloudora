@@ -62,7 +62,7 @@ export async function register(dto: RegisterDTO): Promise<AuthResponse> {
   });
 
   if (existingUser) {
-    throw new AppError('An account with this email address already exists.', 409);
+    throw new AppError('An account with this email address already exists. Please sign in.', 409);
   }
 
   const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
@@ -114,7 +114,7 @@ export async function login(dto: LoginDTO): Promise<AuthResponse> {
   });
 
   if (!user) {
-    throw new AppError('Invalid email or password.', 401);
+    throw new AppError('No account found with this email address. Please create an account or verify your email.', 404);
   }
 
   const isPasswordValid = await bcrypt.compare(
@@ -123,7 +123,7 @@ export async function login(dto: LoginDTO): Promise<AuthResponse> {
   );
 
   if (!isPasswordValid) {
-    throw new AppError('Invalid email or password.', 401);
+    throw new AppError('Incorrect password. Please double-check your password and try again.', 401);
   }
 
   const token = generateToken({

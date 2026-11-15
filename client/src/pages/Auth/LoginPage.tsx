@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { Lock, Mail, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { CloudoraLogo } from '../../components/common/CloudoraLogo';
@@ -7,11 +7,13 @@ import { WireframeGlobe, CapsuleLozengeRow } from '../../components/common/PixGr
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { Modal } from '../../components/ui/Modal';
+import { AuthAlertModal, AuthAlertType } from '../../components/common/AuthAlertModal';
 
 export const LoginPage: React.FC = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -24,6 +26,25 @@ export const LoginPage: React.FC = () => {
 
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+
+  // Classy minimal alert popup state
+  const [alertModal, setAlertModal] = useState<{
+    isOpen: boolean;
+    type: AuthAlertType;
+    message?: string;
+    email?: string;
+  }>({
+    isOpen: false,
+    type: 'generic',
+  });
+
+  // Pre-fill email from URL query if user was redirected from RegisterPage
+  useEffect(() => {
+    const queryEmail = searchParams.get('email');
+    if (queryEmail) {
+      setEmail(queryEmail);
+    }
+  }, [searchParams]);
 
   const validateForm = (): boolean => {
     let isValid = true;
@@ -59,9 +80,51 @@ export const LoginPage: React.FC = () => {
       const from = (location.state as any)?.from?.pathname || '/dashboard';
       navigate(from, { replace: true });
     } catch (err: any) {
+      const status = err.response?.status;
       const message =
         err.response?.data?.message || err.message || 'Login failed. Please check your credentials.';
       setError(message);
+
+      const lowerMsg = message.toLowerCase();
+      if (
+        status === 404 ||
+        lowerMsg.includes('no account') ||
+        lowerMsg.includes('not found') ||
+        lowerMsg.includes('not register') ||
+        lowerMsg.includes('user not found')
+      ) {
+        setAlertModal({
+          isOpen: true,
+          type: 'email-not-found',
+          message: 'No account found with this email address. Please create a new account or check for typos.',
+          email: email.trim(),
+        });
+      } else if (
+        status === 401 ||
+        lowerMsg.includes('password') ||
+        lowerMsg.includes('invalid credentials')
+      ) {
+        setAlertModal({
+          isOpen: true,
+          type: 'invalid-password',
+          message: 'The password you entered does not match. Please verify your credentials and try again.',
+          email: email.trim(),
+        });
+      } else if (status === 429) {
+        setAlertModal({
+          isOpen: true,
+          type: 'rate-limit',
+          message,
+          email: email.trim(),
+        });
+      } else {
+        setAlertModal({
+          isOpen: true,
+          type: 'generic',
+          message,
+          email: email.trim(),
+        });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -287,7 +350,14 @@ export const LoginPage: React.FC = () => {
         )}
       </Modal>
 
-      
+      {/* Classy Minimal Auth Feedback Modal */}
+      <AuthAlertModal
+        isOpen={alertModal.isOpen}
+        onClose={() => setAlertModal((prev) => ({ ...prev, isOpen: false }))}
+        type={alertModal.type}
+        message={alertModal.message}
+        email={alertModal.email}
+      />
     </div>
   );
 };

@@ -1,14 +1,16 @@
-import React, { useState, useMemo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useMemo, useEffect } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { User, Mail, Lock, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { CloudoraLogo } from '../../components/common/CloudoraLogo';
 import { AsteriskFlower, CapsuleLozengeRow } from '../../components/common/PixGraphics';
 import { Input } from '../../components/ui/Input';
+import { AuthAlertModal, AuthAlertType } from '../../components/common/AuthAlertModal';
 
 export const RegisterPage: React.FC = () => {
   const { register } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -24,6 +26,25 @@ export const RegisterPage: React.FC = () => {
   const [passwordError, setPasswordError] = useState('');
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
   const [termsError, setTermsError] = useState('');
+
+  // Classy minimal alert popup state
+  const [alertModal, setAlertModal] = useState<{
+    isOpen: boolean;
+    type: AuthAlertType;
+    message?: string;
+    email?: string;
+  }>({
+    isOpen: false,
+    type: 'generic',
+  });
+
+  // Pre-fill email from URL query if user was redirected from LoginPage
+  useEffect(() => {
+    const queryEmail = searchParams.get('email');
+    if (queryEmail) {
+      setEmail(queryEmail);
+    }
+  }, [searchParams]);
 
   const passwordStrength = useMemo(() => {
     if (!password) return { score: 0, label: 'Empty', color: 'bg-gray-700' };
@@ -93,9 +114,40 @@ export const RegisterPage: React.FC = () => {
       await register(name.trim(), email.trim(), password);
       navigate('/dashboard', { replace: true });
     } catch (err: any) {
+      const status = err.response?.status;
       const message =
         err.response?.data?.message || err.message || 'Registration failed. Please try again.';
       setError(message);
+
+      const lowerMsg = message.toLowerCase();
+      if (
+        status === 409 ||
+        lowerMsg.includes('already exists') ||
+        lowerMsg.includes('already in use') ||
+        lowerMsg.includes('already register') ||
+        lowerMsg.includes('duplicate')
+      ) {
+        setAlertModal({
+          isOpen: true,
+          type: 'email-already-exists',
+          message: 'An account with this email address is already registered. Would you like to sign in instead?',
+          email: email.trim(),
+        });
+      } else if (status === 429) {
+        setAlertModal({
+          isOpen: true,
+          type: 'rate-limit',
+          message,
+          email: email.trim(),
+        });
+      } else {
+        setAlertModal({
+          isOpen: true,
+          type: 'generic',
+          message,
+          email: email.trim(),
+        });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -298,7 +350,14 @@ export const RegisterPage: React.FC = () => {
         </div>
       </main>
 
-      
+      {/* Classy Minimal Auth Feedback Modal */}
+      <AuthAlertModal
+        isOpen={alertModal.isOpen}
+        onClose={() => setAlertModal((prev) => ({ ...prev, isOpen: false }))}
+        type={alertModal.type}
+        message={alertModal.message}
+        email={alertModal.email}
+      />
     </div>
   );
 };
