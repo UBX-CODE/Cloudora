@@ -69,35 +69,54 @@ export const RegisterPage: React.FC = () => {
     setTermsError('');
     setError(null);
 
+    let firstErrorMsg = '';
+
     if (!name.trim() || name.trim().length < 2) {
       setNameError('Full name must be at least 2 characters.');
+      if (!firstErrorMsg) firstErrorMsg = 'Full name must be at least 2 characters long.';
       isValid = false;
     }
 
     if (!email.trim()) {
       setEmailError('Email address is required.');
+      if (!firstErrorMsg) firstErrorMsg = 'Email address is required.';
       isValid = false;
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       setEmailError('Please enter a valid email address.');
+      if (!firstErrorMsg) firstErrorMsg = 'Please enter a valid email address (e.g. user@gmail.com).';
       isValid = false;
     }
 
     if (!password) {
       setPasswordError('Password is required.');
+      if (!firstErrorMsg) firstErrorMsg = 'Password is required.';
       isValid = false;
     } else if (password.length < 8) {
       setPasswordError('Password must be at least 8 characters.');
+      if (!firstErrorMsg) firstErrorMsg = 'Password must be at least 8 characters long.';
       isValid = false;
     }
 
     if (password !== confirmPassword) {
       setConfirmPasswordError('Passwords do not match.');
+      if (!firstErrorMsg) firstErrorMsg = 'Passwords do not match. Please re-enter your password.';
       isValid = false;
     }
 
     if (!agreeTerms) {
       setTermsError('You must agree to the Cloudora Terms of Service.');
+      if (!firstErrorMsg) firstErrorMsg = 'Please accept the Cloudora Terms of Service to continue.';
       isValid = false;
+    }
+
+    if (!isValid && firstErrorMsg) {
+      setError(firstErrorMsg);
+      setAlertModal({
+        isOpen: true,
+        type: 'generic',
+        message: firstErrorMsg,
+        email: email.trim() || undefined,
+      });
     }
 
     return isValid;
@@ -225,11 +244,9 @@ export const RegisterPage: React.FC = () => {
             {/* Header */}
             <div className="mb-6 flex">
               <h2 className="font-display text-4xl sm:text-5xl text-white tracking-wide uppercase leading-none flex items-center gap-2">
-                JOIN THE <span className="text-pix-pink">CLOUD</span>
-                <AsteriskFlower size={32} className="shrink-0" />
+                JOIN THE CLOUD
               </h2>
               <div className="flex items-center justify-between mb-5">
-              <CapsuleLozengeRow className="scale-75 origin-right" />
             </div>
             </div>
 
@@ -242,12 +259,16 @@ export const RegisterPage: React.FC = () => {
             )}
 
             {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form noValidate onSubmit={handleSubmit} className="space-y-4">
               <Input
                 label="Full Name"
                 type="text"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => {
+                  setName(e.target.value);
+                  if (nameError) setNameError('');
+                  if (error) setError(null);
+                }}
                 error={nameError}
                 variant="pink"
                 required
@@ -258,7 +279,11 @@ export const RegisterPage: React.FC = () => {
                 label="Email Address"
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (emailError) setEmailError('');
+                  if (error) setError(null);
+                }}
                 error={emailError}
                 variant="pink"
                 required
@@ -271,7 +296,11 @@ export const RegisterPage: React.FC = () => {
                   isPassword
                   placeholder="At least 8 characters"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (passwordError) setPasswordError('');
+                    if (error) setError(null);
+                  }}
                   error={passwordError}
                   variant="pink"
                   required
@@ -298,7 +327,11 @@ export const RegisterPage: React.FC = () => {
                 label="Confirm Password"
                 isPassword
                 value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                onChange={(e) => {
+                  setConfirmPassword(e.target.value);
+                  if (confirmPasswordError) setConfirmPasswordError('');
+                  if (error) setError(null);
+                }}
                 error={confirmPasswordError}
                 variant="pink"
                 required
@@ -314,6 +347,7 @@ export const RegisterPage: React.FC = () => {
                     onChange={(e) => {
                       setAgreeTerms(e.target.checked);
                       if (e.target.checked) setTermsError('');
+                      if (error) setError(null);
                     }}
                     className="mt-0.5 rounded border border-[#262438] bg-[#0E0D17] text-pix-pink focus:ring-0 focus:outline-none h-4 w-4 shrink-0 accent-pix-pink"
                   />
@@ -327,6 +361,14 @@ export const RegisterPage: React.FC = () => {
                   <p className="text-xs text-pix-pink mt-1 font-mono">⚠ {termsError}</p>
                 )}
               </div>
+
+              {/* Prominent Action Error Notification right above Submit Button */}
+              {error && (
+                <div className="p-3 rounded-xl bg-pix-pink/15 border-2 border-pix-pink/60 text-pix-pink text-xs flex items-start gap-2.5 shadow-[0_0_20px_rgba(255,94,151,0.2)]">
+                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                  <span className="leading-relaxed font-bold font-mono">{error}</span>
+                </div>
+              )}
 
               {/* Submit Button */}
               <div className="pt-2">
@@ -350,6 +392,23 @@ export const RegisterPage: React.FC = () => {
           </div>
         </div>
       </main>
+
+      {/* Floating Top Alert Banner */}
+      {error && (
+        <div className="fixed top-5 left-1/2 -translate-x-1/2 z-[99998] max-w-md w-[92%] p-3.5 rounded-2xl bg-[#140E1B] border-2 border-pix-pink text-white shadow-[0_15px_50px_rgba(255,94,151,0.4)] flex items-center justify-between gap-3 animate-in fade-in">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <AlertCircle className="w-5 h-5 text-pix-pink shrink-0" />
+            <span className="text-xs font-mono font-semibold text-gray-200 truncate">{error}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setError(null)}
+            className="text-gray-400 hover:text-white p-1 rounded-lg hover:bg-white/10 shrink-0 text-sm leading-none"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       {/* Classy Minimal Auth Feedback Modal */}
       <AuthAlertModal

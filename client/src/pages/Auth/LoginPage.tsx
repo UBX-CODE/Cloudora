@@ -52,17 +52,32 @@ export const LoginPage: React.FC = () => {
     setPasswordError('');
     setError(null);
 
+    let firstErrorMsg = '';
+
     if (!email.trim()) {
       setEmailError('Email address is required.');
+      if (!firstErrorMsg) firstErrorMsg = 'Email address is required.';
       isValid = false;
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       setEmailError('Please enter a valid email address.');
+      if (!firstErrorMsg) firstErrorMsg = 'Please enter a valid email address (e.g. user@gmail.com).';
       isValid = false;
     }
 
     if (!password) {
       setPasswordError('Password is required.');
+      if (!firstErrorMsg) firstErrorMsg = 'Password is required.';
       isValid = false;
+    }
+
+    if (!isValid && firstErrorMsg) {
+      setError(firstErrorMsg);
+      setAlertModal({
+        isOpen: true,
+        type: 'generic',
+        message: firstErrorMsg,
+        email: email.trim() || undefined,
+      });
     }
 
     return isValid;
@@ -227,13 +242,17 @@ export const LoginPage: React.FC = () => {
             )}
 
             {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form noValidate onSubmit={handleSubmit} className="space-y-4">
               <Input
                 label="Email Address"
                 type="email"
                 placeholder="elena@cloudora.io"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (emailError) setEmailError('');
+                  if (error) setError(null);
+                }}
                 error={emailError}
                 variant="cyan"
                 required
@@ -246,7 +265,11 @@ export const LoginPage: React.FC = () => {
                   isPassword
                   placeholder="••••••••••••"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (passwordError) setPasswordError('');
+                    if (error) setError(null);
+                  }}
                   error={passwordError}
                   variant="cyan"
                   required
@@ -277,6 +300,14 @@ export const LoginPage: React.FC = () => {
                   </button>
                 </div>
               </div>
+
+              {/* Prominent Action Error Notification right above Submit Button */}
+              {error && (
+                <div className="p-3 rounded-xl bg-pix-pink/15 border-2 border-pix-pink/60 text-pix-pink text-xs flex items-start gap-2.5 shadow-[0_0_20px_rgba(255,94,151,0.2)]">
+                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                  <span className="leading-relaxed font-bold font-mono">{error}</span>
+                </div>
+              )}
 
               <div className="pt-2">
                 <button
@@ -350,6 +381,23 @@ export const LoginPage: React.FC = () => {
           </form>
         )}
       </Modal>
+
+      {/* Floating Top Alert Banner */}
+      {error && (
+        <div className="fixed top-5 left-1/2 -translate-x-1/2 z-[99998] max-w-md w-[92%] p-3.5 rounded-2xl bg-[#140E1B] border-2 border-pix-pink text-white shadow-[0_15px_50px_rgba(255,94,151,0.4)] flex items-center justify-between gap-3 animate-in fade-in">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <AlertCircle className="w-5 h-5 text-pix-pink shrink-0" />
+            <span className="text-xs font-mono font-semibold text-gray-200 truncate">{error}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setError(null)}
+            className="text-gray-400 hover:text-white p-1 rounded-lg hover:bg-white/10 shrink-0 text-sm leading-none"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       {/* Classy Minimal Auth Feedback Modal */}
       <AuthAlertModal

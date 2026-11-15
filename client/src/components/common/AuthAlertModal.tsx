@@ -46,11 +46,14 @@ export const AuthAlertModal: React.FC<AuthAlertModalProps> = ({
   let primaryButtonText: string | null = null;
   let primaryButtonAction: (() => void) | null = null;
 
+  let cardBorder = 'border-white/20 shadow-[0_25px_80px_rgba(0,0,0,0.95)]';
+
   if (type === 'email-not-found') {
     title = 'Email Not Registered';
     description = message || `No account is registered with ${email ? `"${email}"` : 'this email address'}. Please check for typos or create a new account.`;
     icon = <UserX className="w-5 h-5 text-amber-400" />;
     iconBg = 'bg-amber-400/10 border-amber-400/25 text-amber-400 shadow-[0_0_15px_rgba(251,191,36,0.15)]';
+    cardBorder = 'border-amber-500/40 shadow-[0_20px_70px_rgba(251,191,36,0.2)]';
     primaryButtonText = 'Create an Account';
     primaryButtonAction = () => {
       onClose();
@@ -61,6 +64,7 @@ export const AuthAlertModal: React.FC<AuthAlertModalProps> = ({
     description = message || `An account with ${email ? `"${email}"` : 'this email address'} is already registered. Please sign in instead.`;
     icon = <UserCheck className="w-5 h-5 text-pix-pink" />;
     iconBg = 'bg-pix-pink/10 border-pix-pink/25 text-pix-pink shadow-[0_0_15px_rgba(244,63,94,0.15)]';
+    cardBorder = 'border-pix-pink/40 shadow-[0_20px_70px_rgba(255,94,151,0.2)]';
     primaryButtonText = 'Sign In to Account';
     primaryButtonAction = () => {
       onClose();
@@ -71,24 +75,26 @@ export const AuthAlertModal: React.FC<AuthAlertModalProps> = ({
     description = message || 'The password you entered does not match our records. Please verify your credentials and try again.';
     icon = <KeyRound className="w-5 h-5 text-rose-400" />;
     iconBg = 'bg-rose-500/10 border-rose-500/25 text-rose-400 shadow-[0_0_15px_rgba(244,63,94,0.15)]';
+    cardBorder = 'border-rose-500/40 shadow-[0_20px_70px_rgba(244,63,94,0.2)]';
   } else if (type === 'rate-limit') {
     title = 'Security Cooldown';
     description = message || 'Too many attempts. For your account security, please wait a moment before trying again.';
     icon = <ShieldAlert className="w-5 h-5 text-amber-400" />;
     iconBg = 'bg-amber-400/10 border-amber-400/25 text-amber-400';
+    cardBorder = 'border-amber-500/40 shadow-[0_20px_70px_rgba(251,191,36,0.2)]';
   }
 
   const modalElement = (
     <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4">
       {/* Sleek Backdrop */}
       <div
-        className="fixed inset-0 bg-black/80 backdrop-blur-md transition-opacity animate-in fade-in duration-150"
+        className="fixed inset-0 bg-black/85 backdrop-blur-md transition-opacity animate-in fade-in duration-150"
         onClick={onClose}
       />
 
       {/* Classy Minimal Dialog Card */}
       <div
-        className="relative w-full max-w-sm rounded-2xl bg-[#0C0B12] border border-white/[0.12] shadow-[0_25px_60px_rgba(0,0,0,0.85)] p-6 text-white z-10 animate-in fade-in zoom-in-95 duration-150 space-y-4"
+        className={`relative w-full max-w-sm rounded-2xl bg-[#0C0B12] border-2 p-6 text-white z-10 space-y-4 ${cardBorder}`}
         role="alertdialog"
         aria-modal="true"
       >
