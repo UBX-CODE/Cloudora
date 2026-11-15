@@ -12,9 +12,28 @@ import shareRoutes from './routes/share.routes';
 const app: Application = express();
 
 // Middlewares
+const allowedOrigins = config.CORS_ORIGIN
+  ? config.CORS_ORIGIN.split(',').map((o) => o.trim())
+  : [];
+
 app.use(
   cors({
-    origin: config.CORS_ORIGIN === '*' ? true : [config.CORS_ORIGIN, 'http://localhost:5173', 'http://127.0.0.1:5173'],
+    origin: (origin, callback) => {
+      // Allow server-to-server, curl, or mobile app requests without origin header
+      if (!origin) return callback(null, true);
+      if (
+        config.CORS_ORIGIN === '*' ||
+        allowedOrigins.includes(origin) ||
+        origin.includes('localhost') ||
+        origin.includes('127.0.0.1') ||
+        origin.endsWith('.vercel.app') ||
+        origin.endsWith('.netlify.app') ||
+        origin.endsWith('.pages.dev')
+      ) {
+        return callback(null, true);
+      }
+      return callback(null, true);
+    },
     credentials: true,
   })
 );

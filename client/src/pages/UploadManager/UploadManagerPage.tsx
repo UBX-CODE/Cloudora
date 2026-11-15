@@ -187,7 +187,7 @@ export const UploadManagerPage: React.FC = () => {
         </div>
       </div>
 
-      
+
 
       {/* Drag & Drop Zone */}
       <div
@@ -195,11 +195,10 @@ export const UploadManagerPage: React.FC = () => {
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
-        className={`p-8 rounded-xl border border-dashed text-center cursor-pointer transition-all group ${
-          isDragging
-            ? 'border-white bg-[#1A1A24]'
-            : 'border-white/15 hover:border-white/40 bg-[#0E0E14]'
-        }`}
+        className={`p-8 rounded-xl border border-dashed text-center cursor-pointer transition-all group ${isDragging
+          ? 'border-white bg-[#1A1A24]'
+          : 'border-white/15 hover:border-white/40 bg-[#0E0E14]'
+          }`}
       >
         <div className="w-10 h-10 mx-auto rounded-full bg-white/5 text-white flex items-center justify-center mb-2.5 group-hover:scale-105 transition-transform">
           <UploadCloud className="w-5 h-5" />
@@ -207,7 +206,7 @@ export const UploadManagerPage: React.FC = () => {
         <p className="text-sm font-semibold text-white">
           {isDragging ? 'Drop files to upload immediately' : 'Drag & Drop files here, or click to browse'}
         </p>
-        
+
       </div>
 
       {/* Queue Items Stream */}
@@ -249,25 +248,24 @@ export const UploadManagerPage: React.FC = () => {
                         {item.status === 'uploading'
                           ? `${item.speed || ''} • ${item.eta || ''}`
                           : item.status === 'completed'
-                          ? 'Synchronized to vault'
-                          : item.status === 'paused'
-                          ? 'Upload paused by user'
-                          : item.errorMessage || 'Upload failed'}
+                            ? 'Synchronized to vault'
+                            : item.status === 'paused'
+                              ? 'Upload paused by user'
+                              : item.errorMessage || 'Upload failed'}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2 shrink-0">
                     <span
-                      className={`px-2 py-0.5 rounded text-[10px] font-mono font-medium uppercase ${
-                        item.status === 'completed'
-                          ? 'bg-white/15 text-white'
-                          : item.status === 'error'
+                      className={`px-2 py-0.5 rounded text-[10px] font-mono font-medium uppercase ${item.status === 'completed'
+                        ? 'bg-white/15 text-white'
+                        : item.status === 'error'
                           ? 'bg-red-500/10 text-red-400 border border-red-500/20'
                           : item.status === 'paused'
-                          ? 'bg-yellow-500/10 text-yellow-400'
-                          : 'bg-white/5 text-gray-300'
-                      }`}
+                            ? 'bg-yellow-500/10 text-yellow-400'
+                            : 'bg-white/5 text-gray-300'
+                        }`}
                     >
                       {item.status}
                     </span>
@@ -315,13 +313,12 @@ export const UploadManagerPage: React.FC = () => {
                 {/* Real Progress Bar */}
                 <div className="w-full bg-white/10 h-1 rounded-full overflow-hidden">
                   <div
-                    className={`h-full rounded-full transition-all duration-300 ${
-                      item.status === 'error'
-                        ? 'bg-red-400'
-                        : item.status === 'completed'
+                    className={`h-full rounded-full transition-all duration-300 ${item.status === 'error'
+                      ? 'bg-red-400'
+                      : item.status === 'completed'
                         ? 'bg-white'
                         : 'bg-white'
-                    }`}
+                      }`}
                     style={{ width: `${item.progress}%` }}
                   />
                 </div>

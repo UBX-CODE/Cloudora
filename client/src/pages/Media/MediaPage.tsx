@@ -61,41 +61,37 @@ export const MediaPage: React.FC = () => {
         <div className="inline-flex p-1 rounded-xl bg-[#111116] gap-1 text-xs font-mono">
           <button
             onClick={() => setFilter('all')}
-            className={`px-3 py-1.5 rounded-lg transition-colors font-medium ${
-              filter === 'all'
-                ? 'bg-white text-black font-bold'
-                : 'text-gray-400 hover:text-white'
-            }`}
+            className={`px-3 py-1.5 rounded-lg transition-colors font-medium ${filter === 'all'
+              ? 'bg-white text-black font-bold'
+              : 'text-gray-400 hover:text-white'
+              }`}
           >
             All Media ({files.length})
           </button>
           <button
             onClick={() => setFilter('audio')}
-            className={`px-3 py-1.5 rounded-lg transition-colors font-medium ${
-              filter === 'audio'
-                ? 'bg-white text-black font-bold'
-                : 'text-gray-400 hover:text-white'
-            }`}
+            className={`px-3 py-1.5 rounded-lg transition-colors font-medium ${filter === 'audio'
+              ? 'bg-white text-black font-bold'
+              : 'text-gray-400 hover:text-white'
+              }`}
           >
             Audio
           </button>
           <button
             onClick={() => setFilter('video')}
-            className={`px-3 py-1.5 rounded-lg transition-colors font-medium ${
-              filter === 'video'
-                ? 'bg-white text-black font-bold'
-                : 'text-gray-400 hover:text-white'
-            }`}
+            className={`px-3 py-1.5 rounded-lg transition-colors font-medium ${filter === 'video'
+              ? 'bg-white text-black font-bold'
+              : 'text-gray-400 hover:text-white'
+              }`}
           >
             Video
           </button>
           <button
             onClick={() => setFilter('image')}
-            className={`px-3 py-1.5 rounded-lg transition-colors font-medium ${
-              filter === 'image'
-                ? 'bg-white text-black font-bold'
-                : 'text-gray-400 hover:text-white'
-            }`}
+            className={`px-3 py-1.5 rounded-lg transition-colors font-medium ${filter === 'image'
+              ? 'bg-white text-black font-bold'
+              : 'text-gray-400 hover:text-white'
+              }`}
           >
             Images
           </button>

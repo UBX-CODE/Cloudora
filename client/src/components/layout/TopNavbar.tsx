@@ -103,11 +103,6 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({ onToggleSidebar }) => {
               placeholder="Search files, folders, and master tapes..."
               className="w-full bg-[#121217] text-xs text-white placeholder-gray-500 pl-10 pr-12 py-2 rounded-xl border border-white/10 focus:border-white/30 focus:outline-none transition-colors"
             />
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none hidden sm:flex items-center">
-              <kbd className="px-1.5 py-0.5 text-[9px] font-mono text-gray-400 bg-white/5 rounded border border-white/10">
-                ⌘K
-              </kbd>
-            </div>
           </div>
         </div>
 
@@ -115,7 +110,7 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({ onToggleSidebar }) => {
         <div className="flex items-center gap-3 shrink-0">
 
 
-          
+
 
           {/* Notifications Dropdown */}
           <div className="relative" ref={notifRef}>
@@ -187,7 +182,7 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({ onToggleSidebar }) => {
                   {isProfileOpen && (
                     <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-[#111116] border border-white/10 shadow-2xl py-2 z-50 animate-in fade-in zoom-in-95 duration-100">
                       <div className="px-4 py-3 border-b border-white/[0.08] flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-500 text-white flex items-center justify-center text-xs font-bold border border-white/20 overflow-hidden shrink-0 shadow-inner">
+                        <div className="w-10 h-10 rounded-full text-white flex items-center justify-center text-xs font-bold border border-white/20 overflow-hidden shrink-0 shadow-inner">
                           {avatarUrl ? (
                             <img
                               src={avatarUrl}
@@ -217,14 +212,7 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({ onToggleSidebar }) => {
                           <UserIcon className="w-3.5 h-3.5 text-gray-400" />
                           Account Profile
                         </Link>
-                        <Link
-                          to="/settings"
-                          onClick={() => setIsProfileOpen(false)}
-                          className="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-colors"
-                        >
-                          <Settings className="w-3.5 h-3.5 text-gray-400" />
-                          Vault Settings
-                        </Link>
+
                       </div>
 
                       <div className="pt-1 border-t border-white/[0.08]">

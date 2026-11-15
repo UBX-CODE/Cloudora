@@ -80,7 +80,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
     { label: 'Shared with me', path: '/shared', icon: Share2 },
     { label: 'Starred', path: '/starred', icon: Star },
     { label: 'Media Library', path: '/media', icon: Film },
-    { label: 'Upload Manager', path: '/uploads', icon: UploadCloud, badge: 'Active' },
+    { label: 'Upload Manager', path: '/uploads', icon: UploadCloud },
     { label: 'Trash', path: '/trash', icon: Trash2 },
     { label: 'Settings', path: '/settings', icon: Settings },
   ];
@@ -131,10 +131,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
                   to={item.path}
                   onClick={onClose}
                   className={({ isActive }) =>
-                    `flex items-center justify-between px-3.5 py-2.5 text-xs font-medium rounded-xl transition-colors duration-150 ${
-                      isActive
-                        ? 'bg-white/10 text-white font-semibold'
-                        : 'text-gray-400 hover:text-white hover:bg-white/[0.04]'
+                    `flex items-center justify-between px-3.5 py-2.5 text-xs font-medium rounded-xl transition-colors duration-150 ${isActive
+                      ? 'bg-white/10 text-white font-semibold'
+                      : 'text-gray-400 hover:text-white hover:bg-white/[0.04]'
                     }`
                   }
                 >
@@ -142,17 +141,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
                     <>
                       <div className="flex items-center gap-3">
                         <Icon
-                          className={`w-4 h-4 transition-colors ${
-                            isActive ? 'text-white' : 'text-gray-400'
-                          }`}
+                          className={`w-4 h-4 transition-colors ${isActive ? 'text-white' : 'text-gray-400'
+                            }`}
                         />
                         <span>{item.label}</span>
                       </div>
-                      {item.badge && (
-                        <span className="px-2 py-0.5 text-[9px] font-mono font-bold uppercase rounded-full bg-white/10 text-gray-300 border border-white/10">
-                          {item.badge}
-                        </span>
-                      )}
                     </>
                   )}
                 </NavLink>
