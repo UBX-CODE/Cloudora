@@ -8,12 +8,6 @@ import {
   HardDrive,
   Loader2,
   FolderOpen,
-  Layers,
-  FileText,
-  Image as ImageIcon,
-  Film,
-  Music,
-  Archive,
 } from 'lucide-react';
 import { formatFileSize, formatRelativeTime } from '../../utils/formatters';
 import { FileTypeIcon } from '../../components/common/FileTypeIcon';
@@ -91,36 +85,27 @@ export const DashboardPage: React.FC = () => {
       {/* 2. Filter Tabs & Search Bar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pb-3 border-b border-white/[0.08]">
         {/* Category Pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 text-xs font-mono">
+        <div className="flex items-center gap-1 overflow-x-auto pb-1 sm:pb-0 text-xs font-mono">
           {[
-            { id: 'all', label: 'All Assets', icon: Layers, color: 'text-zinc-400' },
-            { id: 'document', label: 'Documents', icon: FileText, color: 'text-blue-400' },
-            { id: 'image', label: 'Images', icon: ImageIcon, color: 'text-fuchsia-400' },
-            { id: 'audio', label: 'Audio', icon: Music, color: 'text-pink-400' },
-            { id: 'video', label: 'Video', icon: Film, color: 'text-purple-400' },
-            { id: 'archive', label: 'Archives', icon: Archive, color: 'text-amber-400' },
-          ].map((cat) => {
-            const CatIcon = cat.icon;
-            const isActive = activeCategory === cat.id;
-            return (
-              <button
-                key={cat.id}
-                onClick={() => setActiveCategory(cat.id)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border transition-all whitespace-nowrap cursor-pointer ${
-                  isActive
-                    ? 'bg-white text-black font-bold border-white shadow-sm'
-                    : 'border-white/5 text-gray-400 hover:text-white hover:bg-white/[0.04] hover:border-white/10'
-                }`}
-              >
-                <CatIcon
-                  className={`w-3.5 h-3.5 ${
-                    isActive ? 'text-black' : cat.color
-                  }`}
-                />
-                <span>{cat.label}</span>
-              </button>
-            );
-          })}
+            { id: 'all', label: 'All Assets' },
+            { id: 'document', label: 'Documents' },
+            { id: 'image', label: 'Images' },
+            { id: 'audio', label: 'Audio' },
+            { id: 'video', label: 'Video' },
+            { id: 'archive', label: 'Archives' },
+          ].map((cat) => (
+            <button
+              key={cat.id}
+              onClick={() => setActiveCategory(cat.id)}
+              className={`px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap ${
+                activeCategory === cat.id
+                  ? 'bg-white text-black font-bold'
+                  : 'text-gray-400 hover:text-white hover:bg-white/[0.04]'
+              }`}
+            >
+              {cat.label}
+            </button>
+          ))}
         </div>
 
        

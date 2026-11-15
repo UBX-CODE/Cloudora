@@ -506,7 +506,9 @@ export const FilesPage: React.FC = () => {
                     className="p-3 rounded-xl bg-[#111116] hover:bg-[#181820] transition-colors cursor-pointer group flex items-center justify-between gap-3 border border-transparent hover:border-white/10"
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <FileTypeIcon category="folder" badgeSize="md" />
+                      <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center shrink-0 text-white group-hover:scale-105 transition-transform">
+                        <Folder className="w-4 h-4 fill-white/20" />
+                      </div>
                       <div className="min-w-0 flex-1">
                         <h3 className="text-xs font-semibold text-white group-hover:text-gray-300 transition-colors truncate">
                           {folder.name}

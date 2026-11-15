@@ -106,12 +106,9 @@ export const TrashPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/[0.08]">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 flex items-center justify-center shadow-[0_0_15px_rgba(239,68,68,0.2)]">
-              <Trash2 className="w-4 h-4" />
-            </div>
-            Trash & Disaster Recovery
+            <Trash2 className="w-5 h-5 text-gray-300" />
+            Trash Recovery
           </h1>
-          
         </div>
 
         {totalCount > 0 && (
@@ -132,9 +129,7 @@ export const TrashPage: React.FC = () => {
         </div>
       ) : totalCount === 0 ? (
         <div className="py-20 text-center">
-          <div className="w-16 h-16 rounded-2xl bg-red-500/5 border border-red-500/15 text-red-400/60 flex items-center justify-center mx-auto mb-3 shadow-[0_0_30px_rgba(239,68,68,0.1)]">
-            <Trash2 className="w-8 h-8" />
-          </div>
+          <Trash2 className="w-10 h-10 mx-auto text-gray-700 mb-3" />
           <h3 className="text-sm font-semibold text-white">Trash is Empty</h3>
           <p className="text-xs text-gray-500 mt-1 max-w-sm mx-auto font-sans">
             Items moved to trash will appear here for recovery before being permanently erased.
@@ -155,7 +150,7 @@ export const TrashPage: React.FC = () => {
                     className="flex items-center justify-between p-3 rounded-xl bg-[#111116] border border-white/5"
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <FileTypeIcon category="folder" badgeSize="sm" />
+                      <Folder className="w-5 h-5 text-amber-400/80 shrink-0" />
                       <div className="min-w-0">
                         <span className="text-xs font-medium text-white truncate block">
                           {folder.name}

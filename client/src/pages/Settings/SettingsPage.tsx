@@ -218,18 +218,17 @@ export const SettingsPage: React.FC = () => {
         <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
           Settings & Preferences
         </h1>
-        
+
       </div>
 
       {/* Tabs */}
       <div className="flex border-b border-white/[0.08] gap-6 text-xs font-semibold overflow-x-auto">
         <button
           onClick={() => setActiveTab('profile')}
-          className={`pb-3 flex items-center gap-2 transition-colors relative whitespace-nowrap ${
-            activeTab === 'profile'
-              ? 'text-white border-b-2 border-white'
-              : 'text-gray-400 hover:text-white'
-          }`}
+          className={`pb-3 flex items-center gap-2 transition-colors relative whitespace-nowrap ${activeTab === 'profile'
+            ? 'text-white border-b-2 border-white'
+            : 'text-gray-400 hover:text-white'
+            }`}
         >
           <UserIcon className="w-4 h-4" />
           Profile
@@ -237,23 +236,21 @@ export const SettingsPage: React.FC = () => {
 
         <button
           onClick={() => setActiveTab('storage')}
-          className={`pb-3 flex items-center gap-2 transition-colors relative whitespace-nowrap ${
-            activeTab === 'storage'
-              ? 'text-white border-b-2 border-white'
-              : 'text-gray-400 hover:text-white'
-          }`}
+          className={`pb-3 flex items-center gap-2 transition-colors relative whitespace-nowrap ${activeTab === 'storage'
+            ? 'text-white border-b-2 border-white'
+            : 'text-gray-400 hover:text-white'
+            }`}
         >
           <HardDrive className="w-4 h-4" />
           Storage
         </button>
-        
+
         <button
           onClick={() => setActiveTab('security')}
-          className={`pb-3 flex items-center gap-2 transition-colors relative whitespace-nowrap ${
-            activeTab === 'security'
-              ? 'text-white border-b-2 border-white'
-              : 'text-gray-400 hover:text-white'
-          }`}
+          className={`pb-3 flex items-center gap-2 transition-colors relative whitespace-nowrap ${activeTab === 'security'
+            ? 'text-white border-b-2 border-white'
+            : 'text-gray-400 hover:text-white'
+            }`}
         >
           <Shield className="w-4 h-4" />
           Security
@@ -348,11 +345,10 @@ export const SettingsPage: React.FC = () => {
 
             {profileMessage && (
               <div
-                className={`p-3.5 rounded-xl border text-xs flex items-center gap-2 font-mono ${
-                  profileMessage.type === 'success'
-                    ? 'bg-emerald-950/30 border-emerald-500/30 text-emerald-400'
-                    : 'bg-red-950/30 border-red-500/30 text-red-400'
-                }`}
+                className={`p-3.5 rounded-xl border text-xs flex items-center gap-2 font-mono ${profileMessage.type === 'success'
+                  ? 'bg-emerald-950/30 border-emerald-500/30 text-emerald-400'
+                  : 'bg-red-950/30 border-red-500/30 text-red-400'
+                  }`}
               >
                 {profileMessage.type === 'success' ? (
                   <CheckCircle2 className="w-4 h-4 shrink-0" />
@@ -434,13 +430,12 @@ export const SettingsPage: React.FC = () => {
                 {/* Progress bar */}
                 <div className="w-full h-3 rounded-full bg-white/10 overflow-hidden">
                   <div
-                    className={`h-full transition-all duration-500 ${
-                      storageSummary.percentageUsed > 90
-                        ? 'bg-red-500'
-                        : storageSummary.percentageUsed > 75
+                    className={`h-full transition-all duration-500 ${storageSummary.percentageUsed > 90
+                      ? 'bg-red-500'
+                      : storageSummary.percentageUsed > 75
                         ? 'bg-amber-400'
                         : 'bg-white'
-                    }`}
+                      }`}
                     style={{ width: `${Math.max(2, Math.min(100, storageSummary.percentageUsed))}%` }}
                   />
                 </div>
@@ -478,31 +473,26 @@ export const SettingsPage: React.FC = () => {
                     {
                       label: 'Documents & Code',
                       icon: <FileText className="w-4 h-4 text-blue-400" />,
-                      badgeBg: 'bg-blue-500/10 border-blue-500/20',
                       bytes: storageSummary.breakdown.documents,
                     },
                     {
                       label: 'Images & Photos',
-                      icon: <ImageIcon className="w-4 h-4 text-fuchsia-400" />,
-                      badgeBg: 'bg-fuchsia-500/10 border-fuchsia-500/20',
+                      icon: <ImageIcon className="w-4 h-4 text-emerald-400" />,
                       bytes: storageSummary.breakdown.images,
                     },
                     {
                       label: 'Videos (MP4 / WebM)',
                       icon: <Film className="w-4 h-4 text-purple-400" />,
-                      badgeBg: 'bg-purple-500/10 border-purple-500/20',
                       bytes: storageSummary.breakdown.videos,
                     },
                     {
                       label: 'Audio (MP3 / FLAC)',
-                      icon: <Music className="w-4 h-4 text-pink-400" />,
-                      badgeBg: 'bg-pink-500/10 border-pink-500/20',
+                      icon: <Music className="w-4 h-4 text-amber-400" />,
                       bytes: storageSummary.breakdown.audio,
                     },
                     {
                       label: 'Archives & Other',
-                      icon: <Archive className="w-4 h-4 text-amber-400" />,
-                      badgeBg: 'bg-amber-500/10 border-amber-500/20',
+                      icon: <Archive className="w-4 h-4 text-gray-400" />,
                       bytes: storageSummary.breakdown.archives + storageSummary.breakdown.other,
                     },
                   ].map((cat) => {
@@ -513,7 +503,7 @@ export const SettingsPage: React.FC = () => {
                     return (
                       <div key={cat.label} className="p-3 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className={`p-2 rounded-xl border ${cat.badgeBg}`}>{cat.icon}</div>
+                          <div className="p-2 rounded-lg bg-white/5">{cat.icon}</div>
                           <div>
                             <span className="text-xs font-semibold text-white block">{cat.label}</span>
                             <span className="text-[11px] text-gray-500 font-mono">{pct}% of total used space</span>
@@ -528,13 +518,13 @@ export const SettingsPage: React.FC = () => {
                 </div>
               </div>
 
-              
+
             </>
           ) : null}
         </div>
       )}
 
-      
+
 
       {/* Tab 4: Security & Password */}
       {activeTab === 'security' && (
@@ -544,11 +534,10 @@ export const SettingsPage: React.FC = () => {
 
             {passwordMessage && (
               <div
-                className={`p-3.5 rounded-xl border text-xs flex items-center gap-2 font-mono ${
-                  passwordMessage.type === 'success'
-                    ? 'bg-emerald-950/30 border-emerald-500/30 text-emerald-400'
-                    : 'bg-red-950/30 border-red-500/30 text-red-400'
-                }`}
+                className={`p-3.5 rounded-xl border text-xs flex items-center gap-2 font-mono ${passwordMessage.type === 'success'
+                  ? 'bg-emerald-950/30 border-emerald-500/30 text-emerald-400'
+                  : 'bg-red-950/30 border-red-500/30 text-red-400'
+                  }`}
               >
                 {passwordMessage.type === 'success' ? (
                   <CheckCircle2 className="w-4 h-4 shrink-0" />

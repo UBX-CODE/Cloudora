@@ -75,15 +75,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
       ? 'bg-amber-400'
       : 'bg-white';
   const navItems = [
-    { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, color: 'text-sky-400', activeBg: 'bg-sky-500/10 border-sky-500/20' },
-    { label: 'My Files', path: '/files', icon: FolderOpen, color: 'text-cyan-400', activeBg: 'bg-cyan-500/10 border-cyan-500/20' },
-    { label: 'Recent', path: '/recent', icon: Clock, color: 'text-blue-400', activeBg: 'bg-blue-500/10 border-blue-500/20' },
-    { label: 'Shared with me', path: '/shared', icon: Share2, color: 'text-emerald-400', activeBg: 'bg-emerald-500/10 border-emerald-500/20' },
-    { label: 'Starred', path: '/starred', icon: Star, color: 'text-amber-400', activeBg: 'bg-amber-500/10 border-amber-500/20' },
-    { label: 'Media Library', path: '/media', icon: Film, color: 'text-purple-400', activeBg: 'bg-purple-500/10 border-purple-500/20' },
-    { label: 'Upload Manager', path: '/uploads', icon: UploadCloud, color: 'text-violet-400', activeBg: 'bg-violet-500/10 border-violet-500/20', badge: 'Active' },
-    { label: 'Trash', path: '/trash', icon: Trash2, color: 'text-rose-400', activeBg: 'bg-rose-500/10 border-rose-500/20' },
-    { label: 'Settings', path: '/settings', icon: Settings, color: 'text-slate-400', activeBg: 'bg-white/10 border-white/20' },
+    { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+    { label: 'My Files', path: '/files', icon: FolderOpen },
+    { label: 'Recent', path: '/recent', icon: Clock },
+    { label: 'Shared with me', path: '/shared', icon: Share2 },
+    { label: 'Starred', path: '/starred', icon: Star },
+    { label: 'Media Library', path: '/media', icon: Film },
+    { label: 'Upload Manager', path: '/uploads', icon: UploadCloud, badge: 'Active' },
+    { label: 'Trash', path: '/trash', icon: Trash2 },
+    { label: 'Settings', path: '/settings', icon: Settings },
   ];
 
   return (
@@ -133,10 +133,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
                   to={item.path}
                   onClick={onClose}
                   className={({ isActive }) =>
-                    `group flex items-center justify-between px-3.5 py-2.5 text-xs font-medium rounded-xl transition-all duration-150 border ${
+                    `flex items-center justify-between px-3.5 py-2.5 text-xs font-medium rounded-xl transition-colors duration-150 ${
                       isActive
-                        ? `${item.activeBg} text-white font-semibold shadow-xs`
-                        : 'border-transparent text-gray-400 hover:text-white hover:bg-white/[0.04]'
+                        ? 'bg-white/10 text-white font-semibold'
+                        : 'text-gray-400 hover:text-white hover:bg-white/[0.04]'
                     }`
                   }
                 >
@@ -144,14 +144,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
                     <>
                       <div className="flex items-center gap-3">
                         <Icon
-                          className={`w-4 h-4 transition-colors shrink-0 ${
-                            isActive ? item.color : `text-gray-400 group-hover:${item.color}`
+                          className={`w-4 h-4 transition-colors ${
+                            isActive ? 'text-white' : 'text-gray-400'
                           }`}
                         />
                         <span>{item.label}</span>
                       </div>
                       {item.badge && (
-                        <span className="px-2 py-0.5 text-[9px] font-mono font-bold uppercase rounded-full bg-violet-500/20 text-violet-300 border border-violet-500/30">
+                        <span className="px-2 py-0.5 text-[9px] font-mono font-bold uppercase rounded-full bg-white/10 text-gray-300 border border-white/10">
                           {item.badge}
                         </span>
                       )}
