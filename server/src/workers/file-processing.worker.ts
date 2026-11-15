@@ -1,15 +1,16 @@
 import { Worker, Job } from 'bullmq';
 import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 import sharp from 'sharp';
-import { bullmqRedisConnection, FileProcessingJobData } from '../queues/file-processing.queue';
+import { bullmqRedisConnection, isQueueEnabled, FileProcessingJobData } from '../queues/file-processing.queue';
 import { storageClient } from '../lib/storage';
 import { config } from '../config/env';
 import { prisma } from '../lib/prisma';
 import { invalidateCacheByPattern } from '../utils/cache';
 
-export const fileProcessingWorker = new Worker<FileProcessingJobData>(
-  'file-processing-queue',
-  async (job: Job<FileProcessingJobData>) => {
+export const fileProcessingWorker = (isQueueEnabled && bullmqRedisConnection)
+  ? new Worker<FileProcessingJobData>(
+      'file-processing-queue',
+      async (job: Job<FileProcessingJobData>) => {
     const { fileId, storageKey, mimeType, ownerId } = job.data;
     console.log(`[Worker] Processing thumbnail for file: "${fileId}" (${mimeType})`);
 
@@ -69,17 +70,21 @@ export const fileProcessingWorker = new Worker<FileProcessingJobData>(
     connection: bullmqRedisConnection,
     concurrency: 2, // Process up to 2 image transforms in parallel
   }
-);
+) : null;
 
 // Worker Lifecycle & Telemetry Events
-fileProcessingWorker.on('ready', () => {
-  console.log('[Worker] File processing worker is ready and listening for jobs.');
-});
+if (fileProcessingWorker) {
+  fileProcessingWorker.on('ready', () => {
+    console.log('[Worker] File processing worker is ready and listening for jobs.');
+  });
 
-fileProcessingWorker.on('completed', (job) => {
-  console.log(`[Worker] Job ${job.id} completed successfully for file ${job.data.fileId}`);
-});
+  fileProcessingWorker.on('completed', (job) => {
+    console.log(`[Worker] Job ${job.id} completed successfully for file ${job.data.fileId}`);
+  });
 
-fileProcessingWorker.on('failed', (job, err) => {
-  console.error(`[Worker] ❌ Job ${job?.id} failed:`, err.message);
-});
+  fileProcessingWorker.on('failed', (job, err) => {
+    console.error(`[Worker] ❌ Job ${job?.id} failed:`, err.message);
+  });
+} else {
+  console.log('[Worker] File processing queue is inactive (no REDIS_URL configured). Direct file operations remain active.');
+}

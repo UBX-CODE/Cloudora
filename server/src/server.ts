@@ -27,6 +27,14 @@ const cleanupTimer = setInterval(async () => {
 
 cleanupTimer.unref();
 
+process.on('unhandledRejection', (reason: any) => {
+  console.warn('[Process] Unhandled Rejection warning:', reason?.message || reason);
+});
+
+process.on('uncaughtException', (err: any) => {
+  console.warn('[Process] Uncaught Exception warning:', err?.message || err);
+});
+
 process.on('SIGTERM', () => {
   console.log('SIGTERM signal received: closing HTTP server');
   clearInterval(cleanupTimer);

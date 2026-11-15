@@ -9,32 +9,51 @@ export interface FileProcessingJobData {
   ownerId: string;
 }
 
-// Dedicated BullMQ Redis connection instance (maxRetriesPerRequest must be null)
-export const bullmqRedisConnection = new Redis(config.REDIS_URL || 'redis://localhost:6379', {
-  maxRetriesPerRequest: null,
-  lazyConnect: true,
-});
+export const isQueueEnabled = Boolean(config.REDIS_URL);
+export let bullmqRedisConnection: Redis | null = null;
+export let fileProcessingQueue: Queue<FileProcessingJobData> | null = null;
 
-bullmqRedisConnection.on('error', (err) => {
-  console.warn('[BullMQ Redis] Connection warning:', err.message);
-});
-
-// 1. Initialize BullMQ Queue
-export const fileProcessingQueue = new Queue<FileProcessingJobData>('file-processing-queue', {
-  connection: bullmqRedisConnection,
-  defaultJobOptions: {
-    attempts: 3, // Retry up to 3 times on transient failures
-    backoff: {
-      type: 'exponential',
-      delay: 2000, // 2s -> 4s -> 8s
+if (isQueueEnabled && config.REDIS_URL) {
+  bullmqRedisConnection = new Redis(config.REDIS_URL, {
+    maxRetriesPerRequest: null,
+    lazyConnect: true,
+    enableOfflineQueue: false,
+    retryStrategy(times) {
+      if (times > 3) {
+        console.warn('[BullMQ Redis] Stopped reconnecting after 3 failed attempts.');
+        return null;
+      }
+      return Math.min(times * 300, 2000);
     },
-    removeOnComplete: 100, // Keep last 100 completed jobs in Redis for telemetry
-    removeOnFail: 500,     // Dead Letter Queue: keep failed jobs for debugging
-  },
-});
+  });
 
-// 2. Helper to dispatch a job from Express handlers
+  bullmqRedisConnection.on('error', (err) => {
+    console.warn('[BullMQ Redis] Connection warning:', err.message);
+  });
+
+  fileProcessingQueue = new Queue<FileProcessingJobData>('file-processing-queue', {
+    connection: bullmqRedisConnection,
+    defaultJobOptions: {
+      attempts: 3,
+      backoff: {
+        type: 'exponential',
+        delay: 2000,
+      },
+      removeOnComplete: 100,
+      removeOnFail: 500,
+    },
+  });
+
+  fileProcessingQueue.on('error', (err) => {
+    console.warn('[BullMQ Queue] Warning:', err.message);
+  });
+}
+
+// Helper to dispatch a job from Express handlers
 export async function dispatchFileProcessingJob(data: FileProcessingJobData) {
+  if (!fileProcessingQueue) {
+    return;
+  }
   try {
     return await fileProcessingQueue.add('generate-thumbnail', data);
   } catch (err: any) {

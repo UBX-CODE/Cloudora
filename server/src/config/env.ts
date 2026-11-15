@@ -16,6 +16,6 @@ export const config = {
   MINIO_SECRET_KEY: process.env.MINIO_SECRET_KEY || '',
   MINIO_BUCKET: process.env.MINIO_BUCKET || 'cloudora-files',
   MINIO_REGION: process.env.MINIO_REGION || 'us-east-1',
-  REDIS_URL: process.env.REDIS_URL || 'redis://localhost:6379',
+  REDIS_URL: process.env.REDIS_URL || '',
 };
 
