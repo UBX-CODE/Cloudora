@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { X, UserX, UserCheck, AlertCircle, ArrowRight, ShieldAlert, KeyRound } from 'lucide-react';
 
@@ -77,8 +78,8 @@ export const AuthAlertModal: React.FC<AuthAlertModalProps> = ({
     iconBg = 'bg-amber-400/10 border-amber-400/25 text-amber-400';
   }
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+  const modalElement = (
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4">
       {/* Sleek Backdrop */}
       <div
         className="fixed inset-0 bg-black/80 backdrop-blur-md transition-opacity animate-in fade-in duration-150"
@@ -129,7 +130,7 @@ export const AuthAlertModal: React.FC<AuthAlertModalProps> = ({
             <button
               type="button"
               onClick={primaryButtonAction}
-              className="w-full py-2.5 px-4 rounded-xl bg-white text-black text-xs font-semibold hover:bg-gray-200 transition-colors flex items-center justify-center gap-1.5 shadow-sm"
+              className="w-full py-2.5 px-4 rounded-xl bg-white text-black text-xs font-semibold hover:bg-gray-200 transition-colors flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
             >
               <span>{primaryButtonText}</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -139,7 +140,7 @@ export const AuthAlertModal: React.FC<AuthAlertModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className={`w-full py-2 px-4 rounded-xl text-xs font-medium transition-colors ${
+            className={`w-full py-2 px-4 rounded-xl text-xs font-medium transition-colors cursor-pointer ${
               primaryButtonText
                 ? 'bg-transparent text-gray-400 hover:text-white hover:bg-white/[0.05]'
                 : 'bg-white text-black font-semibold hover:bg-gray-200'
@@ -151,4 +152,6 @@ export const AuthAlertModal: React.FC<AuthAlertModalProps> = ({
       </div>
     </div>
   );
+
+  return typeof document !== 'undefined' ? createPortal(modalElement, document.body) : null;
 };

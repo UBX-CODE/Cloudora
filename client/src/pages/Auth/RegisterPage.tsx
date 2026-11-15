@@ -117,6 +117,7 @@ export const RegisterPage: React.FC = () => {
       const status = err.response?.status;
       const message =
         err.response?.data?.message || err.message || 'Registration failed. Please try again.';
+      console.warn('[Register Error]', { status, message });
       setError(message);
 
       const lowerMsg = message.toLowerCase();

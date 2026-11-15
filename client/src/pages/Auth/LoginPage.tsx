@@ -83,6 +83,7 @@ export const LoginPage: React.FC = () => {
       const status = err.response?.status;
       const message =
         err.response?.data?.message || err.message || 'Login failed. Please check your credentials.';
+      console.warn('[Login Error]', { status, message });
       setError(message);
 
       const lowerMsg = message.toLowerCase();
