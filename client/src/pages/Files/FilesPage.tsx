@@ -15,6 +15,7 @@ import {
   ArrowUpDown,
   Eye,
   Share2,
+  Edit2,
   Loader2,
   Home,
   AlertCircle,
@@ -31,6 +32,7 @@ import {
   fetchFiles,
   toggleStarFile,
   trashFile,
+  renameFile,
 } from '../../services/file.service';
 import {
   fetchRootFolders,
@@ -38,6 +40,7 @@ import {
   fetchFolderDetails,
   createFolder,
   trashFolder,
+  renameFolder,
   FolderAncestor,
 } from '../../services/folder.service';
 import { startFileUpload } from '../../services/multipart-upload.service';
@@ -74,9 +77,42 @@ export const FilesPage: React.FC = () => {
     item: FileItem | FolderItem;
     type: 'file' | 'folder';
   } | null>(null);
+  const [renameTarget, setRenameTarget] = useState<{
+    item: FileItem | FolderItem;
+    type: 'file' | 'folder';
+  } | null>(null);
+  const [renameValue, setRenameValue] = useState('');
+  const [renamingInProgress, setRenamingInProgress] = useState(false);
   const [newFolderModalOpen, setNewFolderModalOpen] = useState(false);
   const [newFolderName, setNewFolderName] = useState('');
   const [creatingFolder, setCreatingFolder] = useState(false);
+
+  const handleOpenRename = (item: FileItem | FolderItem, type: 'file' | 'folder', e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setRenameTarget({ item, type });
+    setRenameValue(item.name);
+  };
+
+  const handleConfirmRename = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!renameTarget || !renameValue.trim()) return;
+
+    try {
+      setRenamingInProgress(true);
+      if (renameTarget.type === 'file') {
+        const updated = await renameFile(renameTarget.item.id, renameValue.trim());
+        setFiles((prev) => prev.map((f) => (f.id === updated.id ? { ...f, name: updated.name } : f)));
+      } else {
+        const updated = await renameFolder(renameTarget.item.id, renameValue.trim());
+        setFolders((prev) => prev.map((f) => (f.id === updated.id ? { ...f, name: updated.name } : f)));
+      }
+      setRenameTarget(null);
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Failed to rename asset.');
+    } finally {
+      setRenamingInProgress(false);
+    }
+  };
 
   // Active Uploads Tracker (Floating progress pill)
   const [activeUploads, setActiveUploads] = useState<ActiveUploadProgress[]>([]);
@@ -484,6 +520,13 @@ export const FilesPage: React.FC = () => {
                     </div>
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
                       <button
+                        onClick={(e) => handleOpenRename(folder, 'folder', e)}
+                        className="p-1 rounded hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+                        title="Rename Folder"
+                      >
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </button>
+                      <button
                         onClick={(e) => {
                           e.stopPropagation();
                           setShareTarget({ item: folder, type: 'folder' });
@@ -615,6 +658,13 @@ export const FilesPage: React.FC = () => {
                               <Eye className="w-3.5 h-3.5" />
                             </button>
                             <button
+                              onClick={(e) => handleOpenRename(file, 'file', e)}
+                              className="p-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+                              title="Rename File"
+                            >
+                              <Edit2 className="w-3.5 h-3.5" />
+                            </button>
+                            <button
                               onClick={() => setShareTarget({ item: file, type: 'file' })}
                               className="p-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
                               title="Share Asset"
@@ -704,6 +754,13 @@ export const FilesPage: React.FC = () => {
                             title="Preview"
                           >
                             <Eye className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={(e) => handleOpenRename(file, 'file', e)}
+                            className="p-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white"
+                            title="Rename File"
+                          >
+                            <Edit2 className="w-3.5 h-3.5" />
                           </button>
                           <button
                             onClick={() => setShareTarget({ item: file, type: 'file' })}
@@ -837,6 +894,48 @@ export const FilesPage: React.FC = () => {
               className="px-4 py-2 rounded-xl text-xs font-bold text-black bg-white hover:bg-gray-200 transition-colors disabled:opacity-50"
             >
               {creatingFolder ? 'Creating...' : 'Create Folder'}
+            </button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Rename Asset Modal */}
+      <Modal
+        isOpen={Boolean(renameTarget)}
+        onClose={() => setRenameTarget(null)}
+        title={`Rename ${renameTarget?.type === 'file' ? 'File' : 'Folder'}`}
+        description={`Enter a new name for "${renameTarget?.item.name}"`}
+        maxWidth="sm"
+      >
+        <form onSubmit={handleConfirmRename} className="space-y-4 pt-2">
+          <div>
+            <label className="text-xs font-semibold text-gray-300 block mb-1.5">
+              New Name
+            </label>
+            <input
+              type="text"
+              required
+              autoFocus
+              value={renameValue}
+              onChange={(e) => setRenameValue(e.target.value)}
+              className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-white/10 bg-[#121217] text-white focus:outline-none focus:border-white/30"
+            />
+          </div>
+
+          <div className="flex justify-end gap-2 pt-2">
+            <button
+              type="button"
+              onClick={() => setRenameTarget(null)}
+              className="px-4 py-2 rounded-xl text-xs font-semibold text-gray-400 hover:text-white"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={renamingInProgress || !renameValue.trim()}
+              className="px-4 py-2 rounded-xl text-xs font-bold text-black bg-white hover:bg-gray-200 transition-colors disabled:opacity-50"
+            >
+              {renamingInProgress ? 'Renaming...' : 'Save Name'}
             </button>
           </div>
         </form>

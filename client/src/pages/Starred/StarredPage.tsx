@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Star, Download, Eye, Loader2 } from 'lucide-react';
+import { Star, Download, Eye, Share2, Loader2 } from 'lucide-react';
 import { formatFileSize, formatRelativeTime } from '../../utils/formatters';
 import { FileTypeIcon } from '../../components/common/FileTypeIcon';
 import { FilePreviewModal } from '../../components/common/FilePreviewModal';
+import { ShareModal } from '../../components/common/ShareModal';
 import { FileItem } from '../../types/storage.types';
 import { fetchStarredFiles, toggleStarFile } from '../../services/file.service';
 import { downloadFile } from '../../utils/download';
@@ -11,6 +12,7 @@ export const StarredPage: React.FC = () => {
   const [files, setFiles] = useState<FileItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [previewFile, setPreviewFile] = useState<FileItem | null>(null);
+  const [shareFile, setShareFile] = useState<FileItem | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -134,6 +136,13 @@ export const StarredPage: React.FC = () => {
                     <Eye className="w-3.5 h-3.5" />
                   </button>
                   <button
+                    onClick={() => setShareFile(file)}
+                    className="p-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+                    title="Share Asset"
+                  >
+                    <Share2 className="w-3.5 h-3.5" />
+                  </button>
+                  <button
                     onClick={() => downloadFile(file.id, file.name)}
                     className="p-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
                     title="Download"
@@ -152,6 +161,14 @@ export const StarredPage: React.FC = () => {
         file={previewFile}
         isOpen={!!previewFile}
         onClose={() => setPreviewFile(null)}
+      />
+
+      {/* Secure Cryptographic Share Modal */}
+      <ShareModal
+        isOpen={Boolean(shareFile)}
+        onClose={() => setShareFile(null)}
+        target={shareFile}
+        targetType="file"
       />
     </div>
   );

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Play, Download, Film, Disc, Loader2, Music, Image as ImageIcon } from 'lucide-react';
+import { Play, Download, Film, Disc, Loader2, Music, Share2, Image as ImageIcon } from 'lucide-react';
 import { formatFileSize, formatRelativeTime } from '../../utils/formatters';
 import { FilePreviewModal } from '../../components/common/FilePreviewModal';
+import { ShareModal } from '../../components/common/ShareModal';
 import { FileItem } from '../../types/storage.types';
 import { fetchFiles } from '../../services/file.service';
 import { downloadFile } from '../../utils/download';
@@ -9,6 +10,7 @@ import { downloadFile } from '../../utils/download';
 export const MediaPage: React.FC = () => {
   const [filter, setFilter] = useState<'all' | 'audio' | 'video' | 'image'>('all');
   const [selectedMedia, setSelectedMedia] = useState<FileItem | null>(null);
+  const [shareMedia, setShareMedia] = useState<FileItem | null>(null);
   const [files, setFiles] = useState<FileItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -171,17 +173,30 @@ export const MediaPage: React.FC = () => {
                   </div>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    downloadFile(item.id, item.name);
-                  }}
-                  className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors shrink-0"
-                  title="Download"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                </button>
+                <div className="flex items-center gap-1 shrink-0">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShareMedia(item);
+                    }}
+                    className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+                    title="Share Media"
+                  >
+                    <Share2 className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      downloadFile(item.id, item.name);
+                    }}
+                    className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+                    title="Download"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </div>
             </div>
           ))}
@@ -193,6 +208,14 @@ export const MediaPage: React.FC = () => {
         file={selectedMedia}
         isOpen={!!selectedMedia}
         onClose={() => setSelectedMedia(null)}
+      />
+
+      {/* Secure Cryptographic Share Modal */}
+      <ShareModal
+        isOpen={Boolean(shareMedia)}
+        onClose={() => setShareMedia(null)}
+        target={shareMedia}
+        targetType="file"
       />
     </div>
   );

@@ -113,6 +113,14 @@ export async function getFilePreviewUrl(fileId: string): Promise<PreviewData> {
 }
 
 /**
+ * 7.1 Get Presigned Thumbnail URL (asynchronously generated 256x256 WebP)
+ */
+export async function getFileThumbnailUrl(fileId: string): Promise<{ thumbnailUrl: string }> {
+  const response = await api.get(`/files/${fileId}/thumbnail-url`);
+  return response.data.data;
+}
+
+/**
  * 8. Rename file
  */
 export async function renameFile(fileId: string, name: string): Promise<FileItem> {
