@@ -106,20 +106,20 @@ export const TrashPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/[0.08]">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-2.5">
-            <Trash2 className="w-5 h-5 text-gray-300" />
+            <div className="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 flex items-center justify-center shadow-[0_0_15px_rgba(239,68,68,0.2)]">
+              <Trash2 className="w-4 h-4" />
+            </div>
             Trash & Disaster Recovery
           </h1>
-          <p className="text-xs text-gray-400 mt-1 font-sans">
-            Deleted items can be restored back to your drive or permanently purged from storage.
-          </p>
+          
         </div>
 
         {totalCount > 0 && (
           <button
             onClick={() => setEmptyTrashConfirmOpen(true)}
-            className="px-4 py-2 rounded-xl text-xs font-bold text-black bg-white hover:bg-gray-200 transition-colors flex items-center gap-2"
+            className="px-4 py-2 rounded-xl text-xs font-bold text-black bg-white hover:bg-gray-200 transition-colors flex items-center gap-2 shadow-sm"
           >
-            <Trash2 className="w-3.5 h-3.5" />
+            <Trash2 className="w-3.5 h-3.5 text-red-600" />
             <span>Empty Trash ({totalCount})</span>
           </button>
         )}
@@ -132,7 +132,9 @@ export const TrashPage: React.FC = () => {
         </div>
       ) : totalCount === 0 ? (
         <div className="py-20 text-center">
-          <Trash2 className="w-10 h-10 mx-auto text-gray-700 mb-3" />
+          <div className="w-16 h-16 rounded-2xl bg-red-500/5 border border-red-500/15 text-red-400/60 flex items-center justify-center mx-auto mb-3 shadow-[0_0_30px_rgba(239,68,68,0.1)]">
+            <Trash2 className="w-8 h-8" />
+          </div>
           <h3 className="text-sm font-semibold text-white">Trash is Empty</h3>
           <p className="text-xs text-gray-500 mt-1 max-w-sm mx-auto font-sans">
             Items moved to trash will appear here for recovery before being permanently erased.
@@ -153,7 +155,7 @@ export const TrashPage: React.FC = () => {
                     className="flex items-center justify-between p-3 rounded-xl bg-[#111116] border border-white/5"
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <Folder className="w-5 h-5 text-amber-400/80 shrink-0" />
+                      <FileTypeIcon category="folder" badgeSize="sm" />
                       <div className="min-w-0">
                         <span className="text-xs font-medium text-white truncate block">
                           {folder.name}

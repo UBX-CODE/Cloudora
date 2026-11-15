@@ -21,12 +21,15 @@ import {
   Database,
   Cpu,
   RefreshCw,
+  Camera,
+  Upload,
+  Trash2,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useTheme } from '../../hooks/useTheme';
 import { formatDate, formatFileSize } from '../../utils/formatters';
 import { Input } from '../../components/ui/Input';
-import { authService } from '../../services/auth.service';
+import { authService, getAvatarUrl } from '../../services/auth.service';
 import { fetchStorageSummary, StorageSummaryResponse } from '../../services/file.service';
 
 export const SettingsPage: React.FC = () => {
@@ -40,6 +43,9 @@ export const SettingsPage: React.FC = () => {
   const [name, setName] = useState(user?.name || '');
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileMessage, setProfileMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const avatarInputRef = React.useRef<HTMLInputElement>(null);
+  const avatarUrl = getAvatarUrl(user?.avatar);
 
   // Password Change State
   const [currentPassword, setCurrentPassword] = useState('');
@@ -97,6 +103,69 @@ export const SettingsPage: React.FC = () => {
     }
   };
 
+  const handleAvatarFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      setProfileMessage({ type: 'error', text: 'Please select an image file (PNG, JPG, WebP).' });
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setProfileMessage({ type: 'error', text: 'Image file size must be less than 5 MB.' });
+      return;
+    }
+
+    try {
+      setAvatarUploading(true);
+      setProfileMessage(null);
+
+      const reader = new FileReader();
+      reader.onload = async () => {
+        try {
+          const base64 = reader.result as string;
+          await authService.updateProfile({ avatar: base64 });
+          await refreshProfile();
+          setProfileMessage({ type: 'success', text: 'Avatar icon image updated successfully!' });
+        } catch (err: any) {
+          setProfileMessage({
+            type: 'error',
+            text: err.response?.data?.message || 'Failed to upload avatar image.',
+          });
+        } finally {
+          setAvatarUploading(false);
+        }
+      };
+      reader.readAsDataURL(file);
+    } catch (err: any) {
+      setProfileMessage({
+        type: 'error',
+        text: err.response?.data?.message || 'Failed to process avatar file.',
+      });
+      setAvatarUploading(false);
+    } finally {
+      if (avatarInputRef.current) avatarInputRef.current.value = '';
+    }
+  };
+
+  const handleRemoveAvatar = async () => {
+    try {
+      setAvatarUploading(true);
+      setProfileMessage(null);
+      await authService.updateProfile({ avatar: null });
+      await refreshProfile();
+      setProfileMessage({ type: 'success', text: 'Custom avatar removed.' });
+    } catch (err: any) {
+      setProfileMessage({
+        type: 'error',
+        text: err.response?.data?.message || 'Failed to remove avatar.',
+      });
+    } finally {
+      setAvatarUploading(false);
+    }
+  };
+
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
     setPasswordMessage(null);
@@ -145,9 +214,7 @@ export const SettingsPage: React.FC = () => {
         <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
           Settings & Preferences
         </h1>
-        <p className="text-xs text-gray-400 mt-1 font-sans">
-          Manage your account credentials, storage quota telemetry, and system preferences.
-        </p>
+        
       </div>
 
       {/* Tabs */}
@@ -161,7 +228,7 @@ export const SettingsPage: React.FC = () => {
           }`}
         >
           <UserIcon className="w-4 h-4" />
-          Profile Information
+          Profile
         </button>
 
         <button
@@ -173,21 +240,9 @@ export const SettingsPage: React.FC = () => {
           }`}
         >
           <HardDrive className="w-4 h-4" />
-          Storage & Quota Telemetry
+          Storage
         </button>
-
-        <button
-          onClick={() => setActiveTab('theme')}
-          className={`pb-3 flex items-center gap-2 transition-colors relative whitespace-nowrap ${
-            activeTab === 'theme'
-              ? 'text-white border-b-2 border-white'
-              : 'text-gray-400 hover:text-white'
-          }`}
-        >
-          <Palette className="w-4 h-4" />
-          Appearance & Theme
-        </button>
-
+        
         <button
           onClick={() => setActiveTab('security')}
           className={`pb-3 flex items-center gap-2 transition-colors relative whitespace-nowrap ${
@@ -197,7 +252,7 @@ export const SettingsPage: React.FC = () => {
           }`}
         >
           <Shield className="w-4 h-4" />
-          Security & Access
+          Security
         </button>
       </div>
 
@@ -205,23 +260,82 @@ export const SettingsPage: React.FC = () => {
       {activeTab === 'profile' && (
         <div className="space-y-6 max-w-2xl">
           <div className="p-6 rounded-2xl bg-[#111116] space-y-6 border border-white/5">
-            <div className="flex items-center gap-4 pb-6 border-b border-white/[0.06]">
-              <div className="w-12 h-12 rounded-xl bg-white/10 text-white flex items-center justify-center font-bold text-base shadow-sm">
-                {user?.name?.charAt(0) || 'U'}
-              </div>
-              <div>
-                <h2 className="text-base font-bold text-white">
-                  {user?.name || 'Cloudora Member'}
-                </h2>
-                <p className="text-xs text-gray-400 font-mono mt-0.5">{user?.email}</p>
-                <div className="mt-2 flex items-center gap-2">
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/10 text-gray-300">
-                    ROLE: {user?.role || 'USER'}
-                  </span>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                    5 GB FREE TIER
-                  </span>
+            {/* Profile Avatar & Details Header */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 pb-6 border-b border-white/[0.06]">
+              <div className="flex items-center gap-4">
+                {/* Avatar Preview Box */}
+                <div className="relative group shrink-0">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 border border-white/10 flex items-center justify-center font-bold text-xl text-white shadow-lg overflow-hidden relative">
+                    {avatarUrl ? (
+                      <img
+                        src={avatarUrl}
+                        alt={user?.name || 'Avatar'}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-white/80">{user?.name?.charAt(0)?.toUpperCase() || 'U'}</span>
+                    )}
+
+                    {avatarUploading && (
+                      <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
+                        <Loader2 className="w-5 h-5 text-white animate-spin" />
+                      </div>
+                    )}
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => avatarInputRef.current?.click()}
+                    disabled={avatarUploading}
+                    className="absolute -bottom-1 -right-1 p-1.5 rounded-lg bg-white text-black hover:bg-gray-200 shadow-md transition-transform hover:scale-110 disabled:opacity-50 cursor-pointer"
+                    title="Upload Avatar Image"
+                  >
+                    <Camera className="w-3.5 h-3.5" />
+                  </button>
                 </div>
+
+                <div>
+                  <h2 className="text-base font-bold text-white">
+                    {user?.name || 'Cloudora Member'}
+                  </h2>
+                  <p className="text-xs text-gray-400 font-mono mt-0.5">{user?.email}</p>
+                  <p className="text-[11px] text-gray-500 mt-1 font-mono">
+                    {user?.avatar ? 'Custom profile photo active' : 'Default monogram avatar'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Avatar Actions */}
+              <div className="flex items-center gap-2">
+                <input
+                  type="file"
+                  ref={avatarInputRef}
+                  onChange={handleAvatarFileSelect}
+                  accept="image/png,image/jpeg,image/webp,image/gif"
+                  className="hidden"
+                />
+                <button
+                  type="button"
+                  onClick={() => avatarInputRef.current?.click()}
+                  disabled={avatarUploading}
+                  className="px-3.5 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50 cursor-pointer"
+                >
+                  <Upload className="w-3.5 h-3.5 text-gray-300" />
+                  <span>{avatarUploading ? 'Uploading...' : 'Upload Photo'}</span>
+                </button>
+
+                {user?.avatar && (
+                  <button
+                    type="button"
+                    onClick={handleRemoveAvatar}
+                    disabled={avatarUploading}
+                    className="px-3.5 py-2 rounded-xl border border-red-500/20 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50 cursor-pointer"
+                    title="Remove custom photo and reset to initials"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Remove</span>
+                  </button>
+                )}
               </div>
             </div>
 
@@ -262,26 +376,8 @@ export const SettingsPage: React.FC = () => {
                 value={user?.email || ''}
                 readOnly
                 disabled
-                leftIcon={<Mail className="w-4 h-4" />}
                 className="opacity-70 cursor-not-allowed"
               />
-
-              <Input
-                label="Tenant Identifier (UUID)"
-                value={user?.id || ''}
-                readOnly
-                disabled
-                className="font-mono text-xs text-gray-400 opacity-70 cursor-not-allowed"
-              />
-
-              <Input
-                label="Account Registered Date"
-                value={user?.createdAt ? formatDate(user.createdAt) : 'Recently'}
-                readOnly
-                disabled
-                className="font-mono text-xs opacity-70 cursor-not-allowed"
-              />
-
               <div className="pt-2">
                 <button
                   type="submit"
@@ -375,26 +471,31 @@ export const SettingsPage: React.FC = () => {
                     {
                       label: 'Documents & Code',
                       icon: <FileText className="w-4 h-4 text-blue-400" />,
+                      badgeBg: 'bg-blue-500/10 border-blue-500/20',
                       bytes: storageSummary.breakdown.documents,
                     },
                     {
-                      label: 'Images & Thumbnails',
-                      icon: <ImageIcon className="w-4 h-4 text-emerald-400" />,
+                      label: 'Images & Photos',
+                      icon: <ImageIcon className="w-4 h-4 text-fuchsia-400" />,
+                      badgeBg: 'bg-fuchsia-500/10 border-fuchsia-500/20',
                       bytes: storageSummary.breakdown.images,
                     },
                     {
                       label: 'Videos (MP4 / WebM)',
                       icon: <Film className="w-4 h-4 text-purple-400" />,
+                      badgeBg: 'bg-purple-500/10 border-purple-500/20',
                       bytes: storageSummary.breakdown.videos,
                     },
                     {
                       label: 'Audio (MP3 / FLAC)',
-                      icon: <Music className="w-4 h-4 text-amber-400" />,
+                      icon: <Music className="w-4 h-4 text-pink-400" />,
+                      badgeBg: 'bg-pink-500/10 border-pink-500/20',
                       bytes: storageSummary.breakdown.audio,
                     },
                     {
                       label: 'Archives & Other',
-                      icon: <Archive className="w-4 h-4 text-gray-400" />,
+                      icon: <Archive className="w-4 h-4 text-amber-400" />,
+                      badgeBg: 'bg-amber-500/10 border-amber-500/20',
                       bytes: storageSummary.breakdown.archives + storageSummary.breakdown.other,
                     },
                   ].map((cat) => {
@@ -405,7 +506,7 @@ export const SettingsPage: React.FC = () => {
                     return (
                       <div key={cat.label} className="p-3 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="p-2 rounded-lg bg-white/5">{cat.icon}</div>
+                          <div className={`p-2 rounded-xl border ${cat.badgeBg}`}>{cat.icon}</div>
                           <div>
                             <span className="text-xs font-semibold text-white block">{cat.label}</span>
                             <span className="text-[11px] text-gray-500 font-mono">{pct}% of total used space</span>
@@ -420,86 +521,19 @@ export const SettingsPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* System Architecture Guardrails */}
-              <div className="p-5 rounded-2xl bg-[#111116] border border-white/5 space-y-3">
-                <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-gray-400 flex items-center gap-2">
-                  <Database className="w-3.5 h-3.5" />
-                  Distributed Engine Architecture
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono text-gray-400">
-                  <div className="p-2.5 rounded-lg bg-white/[0.02] border border-white/5">
-                    • MinIO S3 Object Storage Active
-                  </div>
-                  <div className="p-2.5 rounded-lg bg-white/[0.02] border border-white/5">
-                    • Redis Cache-Aside & Quota Engine (TTL: 60s)
-                  </div>
-                  <div className="p-2.5 rounded-lg bg-white/[0.02] border border-white/5">
-                    • BullMQ Asynchronous WebP Workers
-                  </div>
-                  <div className="p-2.5 rounded-lg bg-white/[0.02] border border-white/5">
-                    • Multipart Threshold: 16 MiB / Chunk: 8 MiB
-                  </div>
-                </div>
-              </div>
+              
             </>
           ) : null}
         </div>
       )}
 
-      {/* Tab 3: Theme Settings */}
-      {activeTab === 'theme' && (
-        <div className="space-y-6 max-w-2xl">
-          <div className="p-6 rounded-2xl bg-[#111116] space-y-4 border border-white/5">
-            <h2 className="text-sm font-bold text-white">Interface Color Theme</h2>
-            <p className="text-xs text-gray-400">
-              Select your preferred appearance mode for the dashboard and vault tools.
-            </p>
-
-            <div className="grid grid-cols-2 gap-4 pt-2">
-              <button
-                onClick={() => setTheme('dark')}
-                className={`p-4 rounded-xl border text-left transition-all ${
-                  theme === 'dark'
-                    ? 'border-white bg-white/10 ring-1 ring-white'
-                    : 'border-white/10 hover:border-white/20 bg-[#0E0E14]'
-                }`}
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <Moon className="w-5 h-5 text-white" />
-                  {theme === 'dark' && <CheckCircle2 className="w-4 h-4 text-white" />}
-                </div>
-                <h4 className="text-xs font-bold text-white">Obsidian Dark</h4>
-                <p className="text-[11px] text-gray-400 mt-1">Deep clean monochrome slate</p>
-              </button>
-
-              <button
-                onClick={() => setTheme('light')}
-                className={`p-4 rounded-xl border text-left transition-all ${
-                  theme === 'light'
-                    ? 'border-white bg-white/10 ring-1 ring-white'
-                    : 'border-white/10 hover:border-white/20 bg-[#0E0E14]'
-                }`}
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <Sun className="w-5 h-5 text-white" />
-                  {theme === 'light' && <CheckCircle2 className="w-4 h-4 text-white" />}
-                </div>
-                <h4 className="text-xs font-bold text-white">Studio Daylight</h4>
-                <p className="text-[11px] text-gray-400 mt-1">Light interface mode</p>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      
 
       {/* Tab 4: Security & Password */}
       {activeTab === 'security' && (
         <div className="space-y-6 max-w-2xl">
           <div className="p-6 rounded-2xl bg-[#111116] space-y-4 border border-white/5">
             <h2 className="text-sm font-bold text-white">Change Account Password</h2>
-            <p className="text-xs text-gray-400">
-              Passwords are automatically hashed using Bcrypt with 10 salt rounds on the Node.js backend.
-            </p>
 
             {passwordMessage && (
               <div
@@ -525,8 +559,6 @@ export const SettingsPage: React.FC = () => {
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 placeholder="••••••••••••"
-                leftIcon={<Lock className="w-4 h-4" />}
-                required
               />
 
               <Input
@@ -535,8 +567,6 @@ export const SettingsPage: React.FC = () => {
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 placeholder="At least 8 characters"
-                leftIcon={<Lock className="w-4 h-4" />}
-                required
               />
 
               <Input
@@ -545,8 +575,6 @@ export const SettingsPage: React.FC = () => {
                 value={confirmNewPassword}
                 onChange={(e) => setConfirmNewPassword(e.target.value)}
                 placeholder="Re-enter new password"
-                leftIcon={<Lock className="w-4 h-4" />}
-                required
               />
 
               <div className="pt-2">
@@ -559,25 +587,6 @@ export const SettingsPage: React.FC = () => {
                 </button>
               </div>
             </form>
-          </div>
-
-          <div className="p-6 rounded-2xl bg-[#111116] space-y-4 border border-white/5">
-            <h2 className="text-sm font-bold text-white">Active JWT Session Telemetry</h2>
-            <div className="p-3.5 rounded-xl bg-[#0E0E14] border border-white/10 text-xs space-y-1 font-mono text-gray-400">
-              <p className="text-gray-300">Header: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...</p>
-              <p>Algorithm: HMAC SHA-256 (Signed with JWT_SECRET)</p>
-              <p>User Context: {user?.email} [{user?.role}]</p>
-            </div>
-
-            <div className="pt-2">
-              <button
-                onClick={handleLogout}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-white hover:bg-white/10 bg-white/5 border border-white/15 transition-colors flex items-center gap-2"
-              >
-                <LogOut className="w-3.5 h-3.5" />
-                <span>Sign Out of All Sessions</span>
-              </button>
-            </div>
           </div>
         </div>
       )}

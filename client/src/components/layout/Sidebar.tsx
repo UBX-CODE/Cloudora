@@ -17,6 +17,7 @@ import { CloudoraLogo } from '../common/CloudoraLogo';
 import { useAuth } from '../../context/AuthContext';
 import { fetchStorageSummary, StorageSummaryResponse } from '../../services/file.service';
 import { formatFileSize } from '../../utils/formatters';
+import { getAvatarUrl } from '../../services/auth.service';
 
 interface SidebarProps {
   isOpen?: boolean;
@@ -74,15 +75,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
       ? 'bg-amber-400'
       : 'bg-white';
   const navItems = [
-    { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
-    { label: 'My Files', path: '/files', icon: FolderOpen },
-    { label: 'Recent', path: '/recent', icon: Clock },
-    { label: 'Shared with me', path: '/shared', icon: Share2 },
-    { label: 'Starred', path: '/starred', icon: Star },
-    { label: 'Media Library', path: '/media', icon: Film },
-    { label: 'Upload Manager', path: '/uploads', icon: UploadCloud, badge: 'Active' },
-    { label: 'Trash', path: '/trash', icon: Trash2 },
-    { label: 'Settings', path: '/settings', icon: Settings },
+    { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, color: 'text-sky-400', activeBg: 'bg-sky-500/10 border-sky-500/20' },
+    { label: 'My Files', path: '/files', icon: FolderOpen, color: 'text-cyan-400', activeBg: 'bg-cyan-500/10 border-cyan-500/20' },
+    { label: 'Recent', path: '/recent', icon: Clock, color: 'text-blue-400', activeBg: 'bg-blue-500/10 border-blue-500/20' },
+    { label: 'Shared with me', path: '/shared', icon: Share2, color: 'text-emerald-400', activeBg: 'bg-emerald-500/10 border-emerald-500/20' },
+    { label: 'Starred', path: '/starred', icon: Star, color: 'text-amber-400', activeBg: 'bg-amber-500/10 border-amber-500/20' },
+    { label: 'Media Library', path: '/media', icon: Film, color: 'text-purple-400', activeBg: 'bg-purple-500/10 border-purple-500/20' },
+    { label: 'Upload Manager', path: '/uploads', icon: UploadCloud, color: 'text-violet-400', activeBg: 'bg-violet-500/10 border-violet-500/20', badge: 'Active' },
+    { label: 'Trash', path: '/trash', icon: Trash2, color: 'text-rose-400', activeBg: 'bg-rose-500/10 border-rose-500/20' },
+    { label: 'Settings', path: '/settings', icon: Settings, color: 'text-slate-400', activeBg: 'bg-white/10 border-white/20' },
   ];
 
   return (
@@ -118,7 +119,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
             </Link>
           </div>
 
-          {/* Navigation list (Google Drive / Cloudflare style) */}
+          {/* Navigation list */}
           <div className="overflow-y-auto px-3 py-2 space-y-0.5">
             <div className="px-3 py-1.5 text-[10px] font-mono font-bold uppercase tracking-widest text-gray-500">
               Workspace
@@ -132,10 +133,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
                   to={item.path}
                   onClick={onClose}
                   className={({ isActive }) =>
-                    `flex items-center justify-between px-3.5 py-2.5 text-xs font-medium rounded-xl transition-colors duration-150 ${
+                    `group flex items-center justify-between px-3.5 py-2.5 text-xs font-medium rounded-xl transition-all duration-150 border ${
                       isActive
-                        ? 'bg-white/10 text-white font-semibold'
-                        : 'text-gray-400 hover:text-white hover:bg-white/[0.04]'
+                        ? `${item.activeBg} text-white font-semibold shadow-xs`
+                        : 'border-transparent text-gray-400 hover:text-white hover:bg-white/[0.04]'
                     }`
                   }
                 >
@@ -143,14 +144,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
                     <>
                       <div className="flex items-center gap-3">
                         <Icon
-                          className={`w-4 h-4 transition-colors ${
-                            isActive ? 'text-white' : 'text-gray-400'
+                          className={`w-4 h-4 transition-colors shrink-0 ${
+                            isActive ? item.color : `text-gray-400 group-hover:${item.color}`
                           }`}
                         />
                         <span>{item.label}</span>
                       </div>
                       {item.badge && (
-                        <span className="px-2 py-0.5 text-[9px] font-mono font-bold uppercase rounded-full bg-white/10 text-gray-300 border border-white/10">
+                        <span className="px-2 py-0.5 text-[9px] font-mono font-bold uppercase rounded-full bg-violet-500/20 text-violet-300 border border-violet-500/30">
                           {item.badge}
                         </span>
                       )}
@@ -162,37 +163,68 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
           </div>
         </div>
 
-        {/* Storage Quota Bar (Live Reactive Telemetry) */}
-        <Link
-          to="/settings"
-          onClick={onClose}
-          className="p-4 border-t border-white/[0.06] space-y-2.5 bg-[#07070A] hover:bg-white/[0.02] transition-colors block group cursor-pointer"
-          title="Click to view detailed storage telemetry in Settings"
-        >
-          <div className="flex items-center justify-between text-xs">
-            <span className="text-gray-400 font-medium flex items-center gap-1.5 group-hover:text-white transition-colors">
-              <HardDrive className="w-3.5 h-3.5 text-gray-300" />
-              Storage
-            </span>
-            <span className="text-gray-300 font-mono text-[11px]">
-              {formatFileSize(totalUsed)} of {formatFileSize(totalLimit)}
-            </span>
-          </div>
+        {/* Footer: User Profile & Storage Bar */}
+        <div className="border-t border-white/[0.06] bg-[#07070A]">
+          {/* User Profile Card */}
+          {user && (
+            <Link
+              to="/settings"
+              onClick={onClose}
+              className="flex items-center gap-3 px-4 py-3 hover:bg-white/[0.04] transition-colors border-b border-white/[0.04] group cursor-pointer"
+              title="Manage Account Profile & Settings"
+            >
+              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-500 text-white flex items-center justify-center text-xs font-bold border border-white/20 overflow-hidden shrink-0 shadow-sm">
+                {getAvatarUrl(user.avatar) ? (
+                  <img
+                    src={getAvatarUrl(user.avatar)!}
+                    alt={user.name || 'User'}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  user.name?.charAt(0)?.toUpperCase() || 'U'
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-semibold text-white truncate group-hover:text-cyan-400 transition-colors">
+                  {user.name || 'Cloudora User'}
+                </p>
+                <p className="text-[10px] text-gray-400 font-mono truncate">{user.email}</p>
+              </div>
+            </Link>
+          )}
 
-          <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
-            <div
-              className={`h-full rounded-full transition-all duration-500 ${barColor}`}
-              style={{ width: `${Math.max(percentage, totalUsed > 0 ? 1 : 0)}%` }}
-            />
-          </div>
+          {/* Storage Quota Bar (Live Reactive Telemetry) */}
+          <Link
+            to="/settings"
+            onClick={onClose}
+            className="p-4 space-y-2.5 hover:bg-white/[0.02] transition-colors block group cursor-pointer"
+            title="Click to view detailed storage telemetry in Settings"
+          >
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-gray-400 font-medium flex items-center gap-1.5 group-hover:text-white transition-colors">
+                <HardDrive className="w-3.5 h-3.5 text-gray-300" />
+                Storage
+              </span>
+              <span className="text-gray-300 font-mono text-[11px]">
+                {formatFileSize(totalUsed)} of {formatFileSize(totalLimit)}
+              </span>
+            </div>
 
-          <div className="pt-0.5 flex items-center justify-between text-[11px]">
-            <span className="text-gray-500 font-mono">{percentage}% allocated</span>
-            <span className="text-gray-400 font-mono text-[10px] font-bold">
-              {formatFileSize(totalLimit)} TIER
-            </span>
-          </div>
-        </Link>
+            <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all duration-500 ${barColor}`}
+                style={{ width: `${Math.max(percentage, totalUsed > 0 ? 1 : 0)}%` }}
+              />
+            </div>
+
+            <div className="pt-0.5 flex items-center justify-between text-[11px]">
+              <span className="text-gray-500 font-mono">{percentage}% allocated</span>
+              <span className="text-gray-400 font-mono text-[10px] font-bold">
+                {formatFileSize(totalLimit)} TIER
+              </span>
+            </div>
+          </Link>
+        </div>
       </aside>
     </>
   );

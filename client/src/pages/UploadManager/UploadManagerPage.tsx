@@ -170,12 +170,11 @@ export const UploadManagerPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/[0.08]">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-2.5">
-            <UploadCloud className="w-5 h-5 text-gray-300" />
-            Upload Manager & Transfer Queue
+            <div className="w-8 h-8 rounded-lg bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-violet-400">
+              <UploadCloud className="w-4 h-4" />
+            </div>
+            Upload Manager
           </h1>
-          <p className="text-xs text-gray-400 mt-1 font-sans">
-            Real-time telemetry and management controls for outbound and concurrent multipart asset transfers.
-          </p>
         </div>
 
         <div className="flex items-center gap-2.5">
@@ -187,56 +186,10 @@ export const UploadManagerPage: React.FC = () => {
               Clear Completed ({completedCount})
             </button>
           )}
-
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="px-4 py-2 rounded-xl text-xs font-bold text-black bg-white hover:bg-gray-200 transition-colors flex items-center gap-1.5 shadow-sm"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            <span>Select Files</span>
-          </button>
-
-          <button
-            onClick={handleQueueRealSampleMultipart}
-            title="Generate a 20 MB FLAC file to verify real multipart chunking to MinIO"
-            className="px-3.5 py-2 rounded-xl text-xs font-semibold text-gray-300 hover:text-white bg-[#16161E] hover:bg-[#1E1E28] border border-white/15 transition-colors hidden md:flex items-center gap-1.5"
-          >
-            <HardDrive className="w-3.5 h-3.5 text-gray-400" />
-            <span>Test 20MB Multipart</span>
-          </button>
         </div>
       </div>
 
-      {/* Telemetry Row (Clean Minimalist Separation) */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pb-4 border-b border-white/[0.08]">
-        <div className="p-4 rounded-xl bg-[#111116] flex items-center justify-between">
-          <div>
-            <p className="text-[11px] font-mono uppercase text-gray-400">Total in Queue</p>
-            <p className="text-xl font-bold text-white mt-0.5">{queue.length} items</p>
-          </div>
-          <HardDrive className="w-4 h-4 text-gray-400" />
-        </div>
-
-        <div className="p-4 rounded-xl bg-[#111116] flex items-center justify-between">
-          <div>
-            <p className="text-[11px] font-mono uppercase text-gray-400">Active Streams</p>
-            <p className="text-xl font-bold text-white mt-0.5">{activeCount} streaming</p>
-          </div>
-          <span
-            className={`w-2 h-2 rounded-full ${
-              activeCount > 0 ? 'bg-white animate-pulse' : 'bg-gray-600'
-            }`}
-          />
-        </div>
-
-        <div className="p-4 rounded-xl bg-[#111116] flex items-center justify-between">
-          <div>
-            <p className="text-[11px] font-mono uppercase text-gray-400">Completed</p>
-            <p className="text-xl font-bold text-white mt-0.5">{completedCount} synchronized</p>
-          </div>
-          <CheckCircle2 className="w-4 h-4 text-gray-400" />
-        </div>
-      </div>
+      
 
       {/* Drag & Drop Zone */}
       <div
@@ -256,9 +209,7 @@ export const UploadManagerPage: React.FC = () => {
         <p className="text-sm font-semibold text-white">
           {isDragging ? 'Drop files to upload immediately' : 'Drag & Drop files here, or click to browse'}
         </p>
-        <p className="text-xs text-gray-500 mt-1 font-sans">
-          Files ≤ 16 MiB use single PUT; files &gt; 16 MiB automatically use 8 MiB multipart streams with 4 concurrent connections.
-        </p>
+        
       </div>
 
       {/* Queue Items Stream */}
@@ -269,7 +220,7 @@ export const UploadManagerPage: React.FC = () => {
 
         {queue.length === 0 ? (
           <div className="py-12 text-center">
-            <p className="text-xs text-gray-500 font-mono">[ QUEUE IDLE // NO ACTIVE TRANSFERS ]</p>
+            <p className="text-xs text-gray-500 font-mono"></p>
           </div>
         ) : (
           queue.map((item) => {

@@ -129,12 +129,11 @@ export const SharedPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/[0.08]">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-2.5">
-            <Share2 className="w-5 h-5 text-gray-300" />
+            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+              <Share2 className="w-4 h-4" />
+            </div>
             Share Management
           </h1>
-          <p className="text-xs text-gray-400 mt-1 font-sans">
-            Manage incoming collaborations and monitor cryptographic public share links.
-          </p>
         </div>
 
         {/* Tab Switcher: Shared With Me vs My Active Links */}

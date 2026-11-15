@@ -83,13 +83,7 @@ export const LoginPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#08080C] text-white flex flex-col justify-between relative overflow-hidden">
-      {/* Background Ambient Glows */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-pix-purple/20 blur-[130px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-0 right-10 w-[450px] h-[450px] bg-pix-pink/10 blur-[120px] rounded-full pointer-events-none" />
-      <div className="absolute top-1/3 left-10 w-[350px] h-[350px] bg-pix-cyan/10 blur-[140px] rounded-full pointer-events-none" />
-
       
-
       {/* Left Flank Floating Polaroid Meme Sticker Card */}
       <div className="hidden lg:flex absolute left-4 xl:left-14 top-1/2 -translate-y-1/2 flex-col items-center select-none pointer-events-none z-10 -rotate-3 hover:rotate-0 transition-transform duration-300">
         <div className="w-20 h-5 bg-[#FFD13B] border border-black shadow-sm -mb-2.5 z-20 transform -rotate-2" />
@@ -106,9 +100,7 @@ export const LoginPage: React.FC = () => {
             <div className="font-mono text-xs font-black uppercase tracking-wider text-black">
               AUTHORIZED TENANT
             </div>
-            <div className="font-mono text-[10px] text-gray-600 mt-0.5">
-              [SYS_ACCESS: VERIFIED]
-            </div>
+            
           </div>
         </div>
       </div>
@@ -129,9 +121,7 @@ export const LoginPage: React.FC = () => {
             <div className="font-mono text-xs font-black uppercase tracking-wider text-black">
               HIGH-SPEED BUFFER
             </div>
-            <div className="font-mono text-[10px] text-gray-600 mt-0.5">
-              [HOT_CACHE: ONLINE]
-            </div>
+            
           </div>
         </div>
       </div>
@@ -159,11 +149,9 @@ export const LoginPage: React.FC = () => {
             {/* Header */}
             <div className="mb-6 flex">
               <h2 className="font-display text-4xl sm:text-5xl text-white tracking-wide uppercase leading-none flex items-center gap-2">
-                WELCOME <span className="text-pix-cyan">BACK</span>
+                WELCOME BACK
               </h2>
-              <div className="flex items-center justify-between mb-5">
-                <CapsuleLozengeRow className="scale-75 origin-right" />
-              </div>  
+               
             </div>
 
             {/* Error Notification */}

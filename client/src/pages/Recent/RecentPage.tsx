@@ -58,12 +58,11 @@ export const RecentPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/[0.08]">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-2.5">
-            <Clock className="w-5 h-5 text-gray-300" />
-            Recent Files & Activity
+            <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
+              <Clock className="w-4 h-4" />
+            </div>
+            Recent Files
           </h1>
-          <p className="text-xs text-gray-400 mt-1 font-sans">
-            Documents and assets accessed or synchronized across your devices over the last 30 days.
-          </p>
         </div>
 
         {/* Filter Tabs */}

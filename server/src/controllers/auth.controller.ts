@@ -55,14 +55,26 @@ export async function updateProfile(req: Request, res: Response, next: NextFunct
       throw new AppError('Unauthorized: Missing user context.', 401);
     }
 
-    const { name } = req.body;
-    const updatedUser = await authService.updateProfile(req.user.id, { name });
+    const { name, avatar } = req.body;
+    const updatedUser = await authService.updateProfile(req.user.id, { name, avatar });
 
     res.status(200).json({
       success: true,
       message: 'Profile updated successfully.',
       data: { user: updatedUser },
     });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getAvatar(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const { userId } = req.params;
+    const { stream, contentType } = await authService.getAvatarStream(userId);
+    res.setHeader('Content-Type', contentType);
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+    stream.pipe(res);
   } catch (error) {
     next(error);
   }

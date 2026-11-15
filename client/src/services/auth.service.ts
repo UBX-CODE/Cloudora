@@ -32,8 +32,9 @@ export const authService = {
     }
   },
 
-  async updateProfile(name: string): Promise<User> {
-    const response = await api.patch<ApiResponse<{ user: User }>>('/auth/profile', { name });
+  async updateProfile(data: { name?: string; avatar?: string | null } | string): Promise<User> {
+    const payload = typeof data === 'string' ? { name: data } : data;
+    const response = await api.patch<ApiResponse<{ user: User }>>('/auth/profile', payload);
     return response.data.data.user;
   },
 
@@ -44,5 +45,15 @@ export const authService = {
     });
     return response.data.message || 'Password changed successfully.';
   },
+};
+
+export const getAvatarUrl = (avatar?: string | null): string | null => {
+  if (!avatar) return null;
+  if (avatar.startsWith('http://') || avatar.startsWith('https://') || avatar.startsWith('blob:')) {
+    return avatar;
+  }
+  const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+  const origin = apiBase.replace(/\/api\/?$/, '');
+  return `${origin}${avatar}`;
 };
 

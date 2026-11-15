@@ -103,11 +103,7 @@ export const RegisterPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#08080C] text-white flex flex-col justify-between relative overflow-hidden">
-      {/* Background Ambient Glows */}
-      <div className="absolute top-0 right-1/4 w-[600px] h-[350px] bg-pix-purple/20 blur-[130px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-10 left-10 w-[450px] h-[450px] bg-pix-pink/15 blur-[120px] rounded-full pointer-events-none" />
-      <div className="absolute top-1/2 right-10 w-[350px] h-[350px] bg-pix-cyan/10 blur-[140px] rounded-full pointer-events-none" />
-
+      
       {/* Left Flank Floating Polaroid Meme Sticker Card */}
       <div className="hidden lg:flex absolute left-4 xl:left-14 top-1/2 -translate-y-1/2 flex-col items-center select-none pointer-events-none z-10 -rotate-3 hover:rotate-0 transition-transform duration-300">
         <div className="w-20 h-5 bg-[#FF5E97] border border-black shadow-sm -mb-2.5 z-20 transform -rotate-2" />

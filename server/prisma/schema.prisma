@@ -46,6 +46,7 @@ model User {
   name         String
   email        String   @unique
   passwordHash String
+  avatar       String?
   role         UserRole @default(USER)
   storageUsed  BigInt   @default(0)
   storageLimit BigInt   @default(5368709120) // 5 GB in bytes

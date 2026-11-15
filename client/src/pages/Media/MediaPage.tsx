@@ -51,54 +51,57 @@ export const MediaPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/[0.08]">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-2.5">
-            <Film className="w-5 h-5 text-gray-300" />
-            Media & Studio Archive
+            <div className="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
+              <Film className="w-4 h-4" />
+            </div>
+            Media Library
           </h1>
-          <p className="text-xs text-gray-400 mt-1 font-sans">
-            Stream high-fidelity audio, video reels, and high-res imagery directly from storage.
-          </p>
         </div>
 
         {/* Category Filter Tabs */}
-        <div className="inline-flex p-1 rounded-xl bg-[#111116] gap-1 text-xs font-mono">
+        <div className="inline-flex p-1 rounded-xl bg-[#111116] border border-white/5 gap-1 text-xs font-mono">
           <button
             onClick={() => setFilter('all')}
-            className={`px-3 py-1.5 rounded-lg transition-colors font-medium ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors font-medium cursor-pointer ${
               filter === 'all'
                 ? 'bg-white text-black font-bold'
                 : 'text-gray-400 hover:text-white'
             }`}
           >
-            All Media ({files.length})
+            <Film className="w-3.5 h-3.5" />
+            All ({files.length})
           </button>
           <button
             onClick={() => setFilter('audio')}
-            className={`px-3 py-1.5 rounded-lg transition-colors font-medium ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors font-medium cursor-pointer ${
               filter === 'audio'
                 ? 'bg-white text-black font-bold'
-                : 'text-gray-400 hover:text-white'
+                : 'text-gray-400 hover:text-pink-400'
             }`}
           >
+            <Music className={`w-3.5 h-3.5 ${filter === 'audio' ? 'text-black' : 'text-pink-400'}`} />
             Audio
           </button>
           <button
             onClick={() => setFilter('video')}
-            className={`px-3 py-1.5 rounded-lg transition-colors font-medium ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors font-medium cursor-pointer ${
               filter === 'video'
                 ? 'bg-white text-black font-bold'
-                : 'text-gray-400 hover:text-white'
+                : 'text-gray-400 hover:text-purple-400'
             }`}
           >
+            <Film className={`w-3.5 h-3.5 ${filter === 'video' ? 'text-black' : 'text-purple-400'}`} />
             Video
           </button>
           <button
             onClick={() => setFilter('image')}
-            className={`px-3 py-1.5 rounded-lg transition-colors font-medium ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors font-medium cursor-pointer ${
               filter === 'image'
                 ? 'bg-white text-black font-bold'
-                : 'text-gray-400 hover:text-white'
+                : 'text-gray-400 hover:text-fuchsia-400'
             }`}
           >
+            <ImageIcon className={`w-3.5 h-3.5 ${filter === 'image' ? 'text-black' : 'text-fuchsia-400'}`} />
             Images
           </button>
         </div>
@@ -125,28 +128,28 @@ export const MediaPage: React.FC = () => {
               <div className="relative h-44 bg-black/60 flex items-center justify-center overflow-hidden">
                 {item.category === 'video' ? (
                   <div className="flex flex-col items-center justify-center text-white">
-                    <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                      <Play className="w-5 h-5 fill-white ml-0.5 text-white" />
+                    <div className="w-14 h-14 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center mb-2 group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(168,85,247,0.3)] transition-all">
+                      <Play className="w-6 h-6 fill-purple-400 text-purple-400 ml-0.5" />
                     </div>
-                    <span className="text-[10px] font-mono text-gray-400 uppercase tracking-wider">
+                    <span className="text-[10px] font-mono text-purple-300 font-semibold uppercase tracking-wider">
                       PLAY VIDEO
                     </span>
                   </div>
                 ) : item.category === 'audio' ? (
                   <div className="flex flex-col items-center justify-center text-white">
-                    <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform text-white">
-                      <Music className="w-6 h-6" />
+                    <div className="w-14 h-14 rounded-2xl bg-pink-500/10 border border-pink-500/20 flex items-center justify-center mb-2 group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(236,72,153,0.3)] transition-all text-pink-400">
+                      <Music className="w-6 h-6 stroke-[2.2]" />
                     </div>
-                    <span className="text-[10px] font-mono text-gray-400 uppercase tracking-wider">
+                    <span className="text-[10px] font-mono text-pink-300 font-semibold uppercase tracking-wider">
                       STREAM AUDIO
                     </span>
                   </div>
                 ) : (
                   <div className="flex flex-col items-center justify-center text-white">
-                    <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform text-white">
-                      <ImageIcon className="w-6 h-6" />
+                    <div className="w-14 h-14 rounded-2xl bg-fuchsia-500/10 border border-fuchsia-500/20 flex items-center justify-center mb-2 group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(217,70,239,0.3)] transition-all text-fuchsia-400">
+                      <ImageIcon className="w-6 h-6 stroke-[2.2]" />
                     </div>
-                    <span className="text-[10px] font-mono text-gray-400 uppercase tracking-wider">
+                    <span className="text-[10px] font-mono text-fuchsia-300 font-semibold uppercase tracking-wider">
                       VIEW IMAGE
                     </span>
                   </div>

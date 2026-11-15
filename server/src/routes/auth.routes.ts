@@ -8,6 +8,7 @@ const router = Router();
 router.post('/register', authLimiter, authController.register);
 router.post('/login', authLimiter, authController.login);
 router.post('/logout', authController.logout);
+router.get('/avatar/:userId', authController.getAvatar);
 
 // Protected routes (require valid JWT)
 router.get('/me', authenticate, authController.getCurrentUser);

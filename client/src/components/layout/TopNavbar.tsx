@@ -11,6 +11,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
+import { getAvatarUrl } from '../../services/auth.service';
 import { Modal } from '../ui/Modal';
 
 interface TopNavbarProps {
@@ -161,58 +162,85 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({ onToggleSidebar }) => {
 
           {/* User Avatar & Dropdown */}
           <div className="relative" ref={profileRef}>
-            <button
-              onClick={() => setIsProfileOpen(!isProfileOpen)}
-              className="flex items-center gap-2.5 p-1 rounded-lg hover:bg-white/5 transition-colors focus:outline-none"
-              aria-label="User Profile Menu"
-            >
-              <div className="w-8 h-8 rounded-full bg-pix-purple text-white flex items-center justify-center text-xs font-bold border border-white/20">
-                {getInitials(user?.name)}
-              </div>
-              
-            </button>
-
-            {isProfileOpen && (
-              <div className="absolute right-0 mt-2 w-60 rounded-xl bg-[#13121C] border border-[#232135] shadow-2xl py-2 z-50 animate-in fade-in zoom-in-95 duration-100">
-                <div className="px-4 py-2.5 border-b border-[#232135]">
-                  <p className="text-xs font-bold text-white truncate">
-                    {user?.name}
-                  </p>
-                  <p className="text-[11px] text-gray-400 truncate font-mono mt-0.5">
-                    {user?.email}
-                  </p>
-                </div>
-
-                <div className="py-1">
-                  <Link
-                    to="/settings"
-                    onClick={() => setIsProfileOpen(false)}
-                    className="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-colors"
-                  >
-                    <UserIcon className="w-3.5 h-3.5 text-gray-400" />
-                    Account Profile
-                  </Link>
-                  <Link
-                    to="/settings"
-                    onClick={() => setIsProfileOpen(false)}
-                    className="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-colors"
-                  >
-                    <Settings className="w-3.5 h-3.5 text-gray-400" />
-                    Vault Settings
-                  </Link>
-                </div>
-
-                <div className="pt-1 border-t border-[#232135]">
+            {(() => {
+              const avatarUrl = getAvatarUrl(user?.avatar);
+              return (
+                <>
                   <button
-                    onClick={handleLogout}
-                    className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-pix-pink hover:bg-pix-pink/10 transition-colors"
+                    onClick={() => setIsProfileOpen(!isProfileOpen)}
+                    className="flex items-center gap-2 p-1 rounded-xl hover:bg-white/5 transition-all focus:outline-none cursor-pointer"
+                    aria-label="User Profile Menu"
                   >
-                    <LogOut className="w-3.5 h-3.5" />
-                    Sign Out
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-500 text-white flex items-center justify-center text-xs font-bold border border-white/20 shadow-sm overflow-hidden shrink-0">
+                      {avatarUrl ? (
+                        <img
+                          src={avatarUrl}
+                          alt={user?.name || 'User'}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        getInitials(user?.name)
+                      )}
+                    </div>
                   </button>
-                </div>
-              </div>
-            )}
+
+                  {isProfileOpen && (
+                    <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-[#111116] border border-white/10 shadow-2xl py-2 z-50 animate-in fade-in zoom-in-95 duration-100">
+                      <div className="px-4 py-3 border-b border-white/[0.08] flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-500 text-white flex items-center justify-center text-xs font-bold border border-white/20 overflow-hidden shrink-0 shadow-inner">
+                          {avatarUrl ? (
+                            <img
+                              src={avatarUrl}
+                              alt={user?.name || 'User'}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            getInitials(user?.name)
+                          )}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-bold text-white truncate">
+                            {user?.name || 'Cloudora User'}
+                          </p>
+                          <p className="text-[11px] text-gray-400 truncate font-mono mt-0.5">
+                            {user?.email}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="py-1">
+                        <Link
+                          to="/settings"
+                          onClick={() => setIsProfileOpen(false)}
+                          className="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-colors"
+                        >
+                          <UserIcon className="w-3.5 h-3.5 text-gray-400" />
+                          Account Profile
+                        </Link>
+                        <Link
+                          to="/settings"
+                          onClick={() => setIsProfileOpen(false)}
+                          className="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-colors"
+                        >
+                          <Settings className="w-3.5 h-3.5 text-gray-400" />
+                          Vault Settings
+                        </Link>
+                      </div>
+
+                      <div className="pt-1 border-t border-white/[0.08]">
+                        <button
+                          onClick={handleLogout}
+                          className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                        >
+                          <LogOut className="w-3.5 h-3.5" />
+                          Sign Out
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </>
+              );
+            })()}
           </div>
         </div>
       </header>

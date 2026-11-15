@@ -1,7 +1,10 @@
 
 import bcrypt from 'bcrypt';
 import jwt, { SignOptions } from 'jsonwebtoken';
+import sharp from 'sharp';
+import { PutObjectCommand, DeleteObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
 import { prisma } from '../lib/prisma';
+import { storageClient } from '../lib/storage';
 import {
   IUser,
   SafeUser,
@@ -21,6 +24,7 @@ function sanitizeUser(user: any): SafeUser {
 
   return {
     ...safeUser,
+    avatar: user.avatar || null,
     storageUsed: storageUsed !== undefined && storageUsed !== null ? Number(storageUsed) : 0,
     storageLimit: storageLimit !== undefined && storageLimit !== null ? Number(storageLimit) : 5368709120,
     createdAt: createdAt ? new Date(createdAt).toISOString() : new Date().toISOString(),
@@ -147,19 +151,94 @@ export async function getUserById(userId: string): Promise<SafeUser> {
   return sanitizeUser(user);
 }
 
-// Update user profile (name)
-export async function updateProfile(userId: string, data: { name: string }): Promise<SafeUser> {
-  const { name } = data;
-  if (!name || name.trim().length < 2) {
-    throw new AppError('Name must be at least 2 characters long.', 400);
+export interface UpdateProfileDTO {
+  name?: string;
+  avatar?: string | null; // Base64 data URL, or null to remove
+}
+
+// Update user profile (name and/or avatar image)
+export async function updateProfile(userId: string, data: UpdateProfileDTO): Promise<SafeUser> {
+  const updateData: any = {};
+
+  if (data.name !== undefined) {
+    if (!data.name || data.name.trim().length < 2) {
+      throw new AppError('Name must be at least 2 characters long.', 400);
+    }
+    updateData.name = data.name.trim();
+  }
+
+  if (data.avatar !== undefined) {
+    if (data.avatar === null || data.avatar === '') {
+      // Remove avatar from MinIO
+      const avatarKey = `avatars/${userId}.webp`;
+      try {
+        await storageClient.send(
+          new DeleteObjectCommand({
+            Bucket: config.MINIO_BUCKET,
+            Key: avatarKey,
+          })
+        );
+      } catch (err: any) {
+        console.warn(`[Avatar Delete Warning] Key "${avatarKey}":`, err.message);
+      }
+      updateData.avatar = null;
+    } else if (data.avatar.startsWith('data:image/')) {
+      // Extract base64 image and process via sharp
+      const base64Data = data.avatar.split(';base64,').pop();
+      if (!base64Data) {
+        throw new AppError('Invalid image data URL format.', 400);
+      }
+
+      const rawBuffer = Buffer.from(base64Data, 'base64');
+      if (rawBuffer.length > 5 * 1024 * 1024) {
+        throw new AppError('Avatar image must not exceed 5 MB.', 400);
+      }
+
+      // Convert to a sharp, high-res 256x256 WebP avatar
+      const processedBuffer = await sharp(rawBuffer)
+        .resize(256, 256, { fit: 'cover', position: 'center' })
+        .webp({ quality: 90 })
+        .toBuffer();
+
+      const avatarKey = `avatars/${userId}.webp`;
+      await storageClient.send(
+        new PutObjectCommand({
+          Bucket: config.MINIO_BUCKET,
+          Key: avatarKey,
+          Body: processedBuffer,
+          ContentType: 'image/webp',
+        })
+      );
+
+      // Save public stream URL with cache buster
+      updateData.avatar = `/api/auth/avatar/${userId}?t=${Date.now()}`;
+    }
   }
 
   const updatedUser = await prisma.user.update({
     where: { id: userId },
-    data: { name: name.trim() },
+    data: updateData,
   });
 
   return sanitizeUser(updatedUser);
+}
+
+// Stream user avatar from MinIO
+export async function getAvatarStream(userId: string): Promise<{ stream: any; contentType: string }> {
+  const avatarKey = `avatars/${userId}.webp`;
+  try {
+    const command = new GetObjectCommand({
+      Bucket: config.MINIO_BUCKET,
+      Key: avatarKey,
+    });
+    const result = await storageClient.send(command);
+    return {
+      stream: result.Body,
+      contentType: result.ContentType || 'image/webp',
+    };
+  } catch {
+    throw new AppError('Avatar not found.', 404);
+  }
 }
 
 // Change account password

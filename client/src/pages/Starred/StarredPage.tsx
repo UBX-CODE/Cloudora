@@ -49,12 +49,11 @@ export const StarredPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/[0.08]">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-2.5">
-            <Star className="w-5 h-5 text-white fill-white" />
-            Starred Documents & Assets
+            <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+              <Star className="w-4 h-4 fill-amber-400" />
+            </div>
+            Starred Assets
           </h1>
-          <p className="text-xs text-gray-400 mt-1 font-sans">
-            Quickly access priority files, documents, and recordings bookmarked across your drive.
-          </p>
         </div>
       </div>
 
@@ -98,10 +97,10 @@ export const StarredPage: React.FC = () => {
                     e.stopPropagation();
                     handleToggleStar(file.id);
                   }}
-                  className="text-white hover:text-gray-400 transition-colors shrink-0"
+                  className="text-amber-400 hover:text-amber-300 transition-colors shrink-0"
                   title="Remove from Starred"
                 >
-                  <Star className="w-3.5 h-3.5 fill-white text-white" />
+                  <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                 </button>
                 <FileTypeIcon category={file.category} />
                 <span className="text-xs font-medium text-white group-hover:text-gray-300 transition-colors truncate">
