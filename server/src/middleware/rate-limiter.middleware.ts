@@ -94,12 +94,12 @@ export function createRateLimiter(options: RateLimiterOptions) {
     }
   };
 }
-// 1. Auth Limiter: Max 5 attempts per 15 minutes per IP (Brute-force protection)
+// 1. Auth Limiter: Max 10 attempts per 10 minutes per IP (Brute-force protection)
 export const authLimiter = createRateLimiter({
-  windowMs: 15 * 60 * 1000,
-  max: 5,
+  windowMs: 10 * 60 * 1000,
+  max: 10,
   keyPrefix: 'rl:auth',
-  message: 'Too many authentication attempts. Please try again in 15 minutes.',
+  message: 'Too many authentication attempts. Rate limit exceeded. Please wait a moment before trying again.',
 });
 
 // 2. Upload Limiter: Max 20 upload creations per minute per user (DDoS / URL Flooding protection)

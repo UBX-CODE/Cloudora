@@ -22,10 +22,28 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response Interceptor: Handle Authentication Expiry
+// Response Interceptor: Handle Authentication Expiry & Rate Limiting
 api.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
+    // 1. Rate Limiting Trigger (HTTP 429 Too Many Requests)
+    if (error.response?.status === 429) {
+      const responseData = error.response.data as any;
+      const message =
+        responseData?.message ||
+        'Too many requests sent to the server. Please slow down and try again shortly.';
+      const retryAfter = Number(responseData?.retryAfter) || 60;
+
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(
+          new CustomEvent('cloudora:rate-limited', {
+            detail: { message, retryAfter },
+          })
+        );
+      }
+    }
+
+    // 2. Authentication Expiry (HTTP 401 Unauthorized)
     if (error.response?.status === 401) {
       // Clear local storage if token rejected (except on auth pages or public share pages)
       const currentPath = window.location.pathname;

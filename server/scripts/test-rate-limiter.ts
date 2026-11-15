@@ -32,10 +32,10 @@ async function main() {
       console.log(`[Setup] Flushed ${existingKeys.length} old rate-limit keys from Redis.`);
     }
 
-    console.log('\nTesting Auth Rate Limiter (Max: 5 requests per 15 minutes)...');
+    console.log('\nTesting Auth Rate Limiter (Max: 10 requests per 10 minutes)...');
 
-    // Make 5 consecutive requests to /auth/login
-    for (let i = 1; i <= 5; i++) {
+    // Make 10 consecutive requests to /auth/login
+    for (let i = 1; i <= 10; i++) {
       const res = await fetch(`${baseUrl}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -47,12 +47,12 @@ async function main() {
       const reset = res.headers.get('X-RateLimit-Reset');
 
       console.log(`• Request #${i} => HTTP ${res.status} | Limit: ${limit} | Remaining: ${remaining} | Reset: ${reset}`);
-      assert(limit === '5', `Limit should be 5`);
-      assert(remaining === String(5 - i), `Remaining should be ${5 - i}`);
+      assert(limit === '10', `Limit should be 10`);
+      assert(remaining === String(10 - i), `Remaining should be ${10 - i}`);
     }
 
-    // 6th Request: Should be rejected with 429 Too Many Requests!
-    console.log('\nSending Request #6 (Must be rejected with 429)...');
+    // 11th Request: Should be rejected with 429 Too Many Requests!
+    console.log('\nSending Request #11 (Must be rejected with 429)...');
     const blockedRes = await fetch(`${baseUrl}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -63,7 +63,7 @@ async function main() {
     const retryAfter = blockedRes.headers.get('Retry-After');
     const remaining = blockedRes.headers.get('X-RateLimit-Remaining');
 
-    console.log(`• Request #6 => HTTP ${blockedRes.status} | Remaining: ${remaining} | Retry-After: ${retryAfter}s`);
+    console.log(`• Request #11 => HTTP ${blockedRes.status} | Remaining: ${remaining} | Retry-After: ${retryAfter}s`);
     console.log('• Response Body:', blockedData);
 
     assert(blockedRes.status === 429, `Expected HTTP 429, got ${blockedRes.status}`);
