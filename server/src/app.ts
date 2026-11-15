@@ -18,7 +18,7 @@ const allowedOrigins = config.CORS_ORIGIN
 
 app.use(
   cors({
-    origin: (origin, callback) => {
+    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
       // Allow server-to-server, curl, or mobile app requests without origin header
       if (!origin) return callback(null, true);
       if (
@@ -56,7 +56,7 @@ app.use('/api/folders', folderRoutes);
 app.use('/api/files', fileRoutes);
 app.use('/api/shares', shareRoutes);
 
-app.get('/api/storage/health', async (req, res) => {
+app.get('/api/storage/health', async (req: Request, res: Response) => {
   const isConnected = await checkStorageConnection();
 
   res.status(isConnected ? 200 : 500).json({
