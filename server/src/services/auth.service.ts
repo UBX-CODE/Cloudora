@@ -212,6 +212,34 @@ export async function updateProfile(userId: string, data: UpdateProfileDTO): Pro
 
       // Save public stream URL with cache buster
       updateData.avatar = `/api/auth/avatar/${userId}?t=${Date.now()}`;
+    } else if (data.avatar.startsWith('http://') || data.avatar.startsWith('https://')) {
+      try {
+        const resp = await fetch(data.avatar, { signal: AbortSignal.timeout(8000) });
+        if (resp.ok) {
+          const arrayBuf = await resp.arrayBuffer();
+          const rawBuffer = Buffer.from(arrayBuf);
+          const processedBuffer = await sharp(rawBuffer)
+            .resize(256, 256, { fit: 'cover', position: 'center' })
+            .webp({ quality: 90 })
+            .toBuffer();
+
+          const avatarKey = `avatars/${userId}.webp`;
+          await storageClient.send(
+            new PutObjectCommand({
+              Bucket: config.MINIO_BUCKET,
+              Key: avatarKey,
+              Body: processedBuffer,
+              ContentType: 'image/webp',
+            })
+          );
+          updateData.avatar = `/api/auth/avatar/${userId}?t=${Date.now()}`;
+        } else {
+          updateData.avatar = data.avatar;
+        }
+      } catch (err: any) {
+        console.warn(`[Avatar URL Fetch Warning]:`, err.message);
+        updateData.avatar = data.avatar;
+      }
     }
   }
 

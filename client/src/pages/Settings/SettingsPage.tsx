@@ -24,6 +24,8 @@ import {
   Camera,
   Upload,
   Trash2,
+  Sparkles,
+  Link as LinkIcon,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useTheme } from '../../hooks/useTheme';
@@ -31,6 +33,7 @@ import { formatDate, formatFileSize } from '../../utils/formatters';
 import { Input } from '../../components/ui/Input';
 import { authService, getAvatarUrl } from '../../services/auth.service';
 import { fetchStorageSummary, StorageSummaryResponse } from '../../services/file.service';
+import { ChangeAvatarModal } from '../../components/common/ChangeAvatarModal';
 
 export const SettingsPage: React.FC = () => {
   const { user, logout, refreshProfile } = useAuth();
@@ -44,6 +47,7 @@ export const SettingsPage: React.FC = () => {
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileMessage, setProfileMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [avatarUploading, setAvatarUploading] = useState(false);
+  const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
   const avatarInputRef = React.useRef<HTMLInputElement>(null);
   const avatarUrl = getAvatarUrl(user?.avatar);
 
@@ -263,9 +267,13 @@ export const SettingsPage: React.FC = () => {
             {/* Profile Avatar & Details Header */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 pb-6 border-b border-white/[0.06]">
               <div className="flex items-center gap-4">
-                {/* Avatar Preview Box */}
-                <div className="relative group shrink-0">
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 border border-white/10 flex items-center justify-center font-bold text-xl text-white shadow-lg overflow-hidden relative">
+                {/* Avatar Preview Box (Click to Change & Insert) */}
+                <div
+                  onClick={() => setIsAvatarModalOpen(true)}
+                  className="relative group shrink-0 cursor-pointer"
+                  title="Click to change or insert avatar"
+                >
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 border border-white/10 flex items-center justify-center font-bold text-xl text-white shadow-lg overflow-hidden relative group-hover:border-purple-400/50 group-hover:shadow-[0_0_15px_rgba(168,85,247,0.3)] transition-all">
                     {avatarUrl ? (
                       <img
                         src={avatarUrl}
@@ -276,19 +284,26 @@ export const SettingsPage: React.FC = () => {
                       <span className="text-white/80">{user?.name?.charAt(0)?.toUpperCase() || 'U'}</span>
                     )}
 
-                    {avatarUploading && (
+                    {avatarUploading ? (
                       <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
                         <Loader2 className="w-5 h-5 text-white animate-spin" />
+                      </div>
+                    ) : (
+                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition-opacity">
+                        <Camera className="w-5 h-5 text-white" />
+                        <span className="text-[9px] font-mono font-bold text-white uppercase mt-0.5">Edit</span>
                       </div>
                     )}
                   </div>
 
                   <button
                     type="button"
-                    onClick={() => avatarInputRef.current?.click()}
-                    disabled={avatarUploading}
-                    className="absolute -bottom-1 -right-1 p-1.5 rounded-lg bg-white text-black hover:bg-gray-200 shadow-md transition-transform hover:scale-110 disabled:opacity-50 cursor-pointer"
-                    title="Upload Avatar Image"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsAvatarModalOpen(true);
+                    }}
+                    className="absolute -bottom-1 -right-1 p-1.5 rounded-lg bg-white text-black hover:bg-gray-200 shadow-md transition-transform hover:scale-110 cursor-pointer"
+                    title="Change & Insert Avatar"
                   >
                     <Camera className="w-3.5 h-3.5" />
                   </button>
@@ -307,21 +322,13 @@ export const SettingsPage: React.FC = () => {
 
               {/* Avatar Actions */}
               <div className="flex items-center gap-2">
-                <input
-                  type="file"
-                  ref={avatarInputRef}
-                  onChange={handleAvatarFileSelect}
-                  accept="image/png,image/jpeg,image/webp,image/gif"
-                  className="hidden"
-                />
                 <button
                   type="button"
-                  onClick={() => avatarInputRef.current?.click()}
-                  disabled={avatarUploading}
-                  className="px-3.5 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50 cursor-pointer"
+                  onClick={() => setIsAvatarModalOpen(true)}
+                  className="px-3.5 py-2 rounded-xl border border-purple-500/30 bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shadow-sm"
                 >
-                  <Upload className="w-3.5 h-3.5 text-gray-300" />
-                  <span>{avatarUploading ? 'Uploading...' : 'Upload Photo'}</span>
+                  <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+                  <span>Change & Insert Avatar</span>
                 </button>
 
                 {user?.avatar && (
@@ -329,7 +336,7 @@ export const SettingsPage: React.FC = () => {
                     type="button"
                     onClick={handleRemoveAvatar}
                     disabled={avatarUploading}
-                    className="px-3.5 py-2 rounded-xl border border-red-500/20 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50 cursor-pointer"
+                    className="px-3 py-2 rounded-xl border border-red-500/20 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50 cursor-pointer"
                     title="Remove custom photo and reset to initials"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -590,6 +597,15 @@ export const SettingsPage: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Change & Insert Avatar Modal */}
+      <ChangeAvatarModal
+        isOpen={isAvatarModalOpen}
+        onClose={() => setIsAvatarModalOpen(false)}
+        currentAvatar={user?.avatar || null}
+        userName={user?.name}
+        onSuccess={refreshProfile}
+      />
     </div>
   );
 };
