@@ -52,6 +52,7 @@ export const StarredPage: React.FC = () => {
             <Star className="w-5 h-5 text-white fill-white" />
             Starred Documents
           </h1>
+
         </div>
       </div>
 

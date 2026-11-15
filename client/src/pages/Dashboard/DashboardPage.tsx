@@ -80,7 +80,7 @@ export const DashboardPage: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-150">
-      
+
 
       {/* 2. Filter Tabs & Search Bar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pb-3 border-b border-white/[0.08]">
@@ -97,18 +97,17 @@ export const DashboardPage: React.FC = () => {
             <button
               key={cat.id}
               onClick={() => setActiveCategory(cat.id)}
-              className={`px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap ${
-                activeCategory === cat.id
-                  ? 'bg-white text-black font-bold'
-                  : 'text-gray-400 hover:text-white hover:bg-white/[0.04]'
-              }`}
+              className={`px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap ${activeCategory === cat.id
+                ? 'bg-white text-black font-bold'
+                : 'text-gray-400 hover:text-white hover:bg-white/[0.04]'
+                }`}
             >
               {cat.label}
             </button>
           ))}
         </div>
 
-       
+
       </div>
 
       {/* 3. File Stream */}
@@ -152,9 +151,8 @@ export const DashboardPage: React.FC = () => {
                   title={file.isStarred ? 'Unstar' : 'Star'}
                 >
                   <Star
-                    className={`w-3.5 h-3.5 ${
-                      file.isStarred ? 'fill-white text-white' : ''
-                    }`}
+                    className={`w-3.5 h-3.5 ${file.isStarred ? 'fill-white text-white' : ''
+                      }`}
                   />
                 </button>
                 <FileTypeIcon category={file.category} />

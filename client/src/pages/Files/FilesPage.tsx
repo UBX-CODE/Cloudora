@@ -187,8 +187,8 @@ export const FilesPage: React.FC = () => {
                   updates.status === 'completed'
                     ? 'completed'
                     : updates.status === 'error'
-                    ? 'error'
-                    : 'uploading';
+                      ? 'error'
+                      : 'uploading';
                 return {
                   ...item,
                   progress: updates.progress ?? item.progress,
@@ -330,11 +330,10 @@ export const FilesPage: React.FC = () => {
         <div className="flex items-center flex-wrap gap-1.5 text-xs font-mono">
           <button
             onClick={() => setSelectedFolderId(null)}
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-colors ${
-              selectedFolderId === null
-                ? 'bg-white/10 text-white font-bold'
-                : 'text-gray-400 hover:text-white hover:bg-white/5'
-            }`}
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-colors ${selectedFolderId === null
+              ? 'bg-white/10 text-white font-bold'
+              : 'text-gray-400 hover:text-white hover:bg-white/5'
+              }`}
           >
             <Home className="w-3.5 h-3.5" />
             <span>Root</span>
@@ -432,22 +431,20 @@ export const FilesPage: React.FC = () => {
           <div className="flex items-center p-0.5 rounded-xl border border-white/10 bg-[#111116]">
             <button
               onClick={() => setViewMode('list')}
-              className={`p-1.5 rounded-lg transition-colors ${
-                viewMode === 'list'
-                  ? 'bg-white text-black font-bold'
-                  : 'text-gray-400 hover:text-white'
-              }`}
+              className={`p-1.5 rounded-lg transition-colors ${viewMode === 'list'
+                ? 'bg-white text-black font-bold'
+                : 'text-gray-400 hover:text-white'
+                }`}
               title="List View"
             >
               <ListIcon className="w-4 h-4" />
             </button>
             <button
               onClick={() => setViewMode('grid')}
-              className={`p-1.5 rounded-lg transition-colors ${
-                viewMode === 'grid'
-                  ? 'bg-white text-black font-bold'
-                  : 'text-gray-400 hover:text-white'
-              }`}
+              className={`p-1.5 rounded-lg transition-colors ${viewMode === 'grid'
+                ? 'bg-white text-black font-bold'
+                : 'text-gray-400 hover:text-white'
+                }`}
               title="Grid View"
             >
               <LayoutGrid className="w-4 h-4" />
@@ -588,9 +585,8 @@ export const FilesPage: React.FC = () => {
                       <div
                         key={file.id}
                         onClick={() => setPreviewFile(file)}
-                        className={`grid grid-cols-12 items-center py-3.5 border-b border-white/[0.06] hover:bg-white/[0.03] px-2 transition-colors cursor-pointer group ${
-                          isSelected ? 'bg-white/[0.05]' : ''
-                        }`}
+                        className={`grid grid-cols-12 items-center py-3.5 border-b border-white/[0.06] hover:bg-white/[0.03] px-2 transition-colors cursor-pointer group ${isSelected ? 'bg-white/[0.05]' : ''
+                          }`}
                       >
                         {/* Checkbox */}
                         <div className="col-span-1 w-6" onClick={(e) => e.stopPropagation()}>
@@ -616,9 +612,8 @@ export const FilesPage: React.FC = () => {
                             className="text-gray-600 hover:text-white transition-colors shrink-0"
                           >
                             <Star
-                              className={`w-3.5 h-3.5 ${
-                                file.isStarred ? 'fill-white text-white' : ''
-                              }`}
+                              className={`w-3.5 h-3.5 ${file.isStarred ? 'fill-white text-white' : ''
+                                }`}
                             />
                           </button>
                           <FileTypeIcon category={file.category} />
@@ -699,9 +694,8 @@ export const FilesPage: React.FC = () => {
                       <div
                         key={file.id}
                         onClick={() => setPreviewFile(file)}
-                        className={`p-4 rounded-xl transition-all cursor-pointer relative group bg-[#111116] hover:bg-[#181820] border border-white/5 hover:border-white/10 ${
-                          isSelected ? 'ring-1 ring-white bg-[#1A1A24]' : ''
-                        }`}
+                        className={`p-4 rounded-xl transition-all cursor-pointer relative group bg-[#111116] hover:bg-[#181820] border border-white/5 hover:border-white/10 ${isSelected ? 'ring-1 ring-white bg-[#1A1A24]' : ''
+                          }`}
                       >
                         <div className="flex items-center justify-between mb-3">
                           <button
@@ -725,9 +719,8 @@ export const FilesPage: React.FC = () => {
                             className="text-gray-600 hover:text-white transition-colors"
                           >
                             <Star
-                              className={`w-3.5 h-3.5 ${
-                                file.isStarred ? 'fill-white text-white' : ''
-                              }`}
+                              className={`w-3.5 h-3.5 ${file.isStarred ? 'fill-white text-white' : ''
+                                }`}
                             />
                           </button>
                         </div>
@@ -829,13 +822,12 @@ export const FilesPage: React.FC = () => {
 
                 <div className="w-full h-1.5 rounded-full bg-white/10 overflow-hidden">
                   <div
-                    className={`h-full transition-all duration-200 ${
-                      up.status === 'completed'
-                        ? 'bg-emerald-400'
-                        : up.status === 'error'
+                    className={`h-full transition-all duration-200 ${up.status === 'completed'
+                      ? 'bg-emerald-400'
+                      : up.status === 'error'
                         ? 'bg-red-400'
                         : 'bg-white'
-                    }`}
+                      }`}
                     style={{ width: `${up.progress}%` }}
                   />
                 </div>

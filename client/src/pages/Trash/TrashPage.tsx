@@ -114,9 +114,9 @@ export const TrashPage: React.FC = () => {
         {totalCount > 0 && (
           <button
             onClick={() => setEmptyTrashConfirmOpen(true)}
-            className="px-4 py-2 rounded-xl text-xs font-bold text-black bg-white hover:bg-gray-200 transition-colors flex items-center gap-2 shadow-sm"
+            className="px-4 py-2 rounded-xl text-xs font-bold text-black bg-white hover:bg-gray-200 transition-colors flex items-center gap-2"
           >
-            <Trash2 className="w-3.5 h-3.5 text-red-600" />
+            <Trash2 className="w-3.5 h-3.5" />
             <span>Empty Trash ({totalCount})</span>
           </button>
         )}

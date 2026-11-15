@@ -95,7 +95,7 @@ export const SettingsPage: React.FC = () => {
     try {
       await authService.updateProfile(name.trim());
       await refreshProfile();
-      setProfileMessage({ type: 'success', text: 'Display name updated successfully.' });
+      setProfileMessage({ type: 'success', text: 'Name updated successfully.'});
       setTimeout(() => setProfileMessage(null), 4000);
     } catch (err: any) {
       setProfileMessage({
@@ -159,7 +159,7 @@ export const SettingsPage: React.FC = () => {
       setProfileMessage(null);
       await authService.updateProfile({ avatar: null });
       await refreshProfile();
-      setProfileMessage({ type: 'success', text: 'Custom avatar removed.' });
+      setProfileMessage({ type: 'success', text: 'avatar removed.' });
     } catch (err: any) {
       setProfileMessage({
         type: 'error',
@@ -270,7 +270,7 @@ export const SettingsPage: React.FC = () => {
                   className="relative group shrink-0 cursor-pointer"
                   title="Click to change or insert avatar"
                 >
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 border border-white/10 flex items-center justify-center font-bold text-xl text-white shadow-lg overflow-hidden relative group-hover:border-purple-400/50 group-hover:shadow-[0_0_15px_rgba(168,85,247,0.3)] transition-all">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 border border-white/10 flex items-center justify-center font-bold text-xl text-white shadow-lg overflow-hidden relative  transition-all">
                     {avatarUrl ? (
                       <img
                         src={avatarUrl}
@@ -279,17 +279,6 @@ export const SettingsPage: React.FC = () => {
                       />
                     ) : (
                       <span className="text-white/80">{user?.name?.charAt(0)?.toUpperCase() || 'U'}</span>
-                    )}
-
-                    {avatarUploading ? (
-                      <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
-                        <Loader2 className="w-5 h-5 text-white animate-spin" />
-                      </div>
-                    ) : (
-                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition-opacity">
-                        <Camera className="w-5 h-5 text-white" />
-                        <span className="text-[9px] font-mono font-bold text-white uppercase mt-0.5">Edit</span>
-                      </div>
                     )}
                   </div>
 
@@ -310,10 +299,6 @@ export const SettingsPage: React.FC = () => {
                   <h2 className="text-base font-bold text-white">
                     {user?.name || 'Cloudora Member'}
                   </h2>
-                  <p className="text-xs text-gray-400 font-mono mt-0.5">{user?.email}</p>
-                  <p className="text-[11px] text-gray-500 mt-1 font-mono">
-                    {user?.avatar ? 'Custom profile photo active' : 'Default monogram avatar'}
-                  </p>
                 </div>
               </div>
 
@@ -322,10 +307,9 @@ export const SettingsPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsAvatarModalOpen(true)}
-                  className="px-3.5 py-2 rounded-xl border border-purple-500/30 bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shadow-sm"
+                  className="px-3.5 py-2 rounded-lg  bg-white/[0.06]  text-xs font-semibold flex items-center gap-1.5  cursor-pointer shadow-sm"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-                  <span>Change & Insert Avatar</span>
+                  <span>Change Avatar</span>
                 </button>
 
                 {user?.avatar && (
@@ -333,31 +317,16 @@ export const SettingsPage: React.FC = () => {
                     type="button"
                     onClick={handleRemoveAvatar}
                     disabled={avatarUploading}
-                    className="px-3 py-2 rounded-xl border border-red-500/20 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50 cursor-pointer"
+                    className="px-3 py-2 rounded-xl bg-white/[0.06] text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50 cursor-pointer"
                     title="Remove custom photo and reset to initials"
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
                     <span>Remove</span>
                   </button>
                 )}
               </div>
             </div>
 
-            {profileMessage && (
-              <div
-                className={`p-3.5 rounded-xl border text-xs flex items-center gap-2 font-mono ${profileMessage.type === 'success'
-                  ? 'bg-emerald-950/30 border-emerald-500/30 text-emerald-400'
-                  : 'bg-red-950/30 border-red-500/30 text-red-400'
-                  }`}
-              >
-                {profileMessage.type === 'success' ? (
-                  <CheckCircle2 className="w-4 h-4 shrink-0" />
-                ) : (
-                  <AlertCircle className="w-4 h-4 shrink-0" />
-                )}
-                <span>{profileMessage.text}</span>
-              </div>
-            )}
+          
 
             <form onSubmit={handleProfileSave} className="space-y-4">
               <div>
@@ -457,7 +426,7 @@ export const SettingsPage: React.FC = () => {
                   </div>
                   <div className="p-3 rounded-xl bg-white/[0.03] border border-white/5">
                     <span className="text-[10px] text-gray-500 font-mono uppercase block">Account Plan</span>
-                    <span className="text-sm font-bold text-emerald-400 font-mono">Free Tier (5 GB)</span>
+                    <span className="text-sm font-bold font-mono">Free Tier (5 GB)</span>
                   </div>
                 </div>
               </div>

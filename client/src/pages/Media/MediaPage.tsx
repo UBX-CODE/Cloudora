@@ -54,6 +54,7 @@ export const MediaPage: React.FC = () => {
             <Film className="w-5 h-5 text-gray-300" />
             Media
           </h1>
+
         </div>
 
         {/* Category Filter Tabs */}

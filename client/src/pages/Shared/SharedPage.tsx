@@ -132,28 +132,27 @@ export const SharedPage: React.FC = () => {
             <Share2 className="w-5 h-5 text-gray-300" />
             Share Management
           </h1>
+
         </div>
 
         {/* Tab Switcher: Shared With Me vs My Active Links */}
         <div className="inline-flex p-1 rounded-xl bg-[#111116] border border-white/[0.06] text-xs font-mono">
           <button
             onClick={() => setMainTab('received')}
-            className={`px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 font-medium ${
-              mainTab === 'received'
-                ? 'bg-white text-black font-bold shadow-sm'
-                : 'text-gray-400 hover:text-white'
-            }`}
+            className={`px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 font-medium ${mainTab === 'received'
+              ? 'bg-white text-black font-bold shadow-sm'
+              : 'text-gray-400 hover:text-white'
+              }`}
           >
             <Users className="w-3.5 h-3.5" />
             Shared With Me ({sharedWithMe.length})
           </button>
           <button
             onClick={() => setMainTab('created')}
-            className={`px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 font-medium ${
-              mainTab === 'created'
-                ? 'bg-white text-black font-bold shadow-sm'
-                : 'text-gray-400 hover:text-white'
-            }`}
+            className={`px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 font-medium ${mainTab === 'created'
+              ? 'bg-white text-black font-bold shadow-sm'
+              : 'text-gray-400 hover:text-white'
+              }`}
           >
             <Globe className="w-3.5 h-3.5" />
             My Active Links ({myCreatedShares.length})
@@ -176,25 +175,22 @@ export const SharedPage: React.FC = () => {
             <div className="inline-flex p-1 rounded-lg bg-[#111116] gap-1 text-[11px] font-mono">
               <button
                 onClick={() => setFilter('all')}
-                className={`px-2.5 py-1 rounded-md transition-colors ${
-                  filter === 'all' ? 'bg-white/10 text-white font-bold' : 'text-gray-400 hover:text-white'
-                }`}
+                className={`px-2.5 py-1 rounded-md transition-colors ${filter === 'all' ? 'bg-white/10 text-white font-bold' : 'text-gray-400 hover:text-white'
+                  }`}
               >
                 All ({sharedWithMe.length})
               </button>
               <button
                 onClick={() => setFilter('edit')}
-                className={`px-2.5 py-1 rounded-md transition-colors ${
-                  filter === 'edit' ? 'bg-white/10 text-white font-bold' : 'text-gray-400 hover:text-white'
-                }`}
+                className={`px-2.5 py-1 rounded-md transition-colors ${filter === 'edit' ? 'bg-white/10 text-white font-bold' : 'text-gray-400 hover:text-white'
+                  }`}
               >
                 Can Edit
               </button>
               <button
                 onClick={() => setFilter('view')}
-                className={`px-2.5 py-1 rounded-md transition-colors ${
-                  filter === 'view' ? 'bg-white/10 text-white font-bold' : 'text-gray-400 hover:text-white'
-                }`}
+                className={`px-2.5 py-1 rounded-md transition-colors ${filter === 'view' ? 'bg-white/10 text-white font-bold' : 'text-gray-400 hover:text-white'
+                  }`}
               >
                 View Only
               </button>
@@ -356,9 +352,8 @@ export const SharedPage: React.FC = () => {
                   <div className="hidden sm:block sm:col-span-2 font-mono text-xs">
                     {share.expiresAt ? (
                       <span
-                        className={`flex items-center gap-1 text-[11px] ${
-                          share.isExpired ? 'text-red-400' : 'text-gray-400'
-                        }`}
+                        className={`flex items-center gap-1 text-[11px] ${share.isExpired ? 'text-red-400' : 'text-gray-400'
+                          }`}
                       >
                         <Clock className="w-3 h-3" />
                         {share.isExpired

@@ -61,37 +61,35 @@ export const RecentPage: React.FC = () => {
             <Clock className="w-5 h-5 text-gray-300" />
             Recent Files
           </h1>
+
         </div>
 
         {/* Filter Tabs */}
         <div className="inline-flex p-1 rounded-xl bg-[#111116] gap-1 text-xs font-mono">
           <button
             onClick={() => setFilter('all')}
-            className={`px-3 py-1.5 rounded-lg transition-colors font-medium ${
-              filter === 'all'
-                ? 'bg-white text-black font-bold'
-                : 'text-gray-400 hover:text-white'
-            }`}
+            className={`px-3 py-1.5 rounded-lg transition-colors font-medium ${filter === 'all'
+              ? 'bg-white text-black font-bold'
+              : 'text-gray-400 hover:text-white'
+              }`}
           >
             All Activity
           </button>
           <button
             onClick={() => setFilter('today')}
-            className={`px-3 py-1.5 rounded-lg transition-colors font-medium ${
-              filter === 'today'
-                ? 'bg-white text-black font-bold'
-                : 'text-gray-400 hover:text-white'
-            }`}
+            className={`px-3 py-1.5 rounded-lg transition-colors font-medium ${filter === 'today'
+              ? 'bg-white text-black font-bold'
+              : 'text-gray-400 hover:text-white'
+              }`}
           >
             Today
           </button>
           <button
             onClick={() => setFilter('week')}
-            className={`px-3 py-1.5 rounded-lg transition-colors font-medium ${
-              filter === 'week'
-                ? 'bg-white text-black font-bold'
-                : 'text-gray-400 hover:text-white'
-            }`}
+            className={`px-3 py-1.5 rounded-lg transition-colors font-medium ${filter === 'week'
+              ? 'bg-white text-black font-bold'
+              : 'text-gray-400 hover:text-white'
+              }`}
           >
             This Week
           </button>

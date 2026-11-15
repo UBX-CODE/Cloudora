@@ -192,7 +192,7 @@ export const ChangeAvatarModal: React.FC<ChangeAvatarModalProps> = ({
       setSaving(true);
       setErrorMessage(null);
       await authService.updateProfile({ avatar: null });
-      setSuccessMessage('Avatar removed. Restored to default initial monogram.');
+      setSuccessMessage('Avatar removed.');
       setTimeout(() => {
         onSuccess();
         onClose();
@@ -220,16 +220,12 @@ export const ChangeAvatarModal: React.FC<ChangeAvatarModalProps> = ({
         {/* Header */}
         <div className="flex items-start justify-between pb-4 border-b border-white/[0.08]">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
-              <Camera className="w-5 h-5" />
-            </div>
+            
             <div>
               <h2 className="text-base font-bold text-white tracking-tight">
                 Change & Insert Profile Picture
               </h2>
-              <p className="text-xs text-gray-400 font-mono mt-0.5">
-                Upload your photo, insert an image from URL, or choose preset avatars
-              </p>
+              
             </div>
           </div>
           <button
@@ -242,7 +238,7 @@ export const ChangeAvatarModal: React.FC<ChangeAvatarModalProps> = ({
         </div>
 
         {/* Live Preview Bar */}
-        <div className="my-5 p-3.5 rounded-xl bg-[#0a0a0e] border border-white/5 flex items-center justify-between gap-4">
+        <div className="my-5 p-3.5 flex items-center justify-center gap-2">
           <div className="flex items-center gap-3.5">
             <div className="w-14 h-14 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center text-xl font-bold text-white overflow-hidden shadow-inner shrink-0 relative">
               {previewSource ? (
@@ -273,18 +269,6 @@ export const ChangeAvatarModal: React.FC<ChangeAvatarModalProps> = ({
             </div>
           </div>
 
-          {currentAvatar && (
-            <button
-              type="button"
-              onClick={handleRemoveAvatar}
-              disabled={saving}
-              className="px-3 py-1.5 rounded-xl text-xs font-semibold text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 border border-rose-500/20 transition-colors flex items-center gap-1.5 disabled:opacity-40 cursor-pointer"
-              title="Reset to default initial"
-            >
-              <Trash2 className="w-3.5 h-3.5" />
-              <span>Remove Photo</span>
-            </button>
-          )}
         </div>
 
         {/* Navigation Tabs */}
@@ -344,7 +328,7 @@ export const ChangeAvatarModal: React.FC<ChangeAvatarModalProps> = ({
               onClick={() => fileInputRef.current?.click()}
               className="border-2 border-dashed border-white/10 hover:border-white/30 rounded-2xl p-6 flex flex-col items-center justify-center gap-2.5 bg-white/[0.02] hover:bg-white/[0.04] transition-all cursor-pointer group"
             >
-              <div className="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <div className="w-12 h-12 flex items-center justify-center group-hover:scale-110 transition-transform">
                 <Upload className="w-6 h-6" />
               </div>
               <p className="text-xs font-semibold text-white">
@@ -461,7 +445,7 @@ export const ChangeAvatarModal: React.FC<ChangeAvatarModalProps> = ({
               <button
                 type="button"
                 onClick={() => setRandomSeedModifier((prev) => prev + 1)}
-                className="flex items-center gap-1 text-purple-400 hover:text-purple-300 font-mono transition-colors cursor-pointer"
+                className="flex items-center gap-1 font-mono transition-colors cursor-pointer"
               >
                 <RefreshCw className="w-3.5 h-3.5" />
                 <span>Shuffle Avatars</span>
@@ -481,7 +465,7 @@ export const ChangeAvatarModal: React.FC<ChangeAvatarModalProps> = ({
                     }}
                     className={`relative p-2 rounded-xl transition-all flex flex-col items-center justify-center cursor-pointer border ${
                       isSelected
-                        ? 'bg-purple-500/20 border-purple-400 shadow-[0_0_12px_rgba(168,85,247,0.3)] scale-105'
+                        ? 'bg-white/[0.08] border-white/[0.08]  scale-105'
                         : 'bg-[#0a0a0e] border-white/5 hover:border-white/20 hover:bg-white/5'
                     }`}
                   >
@@ -493,11 +477,7 @@ export const ChangeAvatarModal: React.FC<ChangeAvatarModalProps> = ({
                         loading="lazy"
                       />
                     </div>
-                    {isSelected && (
-                      <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-purple-500 text-white flex items-center justify-center text-[10px]">
-                        <Check className="w-2.5 h-2.5 stroke-[3]" />
-                      </div>
-                    )}
+                    
                   </button>
                 );
               })}
@@ -507,14 +487,14 @@ export const ChangeAvatarModal: React.FC<ChangeAvatarModalProps> = ({
 
         {/* Feedback Message */}
         {errorMessage && (
-          <div className="mt-4 p-3 rounded-xl bg-red-950/40 border border-red-500/30 text-red-400 text-xs flex items-center gap-2 font-mono">
+          <div className="mt-4 p-3 rounded-xl bg-white/[0.08] text-xs flex items-center gap-2 font-mono">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{errorMessage}</span>
           </div>
         )}
 
         {successMessage && (
-          <div className="mt-4 p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-emerald-400 text-xs flex items-center gap-2 font-mono">
+          <div className="mt-4 p-3 rounded-xl bg-white/[0.08] text-xs flex items-center gap-2 font-mono">
             <CheckCircle2 className="w-4 h-4 shrink-0" />
             <span>{successMessage}</span>
           </div>

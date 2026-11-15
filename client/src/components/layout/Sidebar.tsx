@@ -17,7 +17,6 @@ import { CloudoraLogo } from '../common/CloudoraLogo';
 import { useAuth } from '../../context/AuthContext';
 import { fetchStorageSummary, StorageSummaryResponse } from '../../services/file.service';
 import { formatFileSize } from '../../utils/formatters';
-import { getAvatarUrl } from '../../services/auth.service';
 
 interface SidebarProps {
   isOpen?: boolean;
@@ -72,8 +71,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
     percentage >= 90
       ? 'bg-red-500'
       : percentage >= 75
-      ? 'bg-amber-400'
-      : 'bg-white';
+        ? 'bg-amber-400'
+        : 'bg-white';
   const navItems = [
     { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { label: 'My Files', path: '/files', icon: FolderOpen },
@@ -97,9 +96,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
       )}
 
       <aside
-        className={`fixed top-0 bottom-0 left-0 z-40 w-64 bg-[#0A0A0E] border-r border-white/[0.06] flex flex-col justify-between transition-transform duration-200 ease-in-out ${
-          isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-        }`}
+        className={`fixed top-0 bottom-0 left-0 z-40 w-64 bg-[#0A0A0E] border-r border-white/[0.06] flex flex-col justify-between transition-transform duration-200 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+          }`}
       >
         <div>
           {/* Brand header */}
@@ -119,7 +117,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
             </Link>
           </div>
 
-          {/* Navigation list */}
+          {/* Navigation list (Google Drive / Cloudflare style) */}
           <div className="overflow-y-auto px-3 py-2 space-y-0.5">
             <div className="px-3 py-1.5 text-[10px] font-mono font-bold uppercase tracking-widest text-gray-500">
               Workspace
@@ -163,68 +161,37 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
           </div>
         </div>
 
-        {/* Footer: User Profile & Storage Bar */}
-        <div className="border-t border-white/[0.06] bg-[#07070A]">
-          {/* User Profile Card */}
-          {user && (
-            <Link
-              to="/settings"
-              onClick={onClose}
-              className="flex items-center gap-3 px-4 py-3 hover:bg-white/[0.04] transition-colors border-b border-white/[0.04] group cursor-pointer"
-              title="Manage Account Profile & Settings"
-            >
-              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-500 text-white flex items-center justify-center text-xs font-bold border border-white/20 overflow-hidden shrink-0 shadow-sm">
-                {getAvatarUrl(user.avatar) ? (
-                  <img
-                    src={getAvatarUrl(user.avatar)!}
-                    alt={user.name || 'User'}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  user.name?.charAt(0)?.toUpperCase() || 'U'
-                )}
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-xs font-semibold text-white truncate group-hover:text-cyan-400 transition-colors">
-                  {user.name || 'Cloudora User'}
-                </p>
-                <p className="text-[10px] text-gray-400 font-mono truncate">{user.email}</p>
-              </div>
-            </Link>
-          )}
+        {/* Storage Quota Bar (Live Reactive Telemetry) */}
+        <Link
+          to="/settings"
+          onClick={onClose}
+          className="p-4 border-t border-white/[0.06] space-y-2.5 bg-[#07070A] hover:bg-white/[0.02] transition-colors block group cursor-pointer"
+          title="Click to view detailed storage telemetry in Settings"
+        >
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-gray-400 font-medium flex items-center gap-1.5 group-hover:text-white transition-colors">
+              <HardDrive className="w-3.5 h-3.5 text-gray-300" />
+              Storage
+            </span>
+            <span className="text-gray-300 font-mono text-[11px]">
+              {formatFileSize(totalUsed)} of {formatFileSize(totalLimit)}
+            </span>
+          </div>
 
-          {/* Storage Quota Bar (Live Reactive Telemetry) */}
-          <Link
-            to="/settings"
-            onClick={onClose}
-            className="p-4 space-y-2.5 hover:bg-white/[0.02] transition-colors block group cursor-pointer"
-            title="Click to view detailed storage telemetry in Settings"
-          >
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-gray-400 font-medium flex items-center gap-1.5 group-hover:text-white transition-colors">
-                <HardDrive className="w-3.5 h-3.5 text-gray-300" />
-                Storage
-              </span>
-              <span className="text-gray-300 font-mono text-[11px]">
-                {formatFileSize(totalUsed)} of {formatFileSize(totalLimit)}
-              </span>
-            </div>
+          <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+            <div
+              className={`h-full rounded-full transition-all duration-500 ${barColor}`}
+              style={{ width: `${Math.max(percentage, totalUsed > 0 ? 1 : 0)}%` }}
+            />
+          </div>
 
-            <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
-              <div
-                className={`h-full rounded-full transition-all duration-500 ${barColor}`}
-                style={{ width: `${Math.max(percentage, totalUsed > 0 ? 1 : 0)}%` }}
-              />
-            </div>
-
-            <div className="pt-0.5 flex items-center justify-between text-[11px]">
-              <span className="text-gray-500 font-mono">{percentage}% allocated</span>
-              <span className="text-gray-400 font-mono text-[10px] font-bold">
-                {formatFileSize(totalLimit)} TIER
-              </span>
-            </div>
-          </Link>
-        </div>
+          <div className="pt-0.5 flex items-center justify-between text-[11px]">
+            <span className="text-gray-500 font-mono">{percentage}% allocated</span>
+            <span className="text-gray-400 font-mono text-[10px] font-bold">
+              {formatFileSize(totalLimit)} TIER
+            </span>
+          </div>
+        </Link>
       </aside>
     </>
   );
