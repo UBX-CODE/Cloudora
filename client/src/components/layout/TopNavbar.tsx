@@ -53,22 +53,10 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({ onToggleSidebar }) => {
   const notifications = [
     {
       id: '1',
-      title: 'Lossless audio synced',
-      description: 'Pulsar Echoes (Master 192kHz) ingested successfully',
-      time: '5m ago',
-    },
-    {
-      id: '2',
-      title: 'Collaborator added',
-      description: 'Mara Voss shared "Vinyl Pressings 2026"',
-      time: '1h ago',
-    },
-    {
-      id: '3',
-      title: 'Security check passed',
-      description: 'JWT session authenticated with Bcrypt verified hash',
-      time: '2h ago',
-    },
+      title: 'Registration',
+      description: 'Welcome to Cloudora! We are excited to have you.',
+      time: 'just now',
+    }
   ];
 
   const getInitials = (name?: string) => {
@@ -129,9 +117,7 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({ onToggleSidebar }) => {
                   <span className="text-xs font-bold uppercase tracking-wider text-white font-mono">
                     Notifications
                   </span>
-                  <span className="text-[10px] font-mono text-pix-pink bg-pix-pink/10 px-2 py-0.5 rounded-full border border-pix-pink/20">
-                    3 New
-                  </span>
+                  
                 </div>
                 <div className="divide-y divide-[#1D1B2C] max-h-72 overflow-y-auto">
                   {notifications.map((n) => (
