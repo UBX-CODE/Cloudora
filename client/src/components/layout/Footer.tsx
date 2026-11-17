@@ -27,47 +27,15 @@ export const Footer: React.FC = () => {
         </div>
 
         {/* Bottom Social Pills from Reference */}
-        <div className="pt-10 border-t border-white/10 flex flex-wrap items-center justify-between gap-6">
-          <div className="flex flex-wrap items-center gap-3">
-            <a
-              href="https://github.com"
-              target="_blank"
-              rel="noreferrer"
-              className="px-5 py-2 rounded-full border border-white/20 text-xs font-mono font-bold uppercase tracking-wider hover:border-pix-cyan hover:text-pix-cyan transition-all"
-            >
-              GITHUB
-            </a>
-            <a
-              href="#"
-              className="px-5 py-2 rounded-full border border-white/20 text-xs font-mono font-bold uppercase tracking-wider hover:border-pix-cyan hover:text-pix-cyan transition-all"
-            >
-              DOCS
-            </a>
-          </div>
-
+        <div className="pt-10 border-t border-white/10 flex flex-wrap flex-col items-center justify-between gap-6">
           {/* Centered Brand Mark */}
           <div className="font-display font-black text-2xl tracking-widest text-white">
             CLOUDORA<span className="text-pix-pink">.</span>
           </div>
-
-          <div className="flex flex-wrap items-center gap-3">
-            <a
-              href="#"
-              className="px-5 py-2 rounded-full border border-white/20 text-xs font-mono font-bold uppercase tracking-wider hover:border-pix-pink hover:text-pix-pink transition-all"
-            >
-              SECURITY
-            </a>
-            <a
-              href="#"
-              className="px-5 py-2 rounded-full border border-white/20 text-xs font-mono font-bold uppercase tracking-wider hover:border-pix-pink hover:text-pix-pink transition-all"
-            >
-              API SPECS
-            </a>
-          </div>
         </div>
 
         <p className="text-xs text-gray-500 font-mono mt-8">
-          © {new Date().getFullYear()} Cloudora Platform Inc. All rights reserved. RFC-7519 & Bcrypt compliant.
+          © {new Date().getFullYear()} Cloudora Platform Inc.
         </p>
       </div>
     </footer>

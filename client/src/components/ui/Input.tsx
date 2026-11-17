@@ -36,7 +36,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       ? 'border-[#262438] hover:border-[#3D3A58] focus:border-pix-pink focus:ring-2 focus:ring-pix-pink/25 focus:bg-[#140E1B]'
       : variant === 'purple'
       ? 'border-[#262438] hover:border-[#3D3A58] focus:border-pix-purple focus:ring-2 focus:ring-pix-purple/25 focus:bg-[#120F24]'
-      : 'border-[#262438] hover:border-[#3D3A58] focus:border-pix-cyan focus:ring-2 focus:ring-pix-cyan/25 focus:bg-[#0B1422]';
+      : 'border-[#262438] hover:border-[#3D3A58] focus:border-pix-white focus:ring-2 focus:ring-pix-cyan/25 focus:bg-[#0B1422]';
 
     const iconColor = error
       ? 'text-red-500'

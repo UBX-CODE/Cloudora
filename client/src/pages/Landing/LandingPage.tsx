@@ -423,9 +423,7 @@ export const LandingPage: React.FC = () => {
         <div className="max-w-5xl mx-auto space-y-12">
           {/* Header */}
           <div className="space-y-3">
-            <span className="text-xs font-mono text-pix-pink font-bold uppercase tracking-widest block">
-              // ARCHITECTURAL LIFECYCLE
-            </span>
+            
             <h2 className="font-display text-4xl sm:text-6xl md:text-7xl font-black uppercase tracking-tight text-white leading-none">
               HOW <span className="text-pix-cyan">CLOUDORA</span> WORKS <AsteriskFlower className="w-8 h-8 sm:w-12 sm:h-12 inline-block text-pix-pink -mt-2 ml-1" />
             </h2>
@@ -453,9 +451,6 @@ export const LandingPage: React.FC = () => {
                     </div>
 
                     <div className="flex items-center gap-4">
-                      <span className="hidden sm:inline-block text-xs text-gray-400 font-mono">
-                        {isOpen ? '[ COLLAPSE ]' : '[ INSPECT ]'}
-                      </span>
                       <div
                         className={`w-9 h-9 rounded-full flex items-center justify-center border-2 border-black transition-all ${
                           isOpen
@@ -489,9 +484,7 @@ export const LandingPage: React.FC = () => {
       <section id="security" className="bg-[#0A0910] py-24 px-4 sm:px-8 border-t border-[#1F1E2C] relative">
         <div className="max-w-7xl mx-auto space-y-16">
           <div className="space-y-4">
-            <span className="text-xs font-mono text-pix-yellow font-bold uppercase tracking-widest block">
-              // CRYPTOGRAPHIC GUARANTEES
-            </span>
+            
             <h2 className="font-display text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black uppercase tracking-tight text-white leading-[0.95]">
               STUDIO SECURITY <br />
               <span className="text-pix-yellow">HIGHLIGHTS</span>{' '}

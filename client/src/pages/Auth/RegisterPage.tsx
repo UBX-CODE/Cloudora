@@ -200,9 +200,7 @@ export const RegisterPage: React.FC = () => {
       <main className="relative z-10 flex-1 flex items-center justify-center p-4 my-6">
         <div className="w-full max-w-lg">
           <div className="rounded-3xl border-2 border-black bg-pix-surface/90 backdrop-blur-xl p-6 sm:p-8 shadow-[0_20px_60px_rgba(0,0,0,0.8)] relative overflow-hidden">
-            {/* Top decorative badge */}
-            
-
+     
             {/* Header */}
             <div className="mb-6 flex">
               <h2 className="font-display text-4xl sm:text-5xl text-white tracking-wide uppercase leading-none flex items-center gap-2">

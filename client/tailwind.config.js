@@ -24,6 +24,7 @@ export default {
           cyan: '#00D2FF',         // Cyan Highlight Text
           yellow: '#FFD13B',       // Chunky Yellow Pill Buttons & Arrows
           'yellow-hover': '#F0C226',
+          white: '#FFFFFF',
         },
       },
       boxShadow: {
