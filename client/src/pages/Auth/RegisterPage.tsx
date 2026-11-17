@@ -69,54 +69,48 @@ export const RegisterPage: React.FC = () => {
     setTermsError('');
     setError(null);
 
-    let firstErrorMsg = '';
+    let firstError = '';
 
     if (!name.trim() || name.trim().length < 2) {
       setNameError('Full name must be at least 2 characters.');
-      if (!firstErrorMsg) firstErrorMsg = 'Full name must be at least 2 characters long.';
+      if (!firstError) firstError = 'Full name must be at least 2 characters.';
       isValid = false;
     }
 
     if (!email.trim()) {
       setEmailError('Email address is required.');
-      if (!firstErrorMsg) firstErrorMsg = 'Email address is required.';
+      if (!firstError) firstError = 'Email address is required.';
       isValid = false;
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       setEmailError('Please enter a valid email address.');
-      if (!firstErrorMsg) firstErrorMsg = 'Please enter a valid email address (e.g. user@gmail.com).';
+      if (!firstError) firstError = 'Please enter a valid email address.';
       isValid = false;
     }
 
     if (!password) {
       setPasswordError('Password is required.');
-      if (!firstErrorMsg) firstErrorMsg = 'Password is required.';
+      if (!firstError) firstError = 'Password is required.';
       isValid = false;
     } else if (password.length < 8) {
       setPasswordError('Password must be at least 8 characters.');
-      if (!firstErrorMsg) firstErrorMsg = 'Password must be at least 8 characters long.';
+      if (!firstError) firstError = 'Password must be at least 8 characters.';
       isValid = false;
     }
 
     if (password !== confirmPassword) {
       setConfirmPasswordError('Passwords do not match.');
-      if (!firstErrorMsg) firstErrorMsg = 'Passwords do not match. Please re-enter your password.';
+      if (!firstError) firstError = 'Passwords do not match.';
       isValid = false;
     }
 
     if (!agreeTerms) {
       setTermsError('You must agree to the Cloudora Terms of Service.');
-      if (!firstErrorMsg) firstErrorMsg = 'Please accept the Cloudora Terms of Service to continue.';
+      if (!firstError) firstError = 'Please agree to the Terms of Service to continue.';
       isValid = false;
     }
 
-    if (!isValid && firstErrorMsg) {
-      setError(firstErrorMsg);
-      setAlertModal({
-        isOpen: true,
-        type: 'generic',
-        message: firstErrorMsg,
-        email: email.trim() || undefined,
-      });
+    if (!isValid && firstError) {
+      setError(firstError);
     }
 
     return isValid;
@@ -250,14 +244,6 @@ export const RegisterPage: React.FC = () => {
             </div>
             </div>
 
-            {/* Error Notification */}
-            {error && (
-              <div className="mb-5 p-3 rounded-xl bg-pix-pink/15 border border-pix-pink/40 text-pix-pink text-xs flex items-start gap-2.5">
-                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                <span className="leading-relaxed font-bold font-mono">{error}</span>
-              </div>
-            )}
-
             {/* Form */}
             <form noValidate onSubmit={handleSubmit} className="space-y-4">
               <Input
@@ -362,11 +348,11 @@ export const RegisterPage: React.FC = () => {
                 )}
               </div>
 
-              {/* Prominent Action Error Notification right above Submit Button */}
+              {/* Clean Minimal Error Notification right above Submit Button */}
               {error && (
-                <div className="p-3 rounded-xl bg-pix-pink/15 border-2 border-pix-pink/60 text-pix-pink text-xs flex items-start gap-2.5 shadow-[0_0_20px_rgba(255,94,151,0.2)]">
-                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                  <span className="leading-relaxed font-bold font-mono">{error}</span>
+                <div className="p-3 rounded-xl bg-white/[0.04] border border-white/[0.12] text-gray-200 text-xs flex items-start gap-2.5">
+                  <AlertCircle className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
+                  <span className="leading-relaxed font-sans">{error}</span>
                 </div>
               )}
 
@@ -392,23 +378,6 @@ export const RegisterPage: React.FC = () => {
           </div>
         </div>
       </main>
-
-      {/* Floating Top Alert Banner */}
-      {error && (
-        <div className="fixed top-5 left-1/2 -translate-x-1/2 z-[99998] max-w-md w-[92%] p-3.5 rounded-2xl bg-[#140E1B] border-2 border-pix-pink text-white shadow-[0_15px_50px_rgba(255,94,151,0.4)] flex items-center justify-between gap-3 animate-in fade-in">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <AlertCircle className="w-5 h-5 text-pix-pink shrink-0" />
-            <span className="text-xs font-mono font-semibold text-gray-200 truncate">{error}</span>
-          </div>
-          <button
-            type="button"
-            onClick={() => setError(null)}
-            className="text-gray-400 hover:text-white p-1 rounded-lg hover:bg-white/10 shrink-0 text-sm leading-none"
-          >
-            ✕
-          </button>
-        </div>
-      )}
 
       {/* Classy Minimal Auth Feedback Modal */}
       <AuthAlertModal

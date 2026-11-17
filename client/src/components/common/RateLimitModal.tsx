@@ -90,7 +90,7 @@ export const RateLimitModal: React.FC = () => {
 
         {/* Clean Header */}
         <div className="flex items-start gap-3.5 pr-6">
-          <div className="w-10 h-10 rounded-xl bg-white/[0.05] border border-white/[0.08] flex items-center justify-center text-gray-300 shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-white/[0.05]  flex items-center justify-center text-gray-300 shrink-0">
             <Clock className="w-5 h-5 text-gray-300" />
           </div>
           <div className="space-y-1">

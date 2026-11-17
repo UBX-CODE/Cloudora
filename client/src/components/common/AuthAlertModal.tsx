@@ -1,9 +1,14 @@
 import React, { useEffect } from 'react';
-import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
-import { X, UserX, UserCheck, AlertCircle, ArrowRight, ShieldAlert, KeyRound } from 'lucide-react';
+import { X, UserCheck, UserX, KeyRound, AlertCircle, ArrowRight } from 'lucide-react';
 
-export type AuthAlertType = 'email-not-found' | 'email-already-exists' | 'invalid-password' | 'rate-limit' | 'generic';
+export type AuthAlertType =
+  | 'email-not-found'
+  | 'email-already-exists'
+  | 'invalid-password'
+  | 'rate-limit'
+  | 'validation'
+  | 'generic';
 
 interface AuthAlertModalProps {
   isOpen: boolean;
@@ -38,63 +43,61 @@ export const AuthAlertModal: React.FC<AuthAlertModalProps> = ({
 
   if (!isOpen) return null;
 
-  // Configuration according to alert type
   let title = 'Authentication Notice';
   let description = message || 'An error occurred while verifying your credentials.';
-  let icon = <AlertCircle className="w-5 h-5 text-rose-400" />;
-  let iconBg = 'bg-rose-500/10 border-rose-500/20 text-rose-400';
+  let icon = <AlertCircle className="w-5 h-5 text-gray-300" />;
   let primaryButtonText: string | null = null;
   let primaryButtonAction: (() => void) | null = null;
 
-  let cardBorder = 'border-white/20 shadow-[0_25px_80px_rgba(0,0,0,0.95)]';
-
-  if (type === 'email-not-found') {
-    title = 'Email Not Registered';
-    description = message || `No account is registered with ${email ? `"${email}"` : 'this email address'}. Please check for typos or create a new account.`;
-    icon = <UserX className="w-5 h-5 text-amber-400" />;
-    iconBg = 'bg-amber-400/10 border-amber-400/25 text-amber-400 shadow-[0_0_15px_rgba(251,191,36,0.15)]';
-    cardBorder = 'border-amber-500/40 shadow-[0_20px_70px_rgba(251,191,36,0.2)]';
+  if (type === 'email-already-exists') {
+    title = 'Account Already Exists';
+    description =
+      message ||
+      `An account with ${email ? `"${email}"` : 'this email address'} is already registered. Would you like to sign in instead?`;
+    icon = <UserCheck className="w-5 h-5 text-gray-300" />;
+    primaryButtonText = 'Sign In Instead';
+    primaryButtonAction = () => {
+      onClose();
+      navigate(email ? `/login?email=${encodeURIComponent(email)}` : '/login');
+    };
+  } else if (type === 'email-not-found') {
+    title = 'Account Not Found';
+    description =
+      message ||
+      `No account was found with ${email ? `"${email}"` : 'this email address'}. Please check for typos or create a new account.`;
+    icon = <UserX className="w-5 h-5 text-gray-300" />;
     primaryButtonText = 'Create an Account';
     primaryButtonAction = () => {
       onClose();
       navigate(email ? `/register?email=${encodeURIComponent(email)}` : '/register');
     };
-  } else if (type === 'email-already-exists') {
-    title = 'Account Already Exists';
-    description = message || `An account with ${email ? `"${email}"` : 'this email address'} is already registered. Please sign in instead.`;
-    icon = <UserCheck className="w-5 h-5 text-pix-pink" />;
-    iconBg = 'bg-pix-pink/10 border-pix-pink/25 text-pix-pink shadow-[0_0_15px_rgba(244,63,94,0.15)]';
-    cardBorder = 'border-pix-pink/40 shadow-[0_20px_70px_rgba(255,94,151,0.2)]';
-    primaryButtonText = 'Sign In to Account';
-    primaryButtonAction = () => {
-      onClose();
-      navigate(email ? `/login?email=${encodeURIComponent(email)}` : '/login');
-    };
   } else if (type === 'invalid-password') {
     title = 'Incorrect Password';
-    description = message || 'The password you entered does not match our records. Please verify your credentials and try again.';
-    icon = <KeyRound className="w-5 h-5 text-rose-400" />;
-    iconBg = 'bg-rose-500/10 border-rose-500/25 text-rose-400 shadow-[0_0_15px_rgba(244,63,94,0.15)]';
-    cardBorder = 'border-rose-500/40 shadow-[0_20px_70px_rgba(244,63,94,0.2)]';
+    description =
+      message || 'The password you entered is incorrect. Please check your credentials and try again.';
+    icon = <KeyRound className="w-5 h-5 text-gray-300" />;
   } else if (type === 'rate-limit') {
-    title = 'Security Cooldown';
-    description = message || 'Too many attempts. For your account security, please wait a moment before trying again.';
-    icon = <ShieldAlert className="w-5 h-5 text-amber-400" />;
-    iconBg = 'bg-amber-400/10 border-amber-400/25 text-amber-400';
-    cardBorder = 'border-amber-500/40 shadow-[0_20px_70px_rgba(251,191,36,0.2)]';
+    title = 'Rate Limit Exceeded';
+    description =
+      message || 'Too many attempts. For account security, please wait a moment before trying again.';
+    icon = <AlertCircle className="w-5 h-5 text-gray-300" />;
+  } else if (type === 'validation') {
+    title = 'Incomplete Information';
+    description = message || 'Please check the required fields and try again.';
+    icon = <AlertCircle className="w-5 h-5 text-gray-300" />;
   }
 
-  const modalElement = (
+  return (
     <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4">
-      {/* Sleek Backdrop */}
+      {/* Subtle Dark Backdrop */}
       <div
-        className="fixed inset-0 bg-black/85 backdrop-blur-md transition-opacity animate-in fade-in duration-150"
+        className="fixed inset-0 bg-black/75 backdrop-blur-sm transition-opacity"
         onClick={onClose}
       />
 
-      {/* Classy Minimal Dialog Card */}
+      {/* Clean Minimalist Dialog Card */}
       <div
-        className={`relative w-full max-w-sm rounded-2xl bg-[#0C0B12] border-2 p-6 text-white z-10 space-y-4 ${cardBorder}`}
+        className="relative w-full max-w-sm rounded-2xl bg-[#0D0D12] border border-white/[0.12] shadow-2xl p-6 text-white z-10 space-y-5"
         role="alertdialog"
         aria-modal="true"
       >
@@ -102,19 +105,19 @@ export const AuthAlertModal: React.FC<AuthAlertModalProps> = ({
         <button
           onClick={onClose}
           type="button"
-          className="absolute top-4 right-4 p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/[0.08] transition-colors focus:outline-none"
+          className="absolute top-4 right-4 p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/[0.06] transition-colors focus:outline-none cursor-pointer"
           aria-label="Close"
         >
           <X className="w-4 h-4" />
         </button>
 
-        {/* Header with Icon and Title */}
+        {/* Clean Header */}
         <div className="flex items-start gap-3.5 pr-6">
-          <div className={`w-10 h-10 rounded-xl border flex items-center justify-center shrink-0 ${iconBg}`}>
+          <div className="w-10 h-10 rounded-xl bg-white/[0.05] border border-white/[0.08] flex items-center justify-center text-gray-300 shrink-0">
             {icon}
           </div>
           <div className="space-y-1 min-w-0">
-            <h3 className="text-base font-semibold tracking-tight text-white leading-snug">
+            <h3 className="text-base font-semibold text-white tracking-tight leading-snug">
               {title}
             </h3>
             {email && (
@@ -125,7 +128,7 @@ export const AuthAlertModal: React.FC<AuthAlertModalProps> = ({
           </div>
         </div>
 
-        {/* Description */}
+        {/* Description Box */}
         <div className="rounded-xl bg-white/[0.03] border border-white/[0.06] p-3 text-xs text-gray-300 leading-relaxed font-sans">
           {description}
         </div>
@@ -152,12 +155,10 @@ export const AuthAlertModal: React.FC<AuthAlertModalProps> = ({
                 : 'bg-white text-black font-semibold hover:bg-gray-200'
             }`}
           >
-            {primaryButtonText ? 'Dismiss' : 'Got it, try again'}
+            {primaryButtonText ? 'Dismiss' : 'Got it'}
           </button>
         </div>
       </div>
     </div>
   );
-
-  return typeof document !== 'undefined' ? createPortal(modalElement, document.body) : null;
 };
