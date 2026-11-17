@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
-import { Lock, Mail, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Lock, Mail, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { CloudoraLogo } from '../../components/common/CloudoraLogo';
 import { WireframeGlobe, CapsuleLozengeRow } from '../../components/common/PixGraphics';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { Modal } from '../../components/ui/Modal';
-import { AuthAlertModal, AuthAlertType } from '../../components/common/AuthAlertModal';
 
 export const LoginPage: React.FC = () => {
   const { login } = useAuth();
@@ -24,19 +23,8 @@ export const LoginPage: React.FC = () => {
   const [forgotEmail, setForgotEmail] = useState('');
   const [forgotSent, setForgotSent] = useState(false);
 
-  const [emailError, setEmailError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
-
-  // Classy minimal alert popup state
-  const [alertModal, setAlertModal] = useState<{
-    isOpen: boolean;
-    type: AuthAlertType;
-    message?: string;
-    email?: string;
-  }>({
-    isOpen: false,
-    type: 'generic',
-  });
+  const [emailError, setEmailError] = useState<React.ReactNode>('');
+  const [passwordError, setPasswordError] = useState<React.ReactNode>('');
 
   // Pre-fill email from URL query if user was redirected from RegisterPage
   useEffect(() => {
@@ -52,32 +40,17 @@ export const LoginPage: React.FC = () => {
     setPasswordError('');
     setError(null);
 
-    let firstErrorMsg = '';
-
     if (!email.trim()) {
       setEmailError('Email address is required.');
-      if (!firstErrorMsg) firstErrorMsg = 'Email address is required.';
       isValid = false;
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       setEmailError('Please enter a valid email address.');
-      if (!firstErrorMsg) firstErrorMsg = 'Please enter a valid email address (e.g. user@gmail.com).';
       isValid = false;
     }
 
     if (!password) {
       setPasswordError('Password is required.');
-      if (!firstErrorMsg) firstErrorMsg = 'Password is required.';
       isValid = false;
-    }
-
-    if (!isValid && firstErrorMsg) {
-      setError(firstErrorMsg);
-      setAlertModal({
-        isOpen: true,
-        type: 'generic',
-        message: firstErrorMsg,
-        email: email.trim() || undefined,
-      });
     }
 
     return isValid;
@@ -99,7 +72,6 @@ export const LoginPage: React.FC = () => {
       const message =
         err.response?.data?.message || err.message || 'Login failed. Please check your credentials.';
       console.warn('[Login Error]', { status, message });
-      setError(message);
 
       const lowerMsg = message.toLowerCase();
       if (
@@ -109,37 +81,27 @@ export const LoginPage: React.FC = () => {
         lowerMsg.includes('not register') ||
         lowerMsg.includes('user not found')
       ) {
-        setAlertModal({
-          isOpen: true,
-          type: 'email-not-found',
-          message: 'No account found with this email address. Please create a new account or check for typos.',
-          email: email.trim(),
-        });
+        setEmailError(
+          <span>
+            No account found with this email.{' '}
+            <Link
+              to={`/register?email=${encodeURIComponent(email.trim())}`}
+              className="text-white underline font-semibold hover:text-pix-yellow"
+            >
+              Create an account
+            </Link>
+          </span>
+        );
       } else if (
         status === 401 ||
         lowerMsg.includes('password') ||
         lowerMsg.includes('invalid credentials')
       ) {
-        setAlertModal({
-          isOpen: true,
-          type: 'invalid-password',
-          message: 'The password you entered does not match. Please verify your credentials and try again.',
-          email: email.trim(),
-        });
+        setPasswordError('Incorrect password. Please try again.');
       } else if (status === 429) {
-        setAlertModal({
-          isOpen: true,
-          type: 'rate-limit',
-          message,
-          email: email.trim(),
-        });
+        // Handled globally by RateLimitModal
       } else {
-        setAlertModal({
-          isOpen: true,
-          type: 'generic',
-          message,
-          email: email.trim(),
-        });
+        setError(message);
       }
     } finally {
       setIsLoading(false);
@@ -246,8 +208,6 @@ export const LoginPage: React.FC = () => {
                   if (error) setError(null);
                 }}
                 error={emailError}
-                variant="cyan"
-                required
                 autoComplete="email"
               />
 
@@ -263,42 +223,15 @@ export const LoginPage: React.FC = () => {
                     if (error) setError(null);
                   }}
                   error={passwordError}
-                  variant="cyan"
-                  required
                   autoComplete="current-password"
                 />
 
-                <div className="flex items-center justify-between mt-2.5 text-xs font-mono">
-                  <label className="flex items-center gap-2 cursor-pointer select-none text-gray-400 hover:text-white transition-colors">
-                    <input
-                      type="checkbox"
-                      checked={rememberMe}
-                      onChange={(e) => setRememberMe(e.target.checked)}
-                      className="rounded border border-[#262438] bg-[#0E0D17] text-pix-cyan focus:ring-0 focus:outline-none h-3.5 w-3.5 accent-pix-cyan"
-                    />
-                    <span>Remember device</span>
-                  </label>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setForgotEmail(email);
-                      setForgotSent(false);
-                      setIsForgotModalOpen(true);
-                    }}
-                    className="text-pix-cyan hover:underline font-bold focus:outline-none"
-                  >
-                    Forgot password?
-                  </button>
-                </div>
+                
               </div>
 
-              {/* Clean Minimal Error Notification right above Submit Button */}
+              {/* Clean Attention Remark right above Submit Button */}
               {error && (
-                <div className="p-3 rounded-xl bg-white/[0.04] border border-white/[0.12] text-gray-200 text-xs flex items-start gap-2.5">
-                  <AlertCircle className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
-                  <span className="leading-relaxed font-sans">{error}</span>
-                </div>
+                <p className="text-xs text-red-500 font-sans mt-2 text-center">{error}</p>
               )}
 
               <div className="pt-2">
@@ -373,15 +306,6 @@ export const LoginPage: React.FC = () => {
           </form>
         )}
       </Modal>
-
-      {/* Classy Minimal Auth Feedback Modal */}
-      <AuthAlertModal
-        isOpen={alertModal.isOpen}
-        onClose={() => setAlertModal((prev) => ({ ...prev, isOpen: false }))}
-        type={alertModal.type}
-        message={alertModal.message}
-        email={alertModal.email}
-      />
     </div>
   );
 };

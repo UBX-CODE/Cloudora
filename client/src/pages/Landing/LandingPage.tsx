@@ -475,26 +475,7 @@ export const LandingPage: React.FC = () => {
                         {item.details}
                       </p>
 
-                      {/* Architecture Sketches preview when item 1 is open */}
-                      {item.showSketches && (
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
-                          <div className="p-4 rounded-2xl bg-[#13121D] border border-pix-cyan/40 space-y-2">
-                            <span className="text-[10px] font-mono text-pix-cyan font-bold">[ 01. REGISTRATION ]</span>
-                            <p className="text-xs text-white">POST /api/auth/register</p>
-                            <p className="text-[11px] font-mono text-gray-400">bcrypt.hash(password, 10)</p>
-                          </div>
-                          <div className="p-4 rounded-2xl bg-[#13121D] border border-pix-pink/40 space-y-2">
-                            <span className="text-[10px] font-mono text-pix-pink font-bold">[ 02. TOKEN DISPATCH ]</span>
-                            <p className="text-xs text-white">jwt.sign({'{'} id, email, role {'}'})</p>
-                            <p className="text-[11px] font-mono text-gray-400">Bearer eyJhbGciOi...</p>
-                          </div>
-                          <div className="p-4 rounded-2xl bg-[#13121D] border border-pix-yellow/40 space-y-2">
-                            <span className="text-[10px] font-mono text-pix-yellow font-bold">[ 03. BOUNDARY CHECK ]</span>
-                            <p className="text-xs text-white">GET /api/auth/me</p>
-                            <p className="text-[11px] font-mono text-gray-400">req.user.id isolation</p>
-                          </div>
-                        </div>
-                      )}
+                      
                     </div>
                   )}
                 </div>

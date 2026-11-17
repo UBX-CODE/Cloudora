@@ -1,11 +1,9 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { User, Mail, Lock, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { CloudoraLogo } from '../../components/common/CloudoraLogo';
 import { AsteriskFlower, CapsuleLozengeRow } from '../../components/common/PixGraphics';
 import { Input } from '../../components/ui/Input';
-import { AuthAlertModal, AuthAlertType } from '../../components/common/AuthAlertModal';
 
 export const RegisterPage: React.FC = () => {
   const { register } = useAuth();
@@ -21,22 +19,11 @@ export const RegisterPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const [nameError, setNameError] = useState('');
-  const [emailError, setEmailError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
-  const [confirmPasswordError, setConfirmPasswordError] = useState('');
-  const [termsError, setTermsError] = useState('');
-
-  // Classy minimal alert popup state
-  const [alertModal, setAlertModal] = useState<{
-    isOpen: boolean;
-    type: AuthAlertType;
-    message?: string;
-    email?: string;
-  }>({
-    isOpen: false,
-    type: 'generic',
-  });
+  const [nameError, setNameError] = useState<React.ReactNode>('');
+  const [emailError, setEmailError] = useState<React.ReactNode>('');
+  const [passwordError, setPasswordError] = useState<React.ReactNode>('');
+  const [confirmPasswordError, setConfirmPasswordError] = useState<React.ReactNode>('');
+  const [termsError, setTermsError] = useState<React.ReactNode>('');
 
   // Pre-fill email from URL query if user was redirected from LoginPage
   useEffect(() => {
@@ -69,48 +56,35 @@ export const RegisterPage: React.FC = () => {
     setTermsError('');
     setError(null);
 
-    let firstError = '';
-
     if (!name.trim() || name.trim().length < 2) {
       setNameError('Full name must be at least 2 characters.');
-      if (!firstError) firstError = 'Full name must be at least 2 characters.';
       isValid = false;
     }
 
     if (!email.trim()) {
       setEmailError('Email address is required.');
-      if (!firstError) firstError = 'Email address is required.';
       isValid = false;
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       setEmailError('Please enter a valid email address.');
-      if (!firstError) firstError = 'Please enter a valid email address.';
       isValid = false;
     }
 
     if (!password) {
       setPasswordError('Password is required.');
-      if (!firstError) firstError = 'Password is required.';
       isValid = false;
     } else if (password.length < 8) {
       setPasswordError('Password must be at least 8 characters.');
-      if (!firstError) firstError = 'Password must be at least 8 characters.';
       isValid = false;
     }
 
     if (password !== confirmPassword) {
-      setConfirmPasswordError('Passwords do not match.');
-      if (!firstError) firstError = 'Passwords do not match.';
+      setConfirmPasswordError("Passwords don't match");
       isValid = false;
     }
 
     if (!agreeTerms) {
       setTermsError('You must agree to the Cloudora Terms of Service.');
-      if (!firstError) firstError = 'Please agree to the Terms of Service to continue.';
       isValid = false;
-    }
-
-    if (!isValid && firstError) {
-      setError(firstError);
     }
 
     return isValid;
@@ -131,7 +105,6 @@ export const RegisterPage: React.FC = () => {
       const message =
         err.response?.data?.message || err.message || 'Registration failed. Please try again.';
       console.warn('[Register Error]', { status, message });
-      setError(message);
 
       const lowerMsg = message.toLowerCase();
       if (
@@ -141,26 +114,21 @@ export const RegisterPage: React.FC = () => {
         lowerMsg.includes('already register') ||
         lowerMsg.includes('duplicate')
       ) {
-        setAlertModal({
-          isOpen: true,
-          type: 'email-already-exists',
-          message: 'An account with this email address is already registered. Would you like to sign in instead?',
-          email: email.trim(),
-        });
+        setEmailError(
+          <span>
+            This email is already registered.{' '}
+            <Link
+              to={`/login?email=${encodeURIComponent(email.trim())}`}
+              className="text-white underline font-semibold hover:text-pix-yellow"
+            >
+              Sign in instead
+            </Link>
+          </span>
+        );
       } else if (status === 429) {
-        setAlertModal({
-          isOpen: true,
-          type: 'rate-limit',
-          message,
-          email: email.trim(),
-        });
+        // Handled globally by RateLimitModal
       } else {
-        setAlertModal({
-          isOpen: true,
-          type: 'generic',
-          message,
-          email: email.trim(),
-        });
+        setError(message);
       }
     } finally {
       setIsLoading(false);
@@ -256,8 +224,6 @@ export const RegisterPage: React.FC = () => {
                   if (error) setError(null);
                 }}
                 error={nameError}
-                variant="pink"
-                required
                 autoComplete="name"
               />
 
@@ -271,8 +237,6 @@ export const RegisterPage: React.FC = () => {
                   if (error) setError(null);
                 }}
                 error={emailError}
-                variant="pink"
-                required
                 autoComplete="email"
               />
 
@@ -288,8 +252,6 @@ export const RegisterPage: React.FC = () => {
                     if (error) setError(null);
                   }}
                   error={passwordError}
-                  variant="pink"
-                  required
                   autoComplete="new-password"
                 />
 
@@ -319,8 +281,6 @@ export const RegisterPage: React.FC = () => {
                   if (error) setError(null);
                 }}
                 error={confirmPasswordError}
-                variant="pink"
-                required
                 autoComplete="new-password"
               />
 
@@ -332,28 +292,25 @@ export const RegisterPage: React.FC = () => {
                     checked={agreeTerms}
                     onChange={(e) => {
                       setAgreeTerms(e.target.checked);
-                      if (e.target.checked) setTermsError('');
+                      if (termsError) setTermsError('');
                       if (error) setError(null);
                     }}
                     className="mt-0.5 rounded border border-[#262438] bg-[#0E0D17] text-pix-pink focus:ring-0 focus:outline-none h-4 w-4 shrink-0 accent-pix-pink"
                   />
                   <span>
                     I accept the{' '}
-                    <span className="text-pix-pink underline font-bold">Cloudora Terms of Service</span>{' '}
+                    <span className="text-gray-300 underline font-medium">Cloudora Terms of Service</span>{' '}
                     and Privacy Protocol.
                   </span>
                 </label>
                 {termsError && (
-                  <p className="text-xs text-pix-pink mt-1 font-mono">⚠ {termsError}</p>
+                  <p className="text-xs text-red-500 font-sans mt-1 leading-tight">{termsError}</p>
                 )}
               </div>
 
-              {/* Clean Minimal Error Notification right above Submit Button */}
+              {/* Clean Attention Remark right above Submit Button */}
               {error && (
-                <div className="p-3 rounded-xl bg-white/[0.04] border border-white/[0.12] text-gray-200 text-xs flex items-start gap-2.5">
-                  <AlertCircle className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
-                  <span className="leading-relaxed font-sans">{error}</span>
-                </div>
+                <p className="text-xs text-red-500 font-sans mt-2 text-center">{error}</p>
               )}
 
               {/* Submit Button */}
@@ -378,15 +335,6 @@ export const RegisterPage: React.FC = () => {
           </div>
         </div>
       </main>
-
-      {/* Classy Minimal Auth Feedback Modal */}
-      <AuthAlertModal
-        isOpen={alertModal.isOpen}
-        onClose={() => setAlertModal((prev) => ({ ...prev, isOpen: false }))}
-        type={alertModal.type}
-        message={alertModal.message}
-        email={alertModal.email}
-      />
     </div>
   );
 };

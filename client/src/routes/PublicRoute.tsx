@@ -8,9 +8,9 @@ export const PublicRoute: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-parchment-200 dark:bg-espresso-950 flex flex-col items-center justify-center p-4">
-        <Loader2 className="w-8 h-8 text-terracotta-500 animate-spin mb-3" />
-        <span className="text-xs font-mono text-espresso-600 dark:text-parchment-400">[ INITIALIZING ARCHIVE ]</span>
+      <div className="min-h-screen bg-[#08080C] text-white flex flex-col items-center justify-center p-4">
+        <Loader2 className="w-7 h-7 text-white/50 animate-spin mb-3" />
+        <span className="text-xs font-mono text-gray-400">[ INITIALIZING CLOUDORA ]</span>
       </div>
     );
   }

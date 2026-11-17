@@ -31,38 +31,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const login = async (email: string, password: string): Promise<void> => {
-    setIsLoading(true);
-    try {
-      const data = await authService.login(email, password);
-      localStorage.setItem('cloudora_token', data.token);
-      setToken(data.token);
-      setUser(data.user);
-    } finally {
-      setIsLoading(false);
-    }
+    const data = await authService.login(email, password);
+    localStorage.setItem('cloudora_token', data.token);
+    setToken(data.token);
+    setUser(data.user);
   };
 
   const register = async (name: string, email: string, password: string): Promise<void> => {
-    setIsLoading(true);
-    try {
-      const data = await authService.register(name, email, password);
-      localStorage.setItem('cloudora_token', data.token);
-      setToken(data.token);
-      setUser(data.user);
-    } finally {
-      setIsLoading(false);
-    }
+    const data = await authService.register(name, email, password);
+    localStorage.setItem('cloudora_token', data.token);
+    setToken(data.token);
+    setUser(data.user);
   };
 
   const logout = async (): Promise<void> => {
-    setIsLoading(true);
     try {
       await authService.logout();
     } finally {
       localStorage.removeItem('cloudora_token');
       setToken(null);
       setUser(null);
-      setIsLoading(false);
     }
   };
 

@@ -3,7 +3,7 @@ import { Eye, EyeOff } from 'lucide-react';
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
-  error?: string;
+  error?: React.ReactNode;
   helperText?: string;
   leftIcon?: React.ReactNode;
   isPassword?: boolean;
@@ -31,7 +31,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 
     // Focused variant color styling without harsh white borders
     const variantFocusClass = error
-      ? 'border-pix-pink focus:border-pix-pink focus:ring-2 focus:ring-pix-pink/25 focus:bg-[#160E18]'
+      ? 'border-red-500/80 focus:border-red-500 focus:ring-1 focus:ring-red-500/25 focus:bg-[#160E18]'
       : variant === 'pink'
       ? 'border-[#262438] hover:border-[#3D3A58] focus:border-pix-pink focus:ring-2 focus:ring-pix-pink/25 focus:bg-[#140E1B]'
       : variant === 'purple'
@@ -39,7 +39,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       : 'border-[#262438] hover:border-[#3D3A58] focus:border-pix-cyan focus:ring-2 focus:ring-pix-cyan/25 focus:bg-[#0B1422]';
 
     const iconColor = error
-      ? 'text-pix-pink'
+      ? 'text-red-500'
       : variant === 'pink'
       ? 'text-pix-pink'
       : variant === 'purple'
@@ -91,7 +91,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           )}
         </div>
 
-        {error && <p className="text-xs text-pix-pink font-medium flex items-center gap-1 font-mono">⚠ {error}</p>}
+        {error && <p className="text-xs text-red-500 font-sans mt-1 leading-tight">{error}</p>}
         {!error && helperText && <p className="text-xs text-gray-400 font-mono">{helperText}</p>}
       </div>
     );

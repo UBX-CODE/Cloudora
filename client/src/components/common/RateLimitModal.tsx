@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Clock, X } from 'lucide-react';
 
 interface RateLimitEventDetail {
@@ -65,7 +66,7 @@ export const RateLimitModal: React.FC = () => {
     Math.max(0, ((initialRetryAfter - retryAfter) / initialRetryAfter) * 100)
   );
 
-  return (
+  const modalElement = (
     <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4">
       {/* Subtle Backdrop */}
       <div
@@ -90,7 +91,7 @@ export const RateLimitModal: React.FC = () => {
 
         {/* Clean Header */}
         <div className="flex items-start gap-3.5 pr-6">
-          <div className="w-10 h-10 rounded-xl bg-white/[0.05]  flex items-center justify-center text-gray-300 shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-white/[0.05] border border-white/[0.08] flex items-center justify-center text-gray-300 shrink-0">
             <Clock className="w-5 h-5 text-gray-300" />
           </div>
           <div className="space-y-1">
@@ -131,4 +132,6 @@ export const RateLimitModal: React.FC = () => {
       </div>
     </div>
   );
+
+  return typeof document !== 'undefined' ? createPortal(modalElement, document.body) : null;
 };
