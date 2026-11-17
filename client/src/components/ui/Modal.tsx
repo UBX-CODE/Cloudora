@@ -53,7 +53,7 @@ export const Modal: React.FC<ModalProps> = ({
 
       {/* Modal Dialog with Pixetivity Dark Frame and Cyan Accent */}
       <div
-        className={`relative w-full ${maxWidthStyles[maxWidth]} rounded-3xl bg-pix-surface border-2 border-pix-purple/60 shadow-[0_16px_50px_rgba(80,51,225,0.25)] p-6 sm:p-8 text-white z-10 animate-in fade-in zoom-in-95 duration-150`}
+        className={`relative w-full ${maxWidthStyles[maxWidth]} rounded-3xl bg-pix-surface p-6 sm:p-8 text-white z-10 animate-in fade-in zoom-in-95 duration-150`}
         role="dialog"
         aria-modal="true"
       >

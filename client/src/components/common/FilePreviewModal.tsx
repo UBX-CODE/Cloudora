@@ -60,16 +60,15 @@ export const FilePreviewModal: React.FC<FilePreviewModalProps> = ({ file, isOpen
       isOpen={isOpen}
       onClose={onClose}
       title={file.name}
-      description={`Category: ${file.category.toUpperCase()} • ${formatFileSize(file.size)} • Modified ${formatRelativeTime(file.updatedAt)}`}
+      description={`Modified ${formatRelativeTime(file.updatedAt)}`}
       maxWidth="4xl"
     >
       <div className="space-y-4 pt-2">
         {/* Preview Container */}
-        <div className="w-full min-h-[260px] max-h-[70vh] flex items-center justify-center rounded-2xl bg-[#09090c] border border-white/10 overflow-hidden relative p-2">
+        <div className="w-full min-h-[260px] max-h-[70vh] flex items-center justify-center rounded-2xl bg-[#09090c]  overflow-hidden relative p-2">
           {loading && (
             <div className="flex flex-col items-center justify-center gap-3 py-16 text-gray-400">
               <Loader2 className="w-8 h-8 animate-spin text-white" />
-              <span className="text-xs font-mono">Generating secure streaming URL...</span>
             </div>
           )}
 
@@ -152,9 +151,6 @@ export const FilePreviewModal: React.FC<FilePreviewModalProps> = ({ file, isOpen
 
         {/* Footer controls */}
         <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
-          <span className="text-[11px] text-gray-500 font-mono">
-            [ S3 PRESIGNED STREAMING • 15 MIN EXPIRY ]
-          </span>
 
           <div className="flex items-center gap-2">
             <button
